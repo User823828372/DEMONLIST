@@ -240,7 +240,7 @@
   margin: 0 0 6px 0;
   color: #eee;
   font-family: 'Montserrat', sans-serif;
-  font-weight: 600; /* SemiBold */
+  font-weight: 600;
 }
 
     .level-author,
@@ -443,7 +443,7 @@
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
       background: linear-gradient(to right, #8a2387, #e94057, #f27121);
 background-clip: text;
--webkit-background-clip: text; /* Для старых версий Safari и Chrome */
+-webkit-background-clip: text; 
       -webkit-text-fill-color: transparent;
     }
 
@@ -496,7 +496,6 @@ background-clip: text;
   transform: translateY(-2px);
 }
 
-/* Новые стили для модального окна рулетки */
 .roulette-modal-content {
     max-width: 500px;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -619,7 +618,7 @@ background-clip: text;
     display: flex;
     gap: 15px;
     justify-content: space-between;
-    margin-bottom: 25px; /* Добавлено 8px отступа сверху */
+    margin-bottom: 25px;
 }
 
 .roulette-ranges-container .roulette-setting-group {
@@ -645,8 +644,8 @@ background-clip: text;
 }
 
 .roulette-range-input input {
-    width: calc(100% - 30px); /* Уменьшаем ширину с учетом padding */
-    max-width: 120px; /* Фиксированная максимальная ширина */
+    width: calc(100% - 30px);
+    max-width: 120px;
     padding: 10px 15px;
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -654,16 +653,14 @@ background-clip: text;
     color: #fff;
     font-size: 1em;
     transition: all 0.3s ease;
-    box-sizing: border-box; /* Учитываем padding в общей ширине */
+    box-sizing: border-box; 
 }
 
-/* Убираем стрелки у числовых полей ввода */
 .no-spinners {
-    -moz-appearance: textfield; /* Firefox */
-    appearance: textfield; /* Стандартное свойство для современных браузеров */
+    -moz-appearance: textfield;
+    appearance: textfield; 
 }
 
-/* Убираем стрелки для WebKit/Blink браузеров (Chrome, Safari, Edge) */
 .no-spinners::-webkit-outer-spin-button,
 .no-spinners::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -720,8 +717,8 @@ background-clip: text;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 10px;
-    text-transform: none; /* Убрано uppercase */
-    letter-spacing: normal; /* Нормальный интервал */
+    text-transform: none; 
+    letter-spacing: normal; 
     box-shadow: 0 4px 15px rgba(226, 67, 93, 0.4);
 }
 
@@ -832,7 +829,7 @@ background-clip: text;
       color: #fff;
       background: linear-gradient(to right, #8a2387, #e94057, #f27121);
 background-clip: text;
--webkit-background-clip: text; /* Для старых версий Safari и Chrome */
+-webkit-background-clip: text; 
       -webkit-text-fill-color: transparent;
     }
 
