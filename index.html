@@ -148,36 +148,49 @@
       color: rgba(255, 255, 255, 0.6);
     }
 
-    .roulette-btn {
-      background: linear-gradient(135deg, #8a2387, #e94057, #f27121);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 12px 25px;
-      font-size: 1em;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-left: 30px;
-      box-shadow: 0 4px 15px rgba(226, 67, 93, 0.3);
-    }
+.roulette-btn {
+  background: linear-gradient(135deg, #8a2387, #e94057, #f27121);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 30px;
+  box-shadow: 0 4px 15px rgba(226, 67, 93, 0.3);
+  position: relative;
+  overflow: hidden;
+}
 
-    .roulette-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(226, 67, 93, 0.5);
-    }
+.roulette-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: all 0.5s ease;
+}
 
-    .roulette-btn:active {
-      transform: translateY(0);
-    }
+.roulette-btn:hover::before {
+  left: 100%;
+}
 
-    .roulette-btn i {
-      margin-right: 10px;
-      font-size: 1.2em;
-    }
+.roulette-btn i {
+  margin-right: 10px;
+  font-size: 1.2em;
+  transition: transform 0.3s ease;
+}
+
+.roulette-btn:hover i {
+  transform: rotate(15deg);
+}
 
     .level-container {
       display: flex;
@@ -719,16 +732,37 @@ background-clip: text;
     margin-top: 10px;
     text-transform: none;
     letter-spacing: normal;
-    box-shadow: 0 4px 15px rgba(226, 67, 93, 0.4);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
 }
 
-.roulette-spin-btn:hover {
-    box-shadow: 0 6px 20px rgba(226, 67, 93, 0.6);
-    filter: brightness(1.1);
+.roulette-spin-btn::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: calc(100% + 20px);
+    height: calc(100% + 20px);
+    background: linear-gradient(
+        135deg, 
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.1) 25%,
+        rgba(255,255,255,0.05) 50%,
+        rgba(255,255,255,0.1) 75%,
+        rgba(255,255,255,0) 100%
+    );
+    transform: translateX(-100%) skew(-20deg);
+    transition: transform 0.6s ease;
+    z-index: -1;
 }
 
-.roulette-spin-btn:active {
-    transform: translateY(0);
+.roulette-spin-btn:hover::before {
+    transform: translateX(100%) skew(-20deg);
+}
+
+.roulette-spin-btn:active::before {
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1), rgba(255,255,255,0.2));
 }
 
     .form-group {
@@ -1118,7 +1152,6 @@ background-clip: text;
 
 .copyable-id:hover {
     color: #e94057;
-    text-decoration: underline;
 }
 
 .copyable-id:hover i {
@@ -6412,15 +6445,20 @@ function scrollToLevel(button) {
 }
 
     // Функция копирования в буфер обмена
-    function copyToClipboard(element, text) {
-      navigator.clipboard.writeText(text).then(() => {
-        const originalText = element.textContent;
-        element.textContent = 'Copied!';
-        setTimeout(() => {
-          element.textContent = originalText;
-        }, 2000);
-      }).catch(err => console.error('Failed to copy text: ', err));
+function copyToClipboard(element, text) {
+  // Проверяем, находится ли элемент внутри рулетки
+  const isInRoulette = element.closest('.roulette-level-stat-value') !== null;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    if (!isInRoulette) {
+      const originalText = element.textContent;
+      element.textContent = 'Copied!';
+      setTimeout(() => {
+        element.textContent = originalText;
+      }, 2000);
     }
+  }).catch(err => console.error('Failed to copy text: ', err));
+}
 
 function filterLevelsByDate(date) {
     const currentList = document.getElementById('classic-list').style.display !== 'none' ? 'classic' : 'challenges';
