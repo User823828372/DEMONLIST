@@ -1343,10 +1343,11 @@ background-clip: text;
   
   <div class="dropdown">
     <button class="dropbtn" id="current-list-btn">Classic List</button>
-    <div class="dropdown-content">
-      <a href="#" data-list="classic">Classic List</a>
-      <a href="#" data-list="challenges">Challenge List</a>
-    </div>
+<div class="dropdown-content">
+  <a href="#" data-list="classic">Classic List</a>
+  <a href="#" data-list="challenges">Challenge List</a>
+  <a href="#" data-list="platformer">Platformer List</a>
+</div>
   </div>
   
 <div class="search-container">
@@ -1421,6 +1422,18 @@ background-clip: text;
                     <input type="number" id="roulette-challenges-max" placeholder="Max" min="1" value="1000" class="no-spinners">
                 </div>
             </div>
+
+            <div class="list-input-row">
+    <label class="roulette-checkbox-label">
+        <input type="checkbox" id="roulette-platformer">
+        <span class="roulette-checkbox-custom"></span>
+        <span>Platformer List</span>
+    </label>
+    <div class="range-inputs">
+        <input type="number" id="roulette-platformer-min" placeholder="Min" min="1" value="1" class="no-spinners">
+        <input type="number" id="roulette-platformer-max" placeholder="Max" min="1" value="1000" class="no-spinners">
+    </div>
+</div>
         </div>
     </div>
     
@@ -1487,6 +1500,7 @@ background-clip: text;
   <!-- Контейнеры с уровнями -->
   <div class="level-container" id="classic-list"></div>
   <div class="level-container" id="challenges-list" style="display: none;"></div>
+  <div class="level-container" id="platformer-list" style="display: none;"></div>
 
   <!-- Кнопка "Наверх" -->
   <button class="scroll-to-top">↑</button>
@@ -5648,6 +5662,96 @@ background-clip: text;
           previewImg: "https://thumbnails.demonlist.org/31462941.png",
           releaseDate: "2017-03-20"
         },  
+        {
+          title: "KapyctaDifficult",
+          author: "BONN GD",
+          verifier: "BONN GD",
+          id: "90479988",
+          videoUrl: "https://youtu.be/6iUA2GHWQAg",
+          previewImg: "https://thumbnails.demonlist.org/90479988.png",
+          releaseDate: "2023-01-03"
+        },  
+        {
+          title: "Cosmic Catastrophe",
+          author: "IINimbusII",
+          verifier: "IINimbusII",
+          id: "60798080",
+          videoUrl: "https://youtu.be/9Tktxk_UOZU",
+          previewImg: "http://i3.ytimg.com/vi/9Tktxk_UOZU/hqdefault.jpg",
+          releaseDate: "2020-04-10"
+        },  
+        {
+          title: "OVERKILL",
+          author: "Jinnans",
+          verifier: "Galaxxyss",
+          id: "104027821",
+          videoUrl: "https://youtu.be/aBDP_9-Sm-w",
+          previewImg: "http://i3.ytimg.com/vi/aBDP_9-Sm-w/hqdefault.jpg",
+          releaseDate: "2024-04-16"
+        },  
+        {
+          title: "Retention Rush",
+          author: "TheBlackHell",
+          verifier: "Dark Angel",
+          id: "81906166",
+          videoUrl: "https://youtu.be/SPn1wsc9J9M",
+          previewImg: "https://thumbnails.demonlist.org/81906166.png",
+          releaseDate: "2022-07-17"
+        },  
+        {
+          title: "The Reaper",
+          author: "Kyhros",
+          verifier: "Teno",
+          id: "68894921",
+          videoUrl: "https://youtu.be/DKJ82-LThkM",
+          previewImg: "http://i3.ytimg.com/vi/DKJ82-LThkM/hqdefault.jpg",
+          releaseDate: "2021-08-31"
+        },
+        {
+          title: "Khorne",
+          author: "Stilluetto",
+          verifier: "Stilluetto",
+          id: "58578389",
+          videoUrl: "https://youtu.be/_ProlqC_fZQ",
+          previewImg: "http://i3.ytimg.com/vi/_ProlqC_fZQ/hqdefault.jpg",
+          releaseDate: "2019-12-08"
+        },
+        {
+          title: "GBS",
+          author: "Kapinapi",
+          verifier: "Luqualizer",
+          id: "95294285",
+          videoUrl: "https://youtu.be/zBmIYg2dpk4",
+          previewImg: "http://i3.ytimg.com/vi/zBmIYg2dpk4/hqdefault.jpg",
+          releaseDate: "2023-10-10"
+        },
+        {
+          title: "Nightshade",
+          author: "YakobNugget",
+          verifier: "YakobNugget",
+          id: "83107375",
+          videoUrl: "https://youtu.be/1RiB0qmwE4A",
+          previewImg: "http://i3.ytimg.com/vi/1RiB0qmwE4A/hqdefault.jpg",
+          releaseDate: "2022-08-26"
+        },
+        {
+          title: "Sunset Sandstorm",
+          author: "crohn44",
+          verifier: "crohn44",
+          id: "55547703",
+          videoUrl: "https://youtu.be/5ary4apA0WA",
+          previewImg: "https://thumbnails.demonlist.org/55547703.png",
+          releaseDate: "2019-05-16"
+        },
+        {
+          title: "DubKore X",
+          author: "Loogiah",
+          verifier: "Blankb",
+          id: "75455769",
+          videoUrl: "https://youtu.be/roz31nm3_nY",
+          previewImg: "http://i3.ytimg.com/vi/roz31nm3_nY/hqdefault.jpg",
+          releaseDate: "2021-11-06"
+        },
       ],
       challenges: [
         {
@@ -5883,6 +5987,269 @@ background-clip: text;
           videoUrl: "https://youtu.be/harwFhCwYlA",
           previewImg: "http://i3.ytimg.com/vi/harwFhCwYlA/hqdefault.jpg",
           releaseDate: "2023-06-06"
+        },  
+      ],
+      platformer: [
+        {
+          title: "delightful climb",
+          author: "JuNiOr202",
+          verifier: "GToast",
+          id: "115206404",
+          videoUrl: "https://youtu.be/Y5cpF51YwgY",
+          previewImg: "http://i3.ytimg.com/vi/uCIq9_mL4MM/hqdefault.jpg",
+          releaseDate: "2025-02-17"
+        },
+        {
+          title: "Diamonds For Dashers",
+          author: "yunotyou",
+          verifier: "nng12",
+          id: "118798387",
+          videoUrl: "https://youtu.be/yU0Nzf8lnTU",
+          previewImg: "http://i3.ytimg.com/vi/yU0Nzf8lnTU/hqdefault.jpg",
+          releaseDate: "2025-05-12"
+        },
+        {
+          title: "Meat Tower",
+          author: "Crerro",
+          verifier: "Crerro",
+          id: "119709734",
+          videoUrl: "https://youtu.be/2HRu26YzDUo",
+          previewImg: "http://i3.ytimg.com/vi/2HRu26YzDUo/hqdefault.jpg",
+          releaseDate: "2025-05-27"
+        },
+        {
+          title: "Ruined",
+          author: "Erzor",
+          verifier: "GToast",
+          id: "99303885",
+          videoUrl: "https://youtu.be/xNFqwuCvrec",
+          previewImg: "http://i3.ytimg.com/vi/7czOEywwzwY/hqdefault.jpg",
+          releaseDate: "2025-03-28"
+        },
+        {
+          title: "Nullspace",
+          author: "No ob",
+          verifier: "Tanuklen",
+          id: "115705984",
+          videoUrl: "https://youtu.be/8dZhz8XJvyk",
+          previewImg: "http://i3.ytimg.com/vi/8dZhz8XJvyk/hqdefault.jpg",
+          releaseDate: "2025-03-03"
+        },
+        {
+          title: "CONVOLUTION",
+          author: "KEaliTgeo",
+          verifier: "GToast",
+          id: "105724358",
+          videoUrl: "https://youtu.be/bfASf1-aK2M",
+          previewImg: "http://i3.ytimg.com/vi/bfASf1-aK2M/hqdefault.jpg",
+          releaseDate: "2024-08-13"
+        },
+        {
+          title: "Its MF Kaiji Sunday",
+          author: "DrJoe",
+          verifier: "MahjongLegend",
+          id: "109540925",
+          videoUrl: "https://youtu.be/34MFHdGgYjk",
+          previewImg: "http://i3.ytimg.com/vi/mqjTDljkD1M/hqdefault.jpg",
+          releaseDate: "2024-08-28"
+        },
+        {
+          title: "glungus",
+          author: "dpoopoop",
+          verifier: "harper",
+          id: "112482571",
+          videoUrl: "https://youtu.be/a9099BQ1Suk",
+          previewImg: "http://i3.ytimg.com/vi/QOLL1XL9x2A/hqdefault.jpg",
+          releaseDate: "2025-02-13"
+        },
+        {
+          title: "HEAVIER METAL",
+          author: "Samamba",
+          verifier: "Samamba",
+          id: "116667069",
+          videoUrl: "https://youtu.be/7SG2_AKQp0o",
+          previewImg: "http://i3.ytimg.com/vi/JNTAasyW4Q4/hqdefault.jpg",
+          releaseDate: "2025-03-30"
+        },
+        {
+          title: "dish rags",
+          author: "KEaliTgeo",
+          verifier: "ali_gd",
+          id: "115455352",
+          videoUrl: "https://youtu.be/y9o5WkasWXw",
+          previewImg: "http://i3.ytimg.com/vi/y9o5WkasWXw/hqdefault.jpg",
+          releaseDate: "2025-04-06"
+        },
+        {
+          title: "Cl5u37r0ph0b1a",
+          author: "Tranzo",
+          verifier: "Aibyou",
+          id: "112059085",
+          videoUrl: "https://youtu.be/1Y0f-vEXw1Y",
+          previewImg: "http://i3.ytimg.com/vi/1Y0f-vEXw1Y/hqdefault.jpg",
+          releaseDate: "2024-03-14"
+        },
+        {
+          title: "Pandora",
+          author: "zYuko",
+          verifier: "mikoshii",
+          id: "115809824",
+          videoUrl: "https://youtu.be/HXM6_i_sZ-8",
+          previewImg: "http://i3.ytimg.com/vi/HXM6_i_sZ-8/hqdefault.jpg",
+          releaseDate: "2025-03-07"
+        },
+        {
+          title: "CaveOfTheScarletSky",
+          author: "zYuko",
+          verifier: "npesta",
+          id: "113224510",
+          videoUrl: "https://youtu.be/hJuDlPPyn5I",
+          previewImg: "http://i3.ytimg.com/vi/hJuDlPPyn5I/hqdefault.jpg",
+          releaseDate: "2024-12-19"
+        },
+        {
+          title: "Rabbit Hole",
+          author: "MadisonYuko",
+          verifier: "Shroomy!!!",
+          id: "115881666",
+          videoUrl: "https://youtu.be/2wtM1fajXMg",
+          previewImg: "http://i3.ytimg.com/vi/YqOATVgAqjQ/hqdefault.jpg",
+          releaseDate: "2025-03-12"
+        },
+        {
+          title: "r a g e",
+          author: "Mo5h",
+          verifier: "kgamesnyc",
+          id: "112834935",
+          videoUrl: "https://youtu.be/HrnReFr3_X0",
+          previewImg: "http://i3.ytimg.com/vi/HrnReFr3_X0/hqdefault.jpg",
+          releaseDate: "2025-03-05"
+        },
+        {
+          title: "The Blooming Garden",
+          author: "DrakXD109",
+          verifier: "Abby135",
+          id: "115979065",
+          videoUrl: "https://youtu.be/FtLZsx5TAFk",
+          previewImg: "http://i3.ytimg.com/vi/FtLZsx5TAFk/hqdefault.jpg",
+          releaseDate: "2025-03-11"
+        },
+        {
+          title: "Kurroku",
+          author: "Romlekt",
+          verifier: "Artemka_Klutoy",
+          id: "114859422",
+          videoUrl: "https://youtu.be/9tt4Bg1mgCg",
+          previewImg: "http://i3.ytimg.com/vi/9tt4Bg1mgCg/hqdefault.jpg",
+          releaseDate: "2025-07-10"
+        },
+        {
+          title: "Null",
+          author: "RealMatter",
+          verifier: "viare",
+          id: "104031134",
+          videoUrl: "https://youtu.be/YG5_j-NGP2A",
+          previewImg: "http://i3.ytimg.com/vi/YG5_j-NGP2A/hqdefault.jpg",
+          releaseDate: "2024-04-27"
+        },
+        {
+          title: "Starlight Cyclone",
+          author: "TNTking531",
+          verifier: "ungafo",
+          id: "117632770",
+          videoUrl: "https://youtu.be/VsQN1_oo_54",
+          previewImg: "http://i3.ytimg.com/vi/fT4hivsygpE/hqdefault.jpg",
+          releaseDate: "2025-04-20"
+        },
+        {
+          title: "Uhm Huh",
+          author: "Crerro",
+          verifier: "Crerro",
+          id: "112426437",
+          videoUrl: "https://youtu.be/bW3CcwkWOgE",
+          previewImg: "http://i3.ytimg.com/vi/vgmqCLUi1aU/hqdefault.jpg",
+          releaseDate: "2024-11-25"
+        },
+        {
+          title: "im happy 4 you",
+          author: "No ob",
+          verifier: "Mikoshii",
+          id: "99195742",
+          videoUrl: "https://youtu.be/rvdQE3EyG-k",
+          previewImg: "http://i3.ytimg.com/vi/JgvAhZ9-W-w/hqdefault.jpg",
+          releaseDate: "2024-06-12"
+        },
+        {
+          title: "Medramint",
+          author: "vLibra",
+          verifier: "vLibra",
+          id: "116728888",
+          videoUrl: "https://youtu.be/U3A_qBbMiFo",
+          previewImg: "http://i3.ytimg.com/vi/FG9pYJuxXd0/hqdefault.jpg",
+          releaseDate: "2025-03-31"
+        },
+        {
+          title: "Trouncy Ball",
+          author: "lappwv",
+          verifier: "lappwv",
+          id: "112972263",
+          videoUrl: "https://youtu.be/n5Swb9JGRGs",
+          previewImg: "http://i3.ytimg.com/vi/luvTeFt8YSE/hqdefault.jpg",
+          releaseDate: "2024-12-11"
+        },
+        {
+          title: "Yimu",
+          author: "mariokirby1703",
+          verifier: "Lutz127",
+          id: "116921752",
+          videoUrl: "https://youtu.be/EKyhlg9U7yI",
+          previewImg: "http://i3.ytimg.com/vi/EKyhlg9U7yI/hqdefault.jpg",
+          releaseDate: "2025-04-05"
+        },
+        {
+          title: "Dead Of Night",
+          author: "TMco",
+          verifier: "GDIris",
+          id: "117297448",
+          videoUrl: "https://youtu.be/NGPjBdJUI2c",
+          previewImg: "http://i3.ytimg.com/vi/NGPjBdJUI2c/hqdefault.jpg",
+          releaseDate: "2025-04-23"
+        },
+        {
+          title: "Project BUZZKILL",
+          author: "Superkobster",
+          verifier: "Superkobster",
+          id: "111113059",
+          videoUrl: "https://youtu.be/HjBLO7flVtY",
+          previewImg: "http://i3.ytimg.com/vi/HjBLO7flVtY/hqdefault.jpg",
+          releaseDate: "2024-10-14"
+        },
+        {
+          title: "Crerro Kaizo II",
+          author: "Crerro",
+          verifier: "Crerro",
+          id: "105567157",
+          videoUrl: "https://youtu.be/lw_Q8Wz-qew",
+          previewImg: "http://i3.ytimg.com/vi/lw_Q8Wz-qew/hqdefault.jpg",
+          releaseDate: "2024-05-22"
+        },
+        {
+          title: "We Forgot Everything",
+          author: "FakeHATETAG",
+          verifier: "Crerro",
+          id: "114635655",
+          videoUrl: "https://youtu.be/mGJ4zTalgrc",
+          previewImg: "http://i3.ytimg.com/vi/mGJ4zTalgrc/hqdefault.jpg",
+          releaseDate: "2025-01-30"
+        },
+        {
+          title: "Aerios",
+          author: "Orelu",
+          verifier: "Rylet",
+          id: "111048577",
+          videoUrl: "https://youtu.be/6LVMnSiVPBI",
+          previewImg: "http://i3.ytimg.com/vi/6LVMnSiVPBI/hqdefault.jpg",
+          releaseDate: "2024-10-18"
         },
       ]
     };
@@ -6035,18 +6402,29 @@ function generateHistoryHTML() {
   // Проверяем, сколько списков выбрано
   const classicChecked = document.getElementById('roulette-classic').checked;
   const challengesChecked = document.getElementById('roulette-challenges').checked;
-  const showListType = classicChecked && challengesChecked; // Показывать тип только если выбраны оба
+  const platformerChecked = document.getElementById('roulette-platformer').checked;
+  
+  // Показывать тип только если выбрано больше одного списка
+  const showListType = [classicChecked, challengesChecked, platformerChecked].filter(Boolean).length > 1;
   
   let html = '';
   // Перебираем историю в обратном порядке (новые сверху)
   for (let i = rouletteState.history.length - 1; i >= 0; i--) {
     const item = rouletteState.history[i];
-    const listType = levelData.classic.includes(item.level) ? 'Classic' : 'Challenge';
     
-    // Формируем строку в зависимости от количества выбранных списков
-    const levelInfo = showListType 
-      ? `#${item.position} (${listType}) - ${item.level.title}`
-      : `#${item.position} - ${item.level.title}`;
+    // Определяем тип списка
+    let listType = '';
+    if (showListType) {
+      if (levelData.classic.some(l => l.id === item.level.id)) {
+        listType = ' (Classic)';
+      } else if (levelData.challenges.some(l => l.id === item.level.id)) {
+        listType = ' (Challenge)';
+      } else if (levelData.platformer.some(l => l.id === item.level.id)) {
+        listType = ' (Platformer)';
+      }
+    }
+    
+    const levelInfo = `#${item.position}${listType} - ${item.level.title}`;
     
     html += `
       <div class="roulette-history-item">
@@ -6095,6 +6473,19 @@ function generateHistoryHTML() {
                 }
             });
         }
+
+        if (document.getElementById('roulette-platformer').checked) {
+    const minPos = parseInt(document.getElementById('roulette-platformer-min').value) || 1;
+    const maxPos = parseInt(document.getElementById('roulette-platformer-max').value) || 1000;
+    const levels = levelData['platformer'];
+    levels.forEach((level, index) => {
+        const position = index + 1;
+        if (position >= minPos && position <= maxPos) {
+            allLevels.push(level);
+            positionMap.push({ listType: 'platformer', position });
+        }
+    });
+}
         
         if (allLevels.length === 0) return null;
         
@@ -6129,13 +6520,16 @@ function startRoulette() {
 const skipCount = skipEnabled ? parseInt(document.getElementById('skip-count').value) || 3 : 0;
     
     // Получаем выбранные типы списков
-    const listTypes = [];
-    if (document.getElementById('roulette-classic').checked) {
-        listTypes.push('classic');
-    }
-    if (document.getElementById('roulette-challenges').checked) {
-        listTypes.push('challenges');
-    }
+const listTypes = [];
+if (document.getElementById('roulette-classic').checked) {
+    listTypes.push('classic');
+}
+if (document.getElementById('roulette-challenges').checked) {
+    listTypes.push('challenges');
+}
+if (document.getElementById('roulette-platformer').checked) {
+    listTypes.push('platformer');
+}
     
     if (listTypes.length === 0) {
         showCustomAlert('Please select at least one list!');
@@ -6295,10 +6689,13 @@ function exportRouletteData() {
         settings: {
             classicList: document.getElementById('roulette-classic').checked,
             challengesList: document.getElementById('roulette-challenges').checked,
+            platformerList: document.getElementById('roulette-platformer').checked,
             classicMin: parseInt(document.getElementById('roulette-classic-min').value) || 1,
             classicMax: parseInt(document.getElementById('roulette-classic-max').value) || 1000,
             challengesMin: parseInt(document.getElementById('roulette-challenges-min').value) || 1,
             challengesMax: parseInt(document.getElementById('roulette-challenges-max').value) || 1000,
+            platformerMin: parseInt(document.getElementById('roulette-platformer-min').value) || 1,
+            platformerMax: parseInt(document.getElementById('roulette-platformer-max').value) || 1000,
             allowRepeats: document.getElementById('allow-repeats').checked,
             skipCount: parseInt(document.getElementById('skip-count').value) || 0
         },
@@ -6306,7 +6703,8 @@ function exportRouletteData() {
             title: item.level.title,
             percentage: item.percentage,
             position: item.position,
-            listType: levelData.classic.includes(item.level) ? 'classic' : 'challenges'
+            listType: levelData.classic.includes(item.level) ? 'classic' : 
+                     levelData.challenges.includes(item.level) ? 'challenges' : 'platformer'
         })),
         currentLevel: rouletteState.currentLevel ? {
             title: rouletteState.currentLevel.level.title,
@@ -6331,119 +6729,123 @@ function exportRouletteData() {
 }
 
     // Функция для импорта истории
-    function importRouletteData(file) {
-        const reader = new FileReader();
-        
+function importRouletteData(file) {
+    const reader = new FileReader();
+    
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
-                
-                // Проверяем структуру данных
-                if (!data.settings || !data.history) {
-                    throw new Error("Invalid file format");
-                }
-                
-                // Загружаем настройки
-                document.getElementById('roulette-classic').checked = data.settings.classicList;
-                document.getElementById('roulette-challenges').checked = data.settings.challengesList;
-                document.getElementById('roulette-classic-min').value = data.settings.classicMin;
-                document.getElementById('roulette-classic-max').value = data.settings.classicMax;
-                document.getElementById('roulette-challenges-min').value = data.settings.challengesMin;
-                document.getElementById('roulette-challenges-max').value = data.settings.challengesMax;
-                document.getElementById('allow-repeats').checked = data.settings.allowRepeats;
-                document.getElementById('skip-count').value = data.settings.skipCount || 0;
-                
-                // Обновляем видимость диапазонов
-                document.querySelector('.classic-range-group').style.display = 
-                    data.settings.classicList ? 'block' : 'none';
-                document.querySelector('.challenges-range-group').style.display = 
-                    data.settings.challengesList ? 'block' : 'none';
-                
-                // Загружаем историю
-            rouletteState.history = data.history.map(item => {
-                    // Находим уровень в данных
-                    let level;
-                    if (item.listType === 'classic') {
-                        level = levelData.classic[item.position - 1];
-                    } else if (item.listType === 'challenges') {
-                        level = levelData.challenges[item.position - 1];
-                    }
-                    
-                    if (!level) {
-                        throw new Error(`Level not found: ${item.title} (${item.listType} #${item.position})`);
-                    }
-                    
-                    return {
-                        level: level,
-                        position: item.position,
-                        percentage: item.percentage
-                    };
-                });
-                
-                // Загружаем текущий уровень, если он есть
-                if (data.currentLevel) {
-                    let currentLevel;
-                    if (data.currentLevel.listType === 'classic') {
-                        currentLevel = levelData.classic[data.currentLevel.position - 1];
-                    } else if (data.currentLevel.listType === 'challenges') {
-                        currentLevel = levelData.challenges[data.currentLevel.position - 1];
-                    }
-                    
-                    if (currentLevel) {
-                        rouletteState.currentLevel = {
-                            level: currentLevel,
-                            position: data.currentLevel.position,
-                            listType: data.currentLevel.listType
-                        };
-                        
-                        // Обновляем контейнер уровней
-                        const container = document.getElementById('roulette-levels-container');
-                        container.innerHTML = generateRouletteLevelHTML(
-                            currentLevel, 
-                            data.currentLevel.position,
-                            data.currentLevel.listType
-                        );
-                        
-                        // Устанавливаем процент, если он был
-                        if (data.currentLevel.percentage) {
-                            document.getElementById('percentage-input').value = data.currentLevel.percentage;
-                        }
-                        
-                        // Добавляем обработчики
-                        document.getElementById('submit-percentage').addEventListener('click', submitPercentage);
-                        document.getElementById('percentage-input').addEventListener('keydown', function(e) {
-                            if (e.key === 'Enter') {
-                                submitPercentage();
-                            }
-                        });
-                    }
-                }
-                
-                // Устанавливаем оставшиеся пропуски
-                rouletteState.remainingSkips = data.remainingSkips || 0;
-                
-                // Обновляем отображение истории
-                document.getElementById('history-container').innerHTML = generateHistoryHTML();
-                
-                // Запускаем рулетку
-                rouletteState.active = true;
-                rouletteState.allowRepeats = data.settings.allowRepeats;
-                rouletteState.totalSkips = data.settings.skipCount || 0;
-                document.getElementById('roulette-section').style.display = 'block';
-                
-                showCustomAlert('History imported successfully!', true);
-            } catch (error) {
-                showCustomAlert(`Import failed: ${error.message}`);
-                console.error(error);
+            
+            // Проверяем структуру данных
+            if (!data.settings || !data.history) {
+                throw new Error("Invalid file format");
             }
-        };
-        
-        reader.onerror = function() {
-            showCustomAlert('Error reading file');
-        };
-        
-        reader.readAsText(file);
-    }
+            
+            // Загружаем настройки
+            document.getElementById('roulette-classic').checked = data.settings.classicList;
+            document.getElementById('roulette-challenges').checked = data.settings.challengesList;
+            document.getElementById('roulette-platformer').checked = data.settings.platformerList || false;
+            document.getElementById('roulette-classic-min').value = data.settings.classicMin;
+            document.getElementById('roulette-classic-max').value = data.settings.classicMax;
+            document.getElementById('roulette-challenges-min').value = data.settings.challengesMin;
+            document.getElementById('roulette-challenges-max').value = data.settings.challengesMax;
+            document.getElementById('roulette-platformer-min').value = data.settings.platformerMin || 1;
+            document.getElementById('roulette-platformer-max').value = data.settings.platformerMax || 1000;
+            document.getElementById('allow-repeats').checked = data.settings.allowRepeats;
+            document.getElementById('skip-count').value = data.settings.skipCount || 0;
+            
+            // Загружаем историю
+            rouletteState.history = data.history.map(item => {
+                // Находим уровень в данных
+                let level;
+                if (item.listType === 'classic') {
+                    level = levelData.classic.find(l => l.id === item.id) || levelData.classic[item.position - 1];
+                } else if (item.listType === 'challenges') {
+                    level = levelData.challenges.find(l => l.id === item.id) || levelData.challenges[item.position - 1];
+                } else if (item.listType === 'platformer') {
+                    level = levelData.platformer.find(l => l.id === item.id) || levelData.platformer[item.position - 1];
+                }
+                
+                if (!level) {
+                    throw new Error(`Level not found: ${item.title} (${item.listType} #${item.position})`);
+                }
+                
+                return {
+                    level: level,
+                    position: item.position,
+                    percentage: item.percentage
+                };
+            });
+            
+            // Загружаем текущий уровень, если он есть
+            if (data.currentLevel) {
+                let currentLevel;
+                if (data.currentLevel.listType === 'classic') {
+                    currentLevel = levelData.classic.find(l => l.id === data.currentLevel.id) || 
+                                 levelData.classic[data.currentLevel.position - 1];
+                } else if (data.currentLevel.listType === 'challenges') {
+                    currentLevel = levelData.challenges.find(l => l.id === data.currentLevel.id) || 
+                                   levelData.challenges[data.currentLevel.position - 1];
+                } else if (data.currentLevel.listType === 'platformer') {
+                    currentLevel = levelData.platformer.find(l => l.id === data.currentLevel.id) || 
+                                  levelData.platformer[data.currentLevel.position - 1];
+                }
+                
+                if (currentLevel) {
+                    rouletteState.currentLevel = {
+                        level: currentLevel,
+                        position: data.currentLevel.position,
+                        listType: data.currentLevel.listType
+                    };
+                    
+                    // Обновляем контейнер уровней
+                    const container = document.getElementById('roulette-levels-container');
+                    container.innerHTML = generateRouletteLevelHTML(
+                        currentLevel, 
+                        data.currentLevel.position,
+                        data.currentLevel.listType
+                    );
+                    
+                    // Устанавливаем процент, если он был
+                    if (data.currentLevel.percentage) {
+                        document.getElementById('percentage-input').value = data.currentLevel.percentage;
+                    }
+                    
+                    // Добавляем обработчики
+                    document.getElementById('submit-percentage').addEventListener('click', submitPercentage);
+                    document.getElementById('percentage-input').addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            submitPercentage();
+                        }
+                    });
+                }
+            }
+            
+            // Устанавливаем оставшиеся пропуски
+            rouletteState.remainingSkips = data.remainingSkips || 0;
+            
+            // Обновляем отображение истории
+            document.getElementById('history-container').innerHTML = generateHistoryHTML();
+            
+            // Запускаем рулетку
+            rouletteState.active = true;
+            rouletteState.allowRepeats = data.settings.allowRepeats;
+            rouletteState.totalSkips = data.settings.skipCount || 0;
+            document.getElementById('roulette-section').style.display = 'block';
+            
+            showCustomAlert('History imported successfully!', true);
+        } catch (error) {
+            showCustomAlert(`Import failed: ${error.message}`);
+            console.error(error);
+        }
+    };
+    
+    reader.onerror = function() {
+        showCustomAlert('Error reading file');
+    };
+    
+    reader.readAsText(file);
+}
 
     function showCustomAlert(message, isSuccess = false) {
       const alertBox = document.createElement('div');
@@ -6542,14 +6944,18 @@ function filterLevels() {
   const searchTerm = document.getElementById('search-input').value.toLowerCase();
   const classicList = document.getElementById('classic-list');
   const challengesList = document.getElementById('challenges-list');
+  const platformerList = document.getElementById('platformer-list');
   
   let levels, container;
   if (classicList.style.display !== 'none') {
     levels = classicList.querySelectorAll('.level');
     container = classicList;
-  } else {
+  } else if (challengesList.style.display !== 'none') {
     levels = challengesList.querySelectorAll('.level');
     container = challengesList;
+  } else {
+    levels = platformerList.querySelectorAll('.level');
+    container = platformerList;
   }
   
   const hasSearchTerm = searchTerm.length > 0;
@@ -6641,6 +7047,7 @@ searchModeBtn.title = searchMode === 'contains' ? 'Contains mode' : 'Starts with
       const currentListBtn = document.getElementById('current-list-btn');
       const classicList = document.getElementById('classic-list');
       const challengesList = document.getElementById('challenges-list');
+      const platformerList = document.getElementById('platformer-list');
       const searchInput = document.getElementById('search-input');
       const dropdownLinks = document.querySelectorAll('.dropdown-content a');
       const scrollToTopBtn = document.querySelector('.scroll-to-top');
@@ -6704,9 +7111,10 @@ searchModeBtn.title = searchMode === 'contains' ? 'Contains mode' : 'Starts with
 
       const viewToggleBtn = document.getElementById('view-toggle-btn');
 
-      viewToggleBtn.addEventListener('click', () => {
-        classicList.classList.toggle('compact-view');
-        challengesList.classList.toggle('compact-view');
+viewToggleBtn.addEventListener('click', () => {
+  classicList.classList.toggle('compact-view');
+  challengesList.classList.toggle('compact-view');
+  platformerList.classList.toggle('compact-view');
         
         // Обновляем текст кнопки
         if (classicList.classList.contains('compact-view')) {
@@ -6725,25 +7133,22 @@ searchModeBtn.title = searchMode === 'contains' ? 'Contains mode' : 'Starts with
       // Инициализация
       renderLevels('classic');
       renderLevels('challenges');
+      renderLevels('platformer');
       
       // Обработчики для dropdown меню
-      dropdownLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const listType = e.target.getAttribute('data-list');
-          currentListBtn.textContent = e.target.textContent;
-          
-          if (listType === 'classic') {
-            classicList.style.display = 'flex';
-            challengesList.style.display = 'none';
-          } else {
-            classicList.style.display = 'none';
-            challengesList.style.display = 'flex';
-          }
-          
-          filterLevels();
-        });
-      });
+dropdownLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const listType = e.target.getAttribute('data-list');
+    currentListBtn.textContent = e.target.textContent;
+    
+    classicList.style.display = listType === 'classic' ? 'flex' : 'none';
+    challengesList.style.display = listType === 'challenges' ? 'flex' : 'none';
+    platformerList.style.display = listType === 'platformer' ? 'flex' : 'none';
+    
+    filterLevels();
+  });
+});
 
       // Обработчики для чекбоксов списков
       document.getElementById('roulette-classic').addEventListener('change', function() {
@@ -6751,6 +7156,9 @@ searchModeBtn.title = searchMode === 'contains' ? 'Contains mode' : 'Starts with
       });
       document.getElementById('roulette-challenges').addEventListener('change', function() {
         document.querySelector('.challenges-range-group').style.display = this.checked ? 'block' : 'none';
+      });
+      document.getElementById('roulette-platformer').addEventListener('change', function() {
+        document.querySelector('.platformer-range-group').style.display = this.checked ? 'block' : 'none';
       });
       
       // Поиск
