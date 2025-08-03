@@ -307,44 +307,72 @@
       display: block;
     }
 
-    .scroll-to-top {
-      position: fixed;
-      bottom: 40px;
-      right: 40px;
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, #1e88e5, #0d47a1);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
-      box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.4s ease;
-      z-index: 999;
-      transform: scale(0.8);
-    }
+.scroll-to-top {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #1e88e5, #0d47a1);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 30px rgba(33, 150, 243, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 999;
+  transform: scale(0.8);
+  overflow: hidden;
+  outline: none;
+}
 
-    .scroll-to-top.visible {
-      opacity: 1;
-      visibility: visible;
-      transform: scale(1);
-    }
+.scroll-to-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+  transform: translateX(-100%) skewX(-20deg);
+  transition: transform 0.6s ease;
+}
 
-    .scroll-to-top:hover {
-      background: linear-gradient(135deg, #42a5f5, #1e88e5);
-      box-shadow: 0 6px 25px rgba(33, 150, 243, 0.6);
-      transform: scale(1.05) !important;
-    }
+.scroll-to-top:hover::before {
+  transform: translateX(100%) skewX(-20deg);
+}
 
-    .scroll-to-top:active {
-      transform: scale(0.95) !important;
-    }
+.scroll-to-top:hover {
+  box-shadow: 0 6px 30px rgba(33, 150, 243, 0.7);
+}
+
+.scroll-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+.scroll-to-top:hover.visible {
+  transform: scale(1.05);
+}
+
+.scroll-to-top:active {
+  transform: scale(0.95) !important;
+}
+
+.scroll-to-top .fa-arrow-up {
+  transition: transform 0.2s ease;
+}
+
+.scroll-to-top:active .fa-arrow-up {
+  transform: translateY(-4px);
+}
 
 .level-preview img,
 .roulette-level-preview img {
@@ -1503,7 +1531,9 @@ background-clip: text;
   <div class="level-container" id="platformer-list" style="display: none;"></div>
 
   <!-- Кнопка "Наверх" -->
-  <button class="scroll-to-top">↑</button>
+<button class="scroll-to-top" aria-label="Scroll to top">
+  <i class="fas fa-arrow-up"></i>
+</button>
 
   <!-- Скрытый input для импорта -->
   <input type="file" id="import-file" accept=".txt" style="display: none;">
@@ -1657,15 +1687,6 @@ background-clip: text;
           releaseDate: "2022-08-23"
         },
         {
-          title: "Menace",
-          author: "MannyHeffley",
-          verifier: "Whizkid05",
-          id: "107805281",
-          videoUrl: "https://youtu.be/nnkgghxxsEE",
-          previewImg: "http://i3.ytimg.com/vi/nnkgghxxsEE/hqdefault.jpg",
-          releaseDate: "2024-07-15"
-        }, 
-        {
           title: "Aquamarine",
           author: "sincos",
           verifier: "seels55",
@@ -1674,6 +1695,15 @@ background-clip: text;
           previewImg: "http://i3.ytimg.com/vi/Q__EnRojGt4/hqdefault.jpg",
           releaseDate: "2024-10-09"
         },
+        {
+          title: "Menace",
+          author: "MannyHeffley",
+          verifier: "Whizkid05",
+          id: "107805281",
+          videoUrl: "https://youtu.be/nnkgghxxsEE",
+          previewImg: "http://i3.ytimg.com/vi/nnkgghxxsEE/hqdefault.jpg",
+          releaseDate: "2024-07-15"
+        }, 
         {
           title: "Tunnel of Despair",
           author: "Exen",
@@ -7704,12 +7734,30 @@ dropdownLinks.forEach(link => {
         }
       });
 
-      scrollToTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      });
+// Обработчик клика
+scrollToTopBtn.addEventListener('click', () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+});
+
+// Обработчик видимости кнопки
+window.addEventListener('scroll', () => {
+  if (window.pageYOffset > 300) {
+    scrollToTopBtn.classList.add('visible');
+  } else {
+    scrollToTopBtn.classList.remove('visible');
+  }
+});
+
+// Добавляем обработчик для сброса анимации после прокрутки
+window.addEventListener('scroll', () => {
+  if (window.pageYOffset === 0) {
+    const icon = scrollToTopBtn.querySelector('i');
+    icon.style.transform = '';
+  }
+});
       
       // Demon Roulette обработчики
       rouletteBtn.addEventListener('click', () => {
