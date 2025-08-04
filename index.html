@@ -401,13 +401,10 @@
   right: 15px;
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #FFD700 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 
-              0 0 0 1px rgba(255, 215, 0, 0.3);
   z-index: 2;
   cursor: pointer;
   transition: transform 0.2s ease;
@@ -417,10 +414,24 @@
   transform: scale(1.1);
 }
 
-.level-crown {
-  color: #5a4a1f;
-  font-size: 1.1em;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+/* Стили для значка в рулетке */
+.roulette-level .level-crown-container {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.roulette-level .level-crown-container:hover {
+    transform: scale(1.1);
 }
 
     ::-webkit-scrollbar {
@@ -1527,9 +1538,6 @@ background-clip: text;
         <button class="roulette-control-btn" id="roulette-end-btn">
           <i class="fas fa-stop"></i> End Roulette
         </button>
-        <button class="roulette-control-btn" id="roulette-clear-btn">
-          <i class="fas fa-trash-alt"></i> Clear History
-        </button>
         <button class="roulette-control-btn" id="roulette-export-btn">
           <i class="fas fa-file-export"></i> Export
         </button>
@@ -1620,7 +1628,7 @@ background-clip: text;
           title: "Quanteuse processing",
           author: "Blankb",
           verifier: "zZoink",
-          id: "113710822",
+          id: "117692518",
           videoUrl: "https://youtu.be/j5NC0u1Q91Q",
           releaseDate: "2025-01-03",
           tags: ["Unrated"]
@@ -7925,7 +7933,16 @@ function wasFirstPlaceOnRelease(level, listType) {
 
     // Функция для генерации HTML уровня
 function generateLevelHTML(level, position, listType) {
-  const isFormerFirstPlace = wasFirstPlaceOnRelease(level, listType);
+  let isFormerFirstPlace = wasFirstPlaceOnRelease(level, listType);
+  
+  // Special case for Thinking Space II if Amethyst is above it
+  if (level.title === "Thinking Space II" && listType === 'classic') {
+      const amethystIndex = levelData.classic.findIndex(l => l.title === "Amethyst");
+      const thinkingSpaceIndex = levelData.classic.findIndex(l => l.title === "Thinking Space II");
+      if (amethystIndex !== -1 && thinkingSpaceIndex !== -1 && amethystIndex < thinkingSpaceIndex) {
+          isFormerFirstPlace = true;
+      }
+  }
   
   // Определяем URL превью: если явно указан - используем его, иначе генерируем из ID
   const previewUrl = level.previewImg 
@@ -7938,7 +7955,7 @@ function generateLevelHTML(level, position, listType) {
         <a href="${level.videoUrl}" target="_blank">
           <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiA5Ii8+" 
                data-src="${previewUrl}" 
-               alt="Verification video" 
+               alt="Level Preview" 
                loading="lazy" 
                width="400" 
                height="225">
@@ -7949,7 +7966,7 @@ function generateLevelHTML(level, position, listType) {
         <p class="level-author">Published by ${level.author}</p>
         <p class="level-verifier">Verified by ${level.verifier}</p>
       </div>
-      ${isFormerFirstPlace ? '<div class="level-crown-container" title="Former #1 level"><div class="level-crown">👑</div></div>' : ''}
+${isFormerFirstPlace ? '<div class="level-crown-container" title="Former Hardest Level"><img src="images/Crown.png" alt="👑" style="width: 100%; height: 100%; object-fit: contain;"></div>' : ''}
       <div class="show-in-list" onclick="scrollToLevel(this)">Show in List</div>
       <div class="level-id" onclick="copyToClipboard(this, '${level.id}')">${level.id}</div>
     </div>
@@ -7986,6 +8003,7 @@ function renderLevels(listType) {
     // Функция для генерации HTML уровня в рулетке
 function generateRouletteLevelHTML(level, position, listType, minPercentage = 1) {
     const listName = listType === 'classic' ? 'Classic List' : 'Challenge List';
+    const isFormerFirstPlace = wasFirstPlaceOnRelease(level, listType);
     
     // Определяем URL превью: если явно указан - используем его, иначе генерируем из ID
     const previewUrl = level.previewImg 
@@ -7994,8 +8012,9 @@ function generateRouletteLevelHTML(level, position, listType, minPercentage = 1)
     
     return `
     <div class="roulette-level">
+        ${isFormerFirstPlace ? '<div class="level-crown-container" title="Former Hardest Level"><img src="images/Crown.png" alt="👑" style="width: 100%; height: 100%; object-fit: contain;"></div>' : ''}
         <div class="roulette-level-header">
-            <h3 class="roulette-level-title">#${position} - ${level.title} ${level.formerFirstPlace ? '👑' : ''}</h3>
+            <h3 class="roulette-level-title">#${position} - ${level.title}</h3>
         </div>
         <div class="roulette-level-content">
             <div class="roulette-level-preview">
@@ -8040,7 +8059,7 @@ function generateRouletteLevelHTML(level, position, listType, minPercentage = 1)
 
  // Функция для генерации HTML истории
 function generateHistoryHTML() {
-  if (rouletteState.history.length === 0) return '<p>No history yet</p>';
+  if (rouletteState.history.length === 0) return '<p>No History Yet</p>';
   
   // Проверяем, сколько списков выбрано
   const classicChecked = document.getElementById('roulette-classic').checked;
@@ -8067,7 +8086,7 @@ function generateHistoryHTML() {
       }
     }
     
-    const levelInfo = `#${item.position}${listType} - ${item.level.title}`;
+const levelInfo = `#${item.position}${listType} - ${item.level.title}`;
     
     html += `
       <div class="roulette-history-item">
@@ -8176,6 +8195,10 @@ function generateHistoryHTML() {
 
     // Функция для запуска рулетки
 function startRoulette() {
+  // Очищаем историю при старте
+rouletteState.history = [];
+document.getElementById('history-container').innerHTML = generateHistoryHTML();
+
     const allowRepeats = document.getElementById('allow-repeats').checked;
     const skipEnabled = document.getElementById('enable-skips').checked;
     const skipCount = skipEnabled ? parseInt(document.getElementById('skip-count').value) || 3 : 0;
@@ -8969,7 +8992,16 @@ document.addEventListener('keydown', (e) => {
         }, 300);
       });
       
-endRouletteBtn.addEventListener('click', endRoulette);
+endRouletteBtn.addEventListener('click', () => {
+  showConfirmationModal(
+    'End Roulette', 
+    'Are you sure you want to end the roulette and clear its history? This action cannot be undone.',
+    () => {
+      clearRouletteHistory();
+      endRoulette();
+    }
+  );
+});
 
       clearRouletteBtn.addEventListener('click', () => {
         showConfirmationModal(
