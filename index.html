@@ -1472,7 +1472,7 @@ background-clip: text;
             Roulette Settings
         </div>
         <div class="roulette-settings-options">
-<div class="roulette-skip-container">
+<div class="roulette-skip-container" style="margin-bottom: 10px;">
     <label class="roulette-checkbox-label" style="flex: 0 0 auto;">
         <input type="checkbox" id="enable-skips" checked>
         <span class="roulette-checkbox-custom"></span>
@@ -1480,7 +1480,12 @@ background-clip: text;
     </label>
     <input type="number" id="skip-count" min="0" max="100" value="3" class="no-spinners" style="width: 180px; margin-left: auto;">
 </div>
-            <label class="roulette-checkbox-label" style="margin-top: 10px;">
+<label class="roulette-checkbox-label">
+    <input type="checkbox" id="skip-adds-percent" checked>
+    <span class="roulette-checkbox-custom"></span>
+    <span>Skip adds +1%</span>
+</label>
+            <label class="roulette-checkbox-label" style="margin-top: 10px !important; display: block !important;">
                 <input type="checkbox" id="allow-repeats">
                 <span class="roulette-checkbox-custom"></span>
                 <span>Allow level repeats</span>
@@ -2345,6 +2350,16 @@ background-clip: text;
           releaseDate: "2021-08-08"
         },
         {
+          title: "BEELINE",
+          author: "Galaxxyss",
+          verifier: "Motor",
+          id: "93792764",
+          videoUrl: "https://youtu.be/nt6T9YDb6gw",
+          previewImg: "http://i3.ytimg.com/vi/nt6T9YDb6gw/hqdefault.jpg",
+          releaseDate: "2024-11-15",
+          tags: ["2Player"]
+        },
+        {
           title: "Coalescence",
           author: "amplitron",
           verifier: "amplitron",
@@ -2397,16 +2412,6 @@ background-clip: text;
           videoUrl: "https://youtu.be/6N8u_byYoZo",
           previewImg: "http://i3.ytimg.com/vi/6N8u_byYoZo/hqdefault.jpg",
           releaseDate: "2023-08-03"
-        },
-        {
-          title: "BEELINE",
-          author: "Galaxxyss",
-          verifier: "Motor",
-          id: "93792764",
-          videoUrl: "https://youtu.be/nt6T9YDb6gw",
-          previewImg: "http://i3.ytimg.com/vi/nt6T9YDb6gw/hqdefault.jpg",
-          releaseDate: "2024-11-15",
-          tags: ["2Player"]
         },
         {
           title: "Buffbath",
@@ -7132,19 +7137,20 @@ function generateHistoryHTML() {
 function startRoulette() {
     const allowRepeats = document.getElementById('allow-repeats').checked;
     const skipEnabled = document.getElementById('enable-skips').checked;
-const skipCount = skipEnabled ? parseInt(document.getElementById('skip-count').value) || 3 : 0;
+    const skipCount = skipEnabled ? parseInt(document.getElementById('skip-count').value) || 3 : 0;
+    const skipAddsPercent = document.getElementById('skip-adds-percent').checked;
     
     // Получаем выбранные типы списков
-const listTypes = [];
-if (document.getElementById('roulette-classic').checked) {
-    listTypes.push('classic');
-}
-if (document.getElementById('roulette-challenges').checked) {
-    listTypes.push('challenges');
-}
-if (document.getElementById('roulette-platformer').checked) {
-    listTypes.push('platformer');
-}
+    const listTypes = [];
+    if (document.getElementById('roulette-classic').checked) {
+        listTypes.push('classic');
+    }
+    if (document.getElementById('roulette-challenges').checked) {
+        listTypes.push('challenges');
+    }
+    if (document.getElementById('roulette-platformer').checked) {
+        listTypes.push('platformer');
+    }
     
     if (listTypes.length === 0) {
         showCustomAlert('Please select at least one list!');
@@ -7159,7 +7165,8 @@ if (document.getElementById('roulette-platformer').checked) {
         history: [],
         usedLevels: new Set(),
         totalSkips: skipCount,
-        remainingSkips: skipCount
+        remainingSkips: skipCount,
+        skipAddsPercent // Добавляем новое поле в состояние
     };
     
     // Прокручиваем страницу вверх перед показом рулетки
@@ -7187,14 +7194,39 @@ function generateNextLevel() {
     
     rouletteState.currentLevel = levelData;
     
-    // Определяем минимальный процент на основе истории
-    let minPercentage = 1;
-    if (rouletteState.history.length > 0) {
-        const lastPercentage = rouletteState.history[rouletteState.history.length - 1].percentage;
-        if (lastPercentage !== 'Skipped') {
-            minPercentage = parseInt(lastPercentage) + 1;
+// Определяем минимальный процент на основе истории
+let minPercentage = 1;
+if (rouletteState.history.length > 0) {
+    // Находим последний введенный процент (не пропущенный)
+    for (let i = rouletteState.history.length - 1; i >= 0; i--) {
+        if (rouletteState.history[i].percentage !== 'Skipped') {
+            minPercentage = parseInt(rouletteState.history[i].percentage) + 1;
+            break;
         }
     }
+    
+    // Если включена опция "Skip adds percent", добавляем +1% за каждый пропуск после последнего введенного процента
+    const skipAddsPercent = document.getElementById('skip-adds-percent').checked;
+    if (skipAddsPercent) {
+        const lastNonSkippedIndex = rouletteState.history.findIndex(item => 
+            item.percentage !== 'Skipped' && 
+            parseInt(item.percentage) === minPercentage - 1
+        );
+        
+        if (lastNonSkippedIndex >= 0) {
+            const skipsAfter = rouletteState.history.slice(lastNonSkippedIndex + 1)
+                .filter(item => item.percentage === 'Skipped').length;
+            
+            minPercentage += skipsAfter;
+        }
+    }
+    
+    // Если было установлено значение из пропуска, используем его
+    if (rouletteState.lastPercentage) {
+        minPercentage = rouletteState.lastPercentage;
+        delete rouletteState.lastPercentage;
+    }
+}
     
     // Обновляем контейнер уровней
     const container = document.getElementById('roulette-levels-container');
@@ -7229,24 +7261,45 @@ function generateNextLevel() {
 }
 
     // Функция для пропуска уровня
-    function skipLevel() {
-        if (rouletteState.remainingSkips <= 0) return;
-        
-        rouletteState.remainingSkips--;
-        
-        // Добавляем в историю
-        rouletteState.history.push({
-            level: rouletteState.currentLevel.level,
-            position: rouletteState.currentLevel.position,
-            percentage: 'Skipped'
-        });
-        
-        // Обновляем историю
-        document.getElementById('history-container').innerHTML = generateHistoryHTML();
-        
-        // Генерируем следующий уровень
-        generateNextLevel();
+function skipLevel() {
+    if (rouletteState.remainingSkips <= 0) return;
+    
+    rouletteState.remainingSkips--;
+    
+    // Добавляем в историю
+    rouletteState.history.push({
+        level: rouletteState.currentLevel.level,
+        position: rouletteState.currentLevel.position,
+        percentage: 'Skipped'
+    });
+    
+// Если включена опция "Skip adds percent", увеличиваем минимальный процент
+const skipAddsPercent = document.getElementById('skip-adds-percent').checked;
+if (skipAddsPercent) {
+    // Находим последний введенный процент (не пропущенный)
+    let lastPercentage = 1;
+    for (let i = rouletteState.history.length - 1; i >= 0; i--) {
+        if (rouletteState.history[i].percentage !== 'Skipped') {
+            lastPercentage = parseInt(rouletteState.history[i].percentage);
+            break;
+        }
     }
+    
+    // Увеличиваем минимальный процент на количество пропусков +1
+    const skipCount = rouletteState.history.filter(item => 
+        item.percentage === 'Skipped' && 
+        rouletteState.history.indexOf(item) > rouletteState.history.findIndex(i => i.percentage === lastPercentage)
+    ).length;
+    
+    rouletteState.lastPercentage = lastPercentage + skipCount + 1;
+}
+    
+    // Обновляем историю
+    document.getElementById('history-container').innerHTML = generateHistoryHTML();
+    
+    // Генерируем следующий уровень
+    generateNextLevel();
+}
 
     // Функция для отправки процента
 function submitPercentage() {
@@ -7312,7 +7365,8 @@ function exportRouletteData() {
             platformerMin: parseInt(document.getElementById('roulette-platformer-min').value) || 1,
             platformerMax: parseInt(document.getElementById('roulette-platformer-max').value) || 1000,
             allowRepeats: document.getElementById('allow-repeats').checked,
-            skipCount: parseInt(document.getElementById('skip-count').value) || 0
+            skipCount: parseInt(document.getElementById('skip-count').value) || 0,
+            skipAddsPercent: document.getElementById('skip-adds-percent').checked // Добавляем новую настройку
         },
         history: rouletteState.history.map(item => ({
             title: item.level.title,
@@ -7368,6 +7422,8 @@ function importRouletteData(file) {
             document.getElementById('roulette-platformer-max').value = data.settings.platformerMax || 1000;
             document.getElementById('allow-repeats').checked = data.settings.allowRepeats;
             document.getElementById('skip-count').value = data.settings.skipCount || 0;
+            document.getElementById('skip-adds-percent').checked = data.settings.skipAddsPercent !== undefined ? 
+                data.settings.skipAddsPercent : true; // По умолчанию true для обратной совместимости
             
             // Загружаем историю
             rouletteState.history = data.history.map(item => {
@@ -7438,6 +7494,8 @@ function importRouletteData(file) {
             
             // Устанавливаем оставшиеся пропуски
             rouletteState.remainingSkips = data.remainingSkips || 0;
+            rouletteState.skipAddsPercent = data.settings.skipAddsPercent !== undefined ? 
+                data.settings.skipAddsPercent : true;
             
             // Обновляем отображение истории
             document.getElementById('history-container').innerHTML = generateHistoryHTML();
