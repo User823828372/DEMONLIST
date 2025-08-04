@@ -1471,26 +1471,25 @@ background-clip: text;
             <i class="fas fa-cog" style="margin-right: 8px;"></i>
             Roulette Settings
         </div>
-        <div class="roulette-settings-options">
-<div class="roulette-skip-container" style="margin-bottom: 10px;">
-    <label class="roulette-checkbox-label" style="flex: 0 0 auto;">
+<div class="roulette-settings-options" style="position: relative;">
+    <label class="roulette-checkbox-label">
         <input type="checkbox" id="enable-skips" checked>
         <span class="roulette-checkbox-custom"></span>
         <span>Skips Allowed</span>
     </label>
-    <input type="number" id="skip-count" min="0" max="100" value="3" class="no-spinners" style="width: 180px; margin-left: auto;">
+    <input type="number" id="skip-count" min="0" max="100" value="3" class="no-spinners" style="position: absolute; right: 0; width: 180px;">
+    
+    <label class="roulette-checkbox-label">
+        <input type="checkbox" id="skip-adds-percent" checked>
+        <span class="roulette-checkbox-custom"></span>
+        <span>Skip Adds +1%</span>
+    </label>
+    <label class="roulette-checkbox-label">
+        <input type="checkbox" id="allow-repeats">
+        <span class="roulette-checkbox-custom"></span>
+        <span>Allow Level Repeats</span>
+    </label>
 </div>
-<label class="roulette-checkbox-label">
-    <input type="checkbox" id="skip-adds-percent" checked>
-    <span class="roulette-checkbox-custom"></span>
-    <span>Skip Adds +1%</span>
-</label>
-            <label class="roulette-checkbox-label" style="margin-top: 10px !important; display: block !important;">
-                <input type="checkbox" id="allow-repeats">
-                <span class="roulette-checkbox-custom"></span>
-                <span>Allow Level Repeats</span>
-            </label>
-        </div>
     </div>
     
     <!-- Новый раздел Filter Levels -->
@@ -8211,43 +8210,53 @@ function importRouletteData(file) {
     }
 
     // Функция для отображения модального окна подтверждения
-    function showConfirmationModal(title, message, callback) {
-      const modal = document.getElementById('confirm-modal');
-      const modalTitle = document.getElementById('confirm-modal-title');
-      const modalMessage = document.getElementById('confirm-modal-message');
-      const confirmBtn = document.getElementById('confirm-modal-ok');
-      const cancelBtn = document.getElementById('confirm-modal-cancel');
-      
-      // Устанавливаем текст
-      modalTitle.textContent = title;
-      modalMessage.textContent = message;
-      
-      // Показываем модальное окно
-      modal.style.display = 'flex';
-      setTimeout(() => {
-        modal.classList.add('active');
-      }, 10);
-      
-      // Обработчики событий
-      const handleConfirm = () => {
-        callback();
-        hideConfirmationModal();
-      };
-      
-      const hideConfirmationModal = () => {
-        modal.classList.remove('active');
-        setTimeout(() => {
-          modal.style.display = 'none';
-        }, 300);
-        
-        // Удаляем обработчики
-        confirmBtn.removeEventListener('click', handleConfirm);
-        cancelBtn.removeEventListener('click', hideConfirmationModal);
-      };
-      
-      confirmBtn.addEventListener('click', handleConfirm);
-      cancelBtn.addEventListener('click', hideConfirmationModal);
+function showConfirmationModal(title, message, callback) {
+  const modal = document.getElementById('confirm-modal');
+  const modalTitle = document.getElementById('confirm-modal-title');
+  const modalMessage = document.getElementById('confirm-modal-message');
+  const confirmBtn = document.getElementById('confirm-modal-ok');
+  const cancelBtn = document.getElementById('confirm-modal-cancel');
+  
+  // Устанавливаем текст
+  modalTitle.textContent = title;
+  modalMessage.textContent = message;
+  
+  // Показываем модальное окно
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    modal.classList.add('active');
+  }, 10);
+  
+  // Обработчики событий
+  const handleConfirm = () => {
+    callback();
+    hideConfirmationModal();
+  };
+  
+  const hideConfirmationModal = () => {
+    document.removeEventListener('keydown', handleEsc);
+    modal.classList.remove('active');
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300);
+    
+    // Удаляем обработчики
+    confirmBtn.removeEventListener('click', handleConfirm);
+    cancelBtn.removeEventListener('click', hideConfirmationModal);
+  };
+  
+  // Закрытие по Esc
+  const handleEsc = (e) => {
+    if (e.key === 'Escape') {
+      hideConfirmationModal();
+      document.removeEventListener('keydown', handleEsc);
     }
+  };
+  document.addEventListener('keydown', handleEsc);
+  
+  confirmBtn.addEventListener('click', handleConfirm);
+  cancelBtn.addEventListener('click', hideConfirmationModal);
+}
 
     // Функция для ленивой загрузки изображений
     function setupLazyLoading() {
@@ -8558,6 +8567,16 @@ window.addEventListener('scroll', () => {
           rouletteModal.style.display = 'none';
         }, 300);
       });
+
+      // Закрытие по Esc
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && rouletteModal.classList.contains('active')) {
+    rouletteModal.classList.remove('active');
+    setTimeout(() => {
+      rouletteModal.style.display = 'none';
+    }, 300);
+  }
+});
       
       spinBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -8611,19 +8630,47 @@ timeMachineBtn.addEventListener('click', () => {
   timeMachineModal.style.display = 'flex';
   setTimeout(() => {
     timeMachineModal.classList.add('active');
-    timeMachineInput.focus(); // Фокус на поле ввода даты
+    timeMachineInput.focus();
+    
+    // Добавляем обработчик Esc при открытии
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        closeTimeMachineModal();
+        document.removeEventListener('keydown', handleEsc);
+      }
+    };
+    document.addEventListener('keydown', handleEsc);
+    
+    // Сохраняем ссылку на обработчик для последующего удаления
+    timeMachineModal._escHandler = handleEsc;
   }, 10);
 });
 
-// Когда нажимаем на крестик (закрыть)
-timeMachineClose.addEventListener('click', () => {
+// Функция закрытия модального окна
+function closeTimeMachineModal() {
+  // Удаляем обработчик Esc
+  if (timeMachineModal._escHandler) {
+    document.removeEventListener('keydown', timeMachineModal._escHandler);
+    delete timeMachineModal._escHandler;
+  }
+  
   timeMachineModal.classList.remove('active');
   setTimeout(() => {
     timeMachineModal.style.display = 'none';
   }, 300);
+}
+
+// Закрытие по клику на крестик
+timeMachineClose.addEventListener('click', closeTimeMachineModal);
+
+// Закрытие по клику вне окна
+timeMachineModal.addEventListener('click', (e) => {
+  if (e.target === timeMachineModal) {
+    closeTimeMachineModal();
+  }
 });
 
-// Когда нажимаем "Apply"
+// Применение даты
 timeMachineApply.addEventListener('click', () => {
   const dateStr = timeMachineInput.value;
   if (!dateStr) {
@@ -8632,10 +8679,7 @@ timeMachineApply.addEventListener('click', () => {
   }
   const selectedDate = new Date(dateStr);
   filterLevelsByDate(selectedDate);
-  timeMachineModal.classList.remove('active');
-  setTimeout(() => {
-    timeMachineModal.style.display = 'none';
-  }, 300);
+  closeTimeMachineModal();
 });
 
   </script>
