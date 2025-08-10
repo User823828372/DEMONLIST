@@ -414,7 +414,6 @@
   transform: scale(1.1);
 }
 
-/* Стили для значка в рулетке */
 .roulette-level .level-crown-container {
     position: absolute;
     top: 15px;
@@ -1366,6 +1365,30 @@ background-clip: text;
       from { opacity: 1; transform: translateX(-50%) translateY(0); }
       to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
     }
+    
+    /* Стили для цветов названий уровней */
+    .no-length-title {
+      color: #ffa500 !important; /* Оранжевый для уровней без lenght */
+    }
+    
+    .has-preview-title {
+      color: #ffff00 !important; /* Желтый для уровней с previewImg */
+    }
+    
+    .no-length-has-preview-title {
+      color: #ff0000 !important; /* Красный для уровней без lenght, но с previewImg */
+    }
+    
+    /* Стиль для всего уровня, если нет lenght */
+    .level.no-length-level {
+      background-color: rgba(255, 0, 0, 0.1) !important;
+      border: 1px solid rgba(255, 0, 0, 0.3) !important;
+    }
+    
+    .compact-view .no-length-level {
+      background-color: rgba(255, 0, 0, 0.1) !important;
+    }
+
   </style>
 
 <!-- Подключение Montserrat с Google Fonts -->
@@ -1500,6 +1523,11 @@ background-clip: text;
         <span class="roulette-checkbox-custom"></span>
         <span>Allow Level Repeats</span>
     </label>
+    <label class="roulette-checkbox-label">
+        <input type="checkbox" id="max-plus-one">
+        <span class="roulette-checkbox-custom"></span>
+        <span>Max +1%</span>
+    </label>
 </div>
     </div>
     
@@ -1571,6 +1599,69 @@ background-clip: text;
 <input type="file" id="import-file" accept=".txt,.json" style="display: none;">
 
   <script>
+
+// Функция для проверки дубликатов ID
+function checkForDuplicateIds() {
+    const allIds = {};
+    const duplicates = {};
+    
+    // Проверяем все списки уровней
+    for (const listType in levelData) {
+        levelData[listType].forEach(level => {
+            if (!allIds[level.id]) {
+                allIds[level.id] = [];
+            }
+            allIds[level.id].push({
+                title: level.title,
+                listType: listType
+            });
+        });
+    }
+    
+    // Находим дубликаты
+    for (const id in allIds) {
+        if (allIds[id].length > 1) {
+            duplicates[id] = allIds[id];
+        }
+    }
+    
+    // Если есть дубликаты - показываем сообщение
+    if (Object.keys(duplicates).length > 0) {
+        let message = 'Found levels with duplicate IDs:\n\n';
+        
+        for (const id in duplicates) {
+            message += `ID: ${id}\n`;
+            duplicates[id].forEach(level => {
+                message += `- ${level.title} (${level.listType} list)\n`;
+            });
+            message += '\n';
+        }
+        
+        showCustomAlert(message, false);
+        console.warn('Duplicate level IDs found:', duplicates);
+    }
+}
+
+// Функция для преобразования строки длительности в секунды
+function parseDurationToSeconds(durationStr) {
+    if (!durationStr) return 0;
+    
+    // Регулярное выражение для поиска компонентов времени
+    const regex = /(\d+d)?\s*(\d+h)?\s*(\d+m)?\s*(\d+s)?/;
+    const matches = durationStr.match(regex);
+    
+    let seconds = 0;
+    
+    if (matches) {
+        if (matches[1]) seconds += parseInt(matches[1]) * 86400; // дни
+        if (matches[2]) seconds += parseInt(matches[2]) * 3600;  // часы
+        if (matches[3]) seconds += parseInt(matches[3]) * 60;    // минуты
+        if (matches[4]) seconds += parseInt(matches[4]);         // секунды
+    }
+    
+    return seconds;
+}
+
     // Данные уровней
     const levelData = {
       classic: [
@@ -1581,6 +1672,7 @@ background-clip: text;
           id: "119544028",
           videoUrl: "https://youtu.be/CELNmHwln_c",
           releaseDate: "2025-05-24",
+          lenght: "70",
           tags: ["Unrated"]
         },
         {
@@ -1589,7 +1681,8 @@ background-clip: text;
           verifier: "wPopoff",
           id: "119550490",
           videoUrl: "https://youtu.be/4lfkzz1VCbA",
-          releaseDate: "2025-05-24"
+          releaseDate: "2025-05-24",
+          lenght: "102",
         },
         {
           title: "Tidal Wave buffed",
@@ -1598,6 +1691,7 @@ background-clip: text;
           id: "116732736",
           videoUrl: "https://youtu.be/1-ihSeRCpds",
           releaseDate: "2025-04-01",
+          lenght: "181",
           tags: ["Unrated"]
         },
         {
@@ -1606,7 +1700,8 @@ background-clip: text;
           verifier: "zZoink",
           id: "86407629",
           videoUrl: "https://youtu.be/9fsZ014qB3s",
-          releaseDate: "2023-09-10"
+          releaseDate: "2023-09-10",
+          lenght: "181",
         },
         {
           title: "Nullscapes",
@@ -1614,7 +1709,8 @@ background-clip: text;
           verifier: "zZoink",
           id: "109780665",
           videoUrl: "https://youtu.be/EztneTPp5CU",
-          releaseDate: "2024-09-02"
+          releaseDate: "2024-09-02",
+          lenght: "86",
         },
         {
           title: "BOOBAWAMBA",
@@ -1622,7 +1718,8 @@ background-clip: text;
           verifier: "eastshark",
           id: "110816181",
           videoUrl: "https://youtu.be/20fYiqLAo_E",
-          releaseDate: "2024-10-06"
+          releaseDate: "2024-10-06",
+          lenght: "146",
         },
         {
           title: "Quanteuse processing",
@@ -1631,6 +1728,7 @@ background-clip: text;
           id: "117692518",
           videoUrl: "https://youtu.be/j5NC0u1Q91Q",
           releaseDate: "2025-01-03",
+          lenght: "103",
           tags: ["Unrated"]
         },
         {
@@ -1639,7 +1737,8 @@ background-clip: text;
           verifier: "Taiago",
           id: "114283297",
           videoUrl: "https://youtu.be/mk3TDemdkC0",
-          releaseDate: "2025-01-19"
+          releaseDate: "2025-01-19",
+          lenght: "76",
         },
         {
           title: "Silent clubstep",
@@ -1647,7 +1746,8 @@ background-clip: text;
           verifier: "zoe",
           id: "4125776",
           videoUrl: "https://youtu.be/GR4OMkS3SN8",
-          releaseDate: "2022-07-18"
+          releaseDate: "2022-07-18",
+          lenght: "87",
         },
         {
           title: "Anathema",
@@ -1655,7 +1755,8 @@ background-clip: text;
           verifier: "Whizkid05",
           id: "112313819",
           videoUrl: "https://youtu.be/_uKwmjHmySI",
-          releaseDate: "2024-11-21"
+          releaseDate: "2024-11-21",
+          lenght: "150",
         },
         {
           title: "Sakupen circles",
@@ -1664,6 +1765,7 @@ background-clip: text;
           id: "10887708",
           videoUrl: "https://youtu.be/AdrmZsy52EY",
           releaseDate: "2025-07-15",
+          lenght: "51",
           tags: ["Unrated"]
         },
         {
@@ -1672,7 +1774,8 @@ background-clip: text;
           verifier: "zZoink",
           id: "89496627",
           videoUrl: "https://youtu.be/16Zh8jssanc",
-          releaseDate: "2023-03-22"
+          releaseDate: "2023-03-22",
+          lenght: "78",
         },
         {
           title: "Every End",
@@ -1680,7 +1783,8 @@ background-clip: text;
           verifier: "Hqmy",
           id: "116174063",
           videoUrl: "https://youtu.be/AO--mVVFtKI",
-          releaseDate: "2025-03-17"
+          releaseDate: "2025-03-17",
+          lenght: "440",
         },
         {
           title: "Spectre",
@@ -1688,7 +1792,8 @@ background-clip: text;
           verifier: "PersonHuman42",
           id: "110815379",
           videoUrl: "https://youtu.be/MzsSLKJrLSI",
-          releaseDate: "2024-10-05"
+          releaseDate: "2024-10-05",
+          lenght: "165",
         },
         {
           title: "Acheron buffed",
@@ -1697,6 +1802,7 @@ background-clip: text;
           id: "88201288",
           videoUrl: "https://youtu.be/06ADbkaBDz4",
           releaseDate: "2023-01-30",
+          lenght: "67",
           tags: ["Unrated"]
         },
         {
@@ -1705,7 +1811,8 @@ background-clip: text;
           verifier: "zZoink",
           id: "73667628",
           videoUrl: "https://youtu.be/sBKR6aUorzA",
-          releaseDate: "2022-08-23"
+          releaseDate: "2022-08-23",
+          lenght: "67",
         },
         {
           title: "Aquamarine",
@@ -1714,6 +1821,7 @@ background-clip: text;
           id: "77331805",
           videoUrl: "https://youtu.be/Q__EnRojGt4",
           releaseDate: "2024-10-09",
+          lenght: "56",
           tags: ["Unrated"]
         },
         {
@@ -1722,7 +1830,8 @@ background-clip: text;
           verifier: "Whizkid05",
           id: "107805281",
           videoUrl: "https://youtu.be/nnkgghxxsEE",
-          releaseDate: "2024-07-15"
+          releaseDate: "2024-07-15",
+          lenght: "189",
         }, 
         {
           title: "Abyss of Darkness",
@@ -1730,7 +1839,8 @@ background-clip: text;
           verifier: "Cursed",
           id: "49896559",
           videoUrl: "https://youtu.be/ejJkpqcMMCY",
-          releaseDate: "2022-04-04"
+          releaseDate: "2022-04-04",
+          lenght: "125",
         },
         {
           title: "Tunnel of Despair",
@@ -1738,7 +1848,8 @@ background-clip: text;
           verifier: "zZoink",
           id: "91351939",
           videoUrl: "https://youtu.be/LpS4JREhW98",
-          releaseDate: "2023-06-07"
+          releaseDate: "2023-06-07",
+          lenght: "104",
         },
         {
           title: "Subterminal Point",
@@ -1746,7 +1857,8 @@ background-clip: text;
           verifier: "PoCle",
           id: "113599729",
           videoUrl: "https://youtu.be/h2wmRMgACH4",
-          releaseDate: "2024-12-29"
+          releaseDate: "2024-12-29",
+          lenght: "70",
         },
         {
           title: "Kyouki",
@@ -1754,7 +1866,18 @@ background-clip: text;
           verifier: "Demishio",
           id: "86018142",
           videoUrl: "https://youtu.be/KDa5c0CJTHs",
-          releaseDate: "2022-11-24"
+          releaseDate: "2022-11-24",
+          lenght: "98",
+        },
+        {
+          title: "Unnerfed Firework",
+          author: "Openix",
+          verifier: "Openix",
+          id: "97139950",
+          videoUrl: "https://youtu.be/8zU6VTSuOgU",
+          releaseDate: "2023-12-07",
+          lenght: "127",
+          tags: ["Unrated"]
         },
         {
           title: "Old AoD",
@@ -1763,6 +1886,7 @@ background-clip: text;
           id: "76680844",
           videoUrl: "https://youtu.be/RWBEfS4mLbw",
           releaseDate: "2023-03-20",
+          lenght: "125",
           tags: ["Unrated"]
         },
         {
@@ -1772,6 +1896,7 @@ background-clip: text;
           id: "61775814",
           videoUrl: "https://youtu.be/ZcdiTGuIJ1k",
           releaseDate: "2024-04-12",
+          lenght: "97",
           tags: ["Unrated"]
         },
         {
@@ -1781,6 +1906,7 @@ background-clip: text;
           id: "84117769",
           videoUrl: "https://youtu.be/5rUPUAyQtWc",
           releaseDate: "2023-11-06",
+          lenght: "70",
           tags: ["Unrated"]
         },
         {
@@ -1789,7 +1915,8 @@ background-clip: text;
           verifier: "Doggie",
           id: "27690100",
           videoUrl: "https://youtu.be/kpcF1-QAHQc",
-          releaseDate: "2021-12-22"
+          releaseDate: "2021-12-22",
+          lenght: "70",
         },
         {
           title: "Ashley Wave Trials",
@@ -1798,6 +1925,7 @@ background-clip: text;
           id: "62912799",
           videoUrl: "https://youtu.be/aTxt76U3e2Q",
           releaseDate: "2024-11-02",
+          lenght: "126",
           tags: ["Unrated"]
         },
         {
@@ -1806,7 +1934,8 @@ background-clip: text;
           verifier: "zZoink",
           id: "87665224",
           videoUrl: "https://youtu.be/2CxE-UWCIG4",
-          releaseDate: "2023-05-13"
+          releaseDate: "2023-05-13",
+          lenght: "89",
         },
         {
           title: "KOCMOC Trick",
@@ -1815,32 +1944,7 @@ background-clip: text;
           id: "91901757",
           videoUrl: "https://youtu.be/RsOVrVlcE2g",
           releaseDate: "2023-03-13",
-          tags: ["Unrated"]
-        },
-        {
-          title: "Sakupen Circles",
-          author: "TDiamond",
-          verifier: "Diamond",
-          id: "76962930",
-          videoUrl: "https://youtu.be/ofG2mJi9kEA",
-          releaseDate: "2021-12-30"
-        },
-        {
-          title: "WOKE circles",
-          author: "PPPixel",
-          verifier: "PPPixel",
-          id: "88318424",
-          videoUrl: "https://youtu.be/MKFeLVaBdoE",
-          releaseDate: "2023-02-04",
-          tags: ["Unrated"]
-        },
-        {
-          title: "Exens limit",
-          author: "Legoyoshi3",
-          verifier: "Cursed",
-          id: "97338077",
-          videoUrl: "https://youtu.be/KZksoQVGmKw",
-          releaseDate: "2023-06-19",
+          lenght: "89",
           tags: ["Unrated"]
         },
         {
@@ -1850,6 +1954,7 @@ background-clip: text;
           id: "13586257",
           videoUrl: "https://youtu.be/XQ_TZc7cnPs",
           releaseDate: "2025-01-30",
+          lenght: "104",
           tags: ["Unrated"]
         },
         {
@@ -1859,6 +1964,36 @@ background-clip: text;
           id: "120012581",
           videoUrl: "https://youtu.be/nU5AQPzd2YA",
           releaseDate: "2025-06-01",
+          lenght: "60",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Sakupen Circles",
+          author: "TheDiamondPizza",
+          verifier: "TheDiamondPizza",
+          id: "76962930",
+          videoUrl: "https://youtu.be/ofG2mJi9kEA",
+          releaseDate: "2021-12-30",
+          lenght: "51",
+        },
+        {
+          title: "WOKE circles",
+          author: "PPPixel",
+          verifier: "PPPixel",
+          id: "88318424",
+          videoUrl: "https://youtu.be/MKFeLVaBdoE",
+          releaseDate: "2023-02-04",
+          lenght: "51",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Exens limit",
+          author: "Legoyoshi3",
+          verifier: "Cursed",
+          id: "97338077",
+          videoUrl: "https://youtu.be/KZksoQVGmKw",
+          releaseDate: "2023-06-19",
+          lenght: "51",
           tags: ["Unrated"]
         },
         {
@@ -1868,15 +2003,17 @@ background-clip: text;
           id: "110534288",
           videoUrl: "https://youtu.be/yQBFyUvB3lY",
           releaseDate: "2024-09-28",
+          lenght: "88",
           tags: ["Unrated"]
         },
         {
           title: "Unnerfed Yatagarasu",
-          author: "TrusTa",
+          author: "Compendium",
           verifier: "zZoink",
           id: "28224824",
           videoUrl: "https://youtu.be/qSdyb-Ft1tk",
           releaseDate: "2023-12-31",
+          lenght: "177",
           tags: ["Unrated"]
         },
         {
@@ -1886,6 +2023,7 @@ background-clip: text;
           id: "113322063",
           videoUrl: "https://youtu.be/qeRKuyU3eGI",
           releaseDate: "2024-12-24",
+          lenght: "66",
           tags: ["Unrated"]
         },
         {
@@ -1894,15 +2032,26 @@ background-clip: text;
           verifier: "Doggie",
           id: "93091893",
           videoUrl: "https://youtu.be/b2yHaIk5zio",
-          releaseDate: "2023-08-06"
+          releaseDate: "2023-08-06",
+          lenght: "177",
+        },
+        {
+          title: "The Lightning Rod",
+          author: "Lavatrex",
+          verifier: "Lavatrex",
+          id: "93917076",
+          videoUrl: "https://youtu.be/nQDTi077O6M",
+          releaseDate: "2023-08-29",
+          lenght: "97",
         },
         {
           title: "Firework",
           author: "TrickGMD",
-          verifier: "Trick",
+          verifier: "TrickGMD",
           id: "75206202",
           videoUrl: "https://youtu.be/QBe5x2o9v2w",
-          releaseDate: "2021-10-31"
+          releaseDate: "2021-10-31",
+          lenght: "127",
         },
         {
           title: "Map of Problematique",
@@ -1911,31 +2060,26 @@ background-clip: text;
           id: "91736575",
           videoUrl: "https://youtu.be/Sm0UvvwOE08",
           releaseDate: "2024-10-12",
+          lenght: "140",
           tags: ["Unrated"]
         },
         {
           title: "KOSETSU",
-          author: "fwefwe",
+          author: "fwwe",
           verifier: "Taiago",
           id: "109439644",
           videoUrl: "https://youtu.be/hZ8vFX8z_BU",
-          releaseDate: "2024-08-25"
-        },
-        {
-          title: "The Lightning Rod",
-          author: "Lavatrex",
-          verifier: "Lavatrex",
-          id: "93917076",
-          videoUrl: "https://youtu.be/nQDTi077O6M",
-          releaseDate: "2023-08-29"
+          releaseDate: "2024-08-25",
+          lenght: "72",
         },
         {
           title: "True Innards",
-          author: "eandis",
-          verifier: "eandis",
+          author: "TheRealEandis",
+          verifier: "TheRealEandis",
           id: "88216956",
           videoUrl: "https://youtu.be/K77leSnLP0Y",
           releaseDate: "2023-01-30",
+          lenght: "85",
           tags: ["Unrated"]
         },
         {
@@ -1945,6 +2089,7 @@ background-clip: text;
           id: "49072489",
           videoUrl: "https://youtu.be/4yHA6jux5UI",
           releaseDate: "2023-10-13",
+          lenght: "98",
           tags: ["Unrated"]
         },
         {
@@ -1953,7 +2098,8 @@ background-clip: text;
           verifier: "Vorten",
           id: "120255728",
           videoUrl: "https://youtu.be/TvA8EJTJFCc",
-          releaseDate: "2025-06-04"
+          releaseDate: "2025-06-04",
+          lenght: "74",
         },
         {
           title: "Silentlocked",
@@ -1962,15 +2108,8 @@ background-clip: text;
           id: "113959291",
           videoUrl: "https://youtu.be/O-IQeUdEGvI",
           releaseDate: "2025-01-08",
+          lenght: "106",
           tags: ["Unrated"]
-        },
-        {
-          title: "Saul Goodman",
-          author: "Renn241",
-          verifier: "Jori",
-          id: "90477539",
-          videoUrl: "https://youtu.be/hjs5PjUaw9k",
-          releaseDate: "2023-05-03"
         },
         {
           title: "NOMAD",
@@ -1979,15 +2118,17 @@ background-clip: text;
           id: "115077305",
           videoUrl: "https://youtu.be/H2TkHbEX__A",
           releaseDate: "2025-02-13",
+          lenght: "55",
           tags: ["Unrated"]
         },
         {
           title: "poocubed",
-          author: "btLisp",
+          author: "Liisp",
           verifier: "Kyasshukodo",
           id: "85133223",
           videoUrl: "https://youtu.be/fzL31vai1ms",
-          releaseDate: "2022-11-02"
+          releaseDate: "2022-11-02",
+          lenght: "82",
         },
         {
           title: "Snowbound",
@@ -1996,7 +2137,17 @@ background-clip: text;
           id: "120289520",
           videoUrl: "https://youtu.be/cjHwgbtAkXU",
           releaseDate: "2025-06-05",
+          lenght: "140",
           tags: ["Unrated"]
+        },  
+        {
+          title: "Eyes in the Water",
+          author: "nothawkyre",
+          verifier: "LordVadercraft",
+          id: "95851008",
+          videoUrl: "https://youtu.be/yvLwiOy3KEA",
+          releaseDate: "2023-10-29",
+          lenght: "92",
         },
         {
           title: "Infinite Chaos",
@@ -2005,16 +2156,9 @@ background-clip: text;
           id: "119689515",
           videoUrl: "https://youtu.be/wOMVERxU5IA",
           releaseDate: "2025-05-27",
+          lenght: "194",
           tags: ["Unrated"]
-        },     
-        {
-          title: "Eyes in the Water",
-          author: "nothawkyre",
-          verifier: "LordVadercraft",
-          id: "95851008",
-          videoUrl: "https://youtu.be/yvLwiOy3KEA",
-          releaseDate: "2023-10-29"
-        },
+        },   
         {
           title: "Centipede",
           author: "zander12",
@@ -2022,7 +2166,17 @@ background-clip: text;
           id: "106646765",
           videoUrl: "https://youtu.be/eLGr383CmyM",
           releaseDate: "2024-06-17",
+          lenght: "109",
           tags: ["Unrated"]
+        },
+        {
+          title: "Saul Goodman",
+          author: "Renn241",
+          verifier: "Jori",
+          id: "90477539",
+          videoUrl: "https://youtu.be/hjs5PjUaw9k",
+          releaseDate: "2023-05-03",
+          lenght: "86",
         },
         {
           title: "MINUSdry",
@@ -2030,7 +2184,8 @@ background-clip: text;
           verifier: "Varium",
           id: "89414220",
           videoUrl: "https://youtu.be/YvA8ehhzz0Q",
-          releaseDate: "2023-03-19"
+          releaseDate: "2023-03-19",
+          lenght: "82",
         },
         {
           title: "Hazard Duty Pay",
@@ -2039,6 +2194,7 @@ background-clip: text;
           id: "104359956",
           videoUrl: "https://youtu.be/kpbE1vJXUos",
           releaseDate: "2025-03-18",
+          lenght: "66",
           tags: ["Unrated"]
         },
         {
@@ -2047,7 +2203,17 @@ background-clip: text;
           verifier: "polterghast",
           id: "113443235",
           videoUrl: "https://youtu.be/RUBbpsTR5eU",
-          releaseDate: "2024-12-25"
+          releaseDate: "2024-12-25",
+          lenght: "269",
+        },
+        {
+          title: "Deadlier Clubstep",
+          author: "herozombie80",
+          verifier: "Jenath",
+          id: "96314787",
+          videoUrl: "https://youtu.be/eRhgaF0r5Q0",
+          releaseDate: "2023-10-21",
+          lenght: "104",
         },
         {
           title: "Belladonna",
@@ -2055,7 +2221,8 @@ background-clip: text;
           verifier: "exsii",
           id: "94969889",
           videoUrl: "https://youtu.be/saHSgoU1JQQ",
-          releaseDate: "2023-09-27"
+          releaseDate: "2023-09-27",
+          lenght: "106",
         },
         {
           title: "The Hallucination",
@@ -2063,7 +2230,8 @@ background-clip: text;
           verifier: "VoTcHi",
           id: "81139702",
           videoUrl: "https://youtu.be/tYbXsNkO9HE",
-          releaseDate: "2022-06-19"
+          releaseDate: "2022-06-19",
+          lenght: "124",
         },
         {
           title: "COMBUSTION",
@@ -2071,15 +2239,26 @@ background-clip: text;
           verifier: "Slithium",
           id: "94359172",
           videoUrl: "https://youtu.be/3cTR4XUcA28",
-          releaseDate: "2023-09-11"
+          releaseDate: "2023-09-11",
+          lenght: "59",
+        },
+        {
+          title: "Gaggatrondra",
+          author: "MoistyJc",
+          verifier: "Zeronium",
+          id: "114990369",
+          videoUrl: "https://youtu.be/A4G41vw6Cf0",
+          releaseDate: "2025-02-10",
+          lenght: "62",
         },
         {
           title: "The Salt Factory",
           author: "NiCkNaMe09",
-          verifier: "Nickname",
+          verifier: "NiCkNaMe09",
           id: "113045735",
           videoUrl: "https://youtu.be/lQ7M-Sgov24",
           releaseDate: "2024-12-14",
+          lenght: "96",
           tags: ["Unrated"]
         },
         {
@@ -2089,6 +2268,7 @@ background-clip: text;
           id: "83244159",
           videoUrl: "https://youtu.be/XpBY-eMYZTE",
           releaseDate: "2022-08-30",
+          lenght: "63",
           tags: ["Unrated"]
         },
         {
@@ -2097,7 +2277,8 @@ background-clip: text;
           verifier: "swiborg",
           id: "90390075",
           videoUrl: "https://youtu.be/eHQNgty8ypY",
-          releaseDate: "2023-04-29"
+          releaseDate: "2023-04-29",
+          lenght: "65",
         },
         {
           title: "walter white",
@@ -2105,15 +2286,8 @@ background-clip: text;
           verifier: "iIiLaSeRiIi",
           id: "81011195",
           videoUrl: "https://youtu.be/KzK62PkWOJ0",
-          releaseDate: "2022-07-02"
-        },
-        {
-          title: "Gaggatrondra",
-          author: "MoistyJc",
-          verifier: "Zeronium",
-          id: "114990369",
-          videoUrl: "https://youtu.be/A4G41vw6Cf0",
-          releaseDate: "2025-02-10"
+          releaseDate: "2022-07-02",
+          lenght: "124",
         },
         {
           title: "LIMBO",
@@ -2121,7 +2295,8 @@ background-clip: text;
           verifier: "BUNNYGRAM",
           id: "86084399",
           videoUrl: "https://youtu.be/kXYMbaMVOZg",
-          releaseDate: "2022-11-26"
+          releaseDate: "2022-11-26",
+          lenght: "207",
         },
         {
           title: "M I S F O R T U N E",
@@ -2130,6 +2305,7 @@ background-clip: text;
           id: "115093521",
           videoUrl: "https://youtu.be/lnutSFazI_c",
           releaseDate: "2025-02-12",
+          lenght: "42",
           tags: ["Unrated"]
         },
         {
@@ -2138,7 +2314,8 @@ background-clip: text;
           verifier: "polterghast",
           id: "89187968",
           videoUrl: "https://youtu.be/rUphe3H59yU",
-          releaseDate: "2023-03-10"
+          releaseDate: "2023-03-10",
+          lenght: "126",
         },
         {
           title: "Codependence",
@@ -2147,7 +2324,17 @@ background-clip: text;
           id: "62556400",
           videoUrl: "https://youtu.be/IKGk41hSnDo",
           releaseDate: "2023-06-05",
+          lenght: "125",
           tags: ["2Player"]
+        },
+        {
+          title: "Collapse",
+          author: "rnexel",
+          verifier: "rnexel",
+          id: "113256247",
+          videoUrl: "https://youtu.be/RCFpXyf6bn0",
+          releaseDate: "2024-12-20",
+          lenght: "123",
         },
         {
           title: "Mayhem",
@@ -2155,7 +2342,8 @@ background-clip: text;
           verifier: "LordVadercraft",
           id: "82544060",
           videoUrl: "https://youtu.be/U6e6DD32noM",
-          releaseDate: "2022-08-08"
+          releaseDate: "2022-08-08",
+          lenght: "89",
         },
         {
           title: "Itsumade",
@@ -2164,15 +2352,8 @@ background-clip: text;
           id: "120590716",
           videoUrl: "https://youtu.be/Oh8t09JF-EA",
           releaseDate: "2025-06-09",
+          lenght: "188",
           tags: ["Unrated"]
-        },
-        {
-          title: "Deadlier Clubstep",
-          author: "herozombie80",
-          verifier: "Jenath",
-          id: "96314787",
-          videoUrl: "https://youtu.be/eRhgaF0r5Q0",
-          releaseDate: "2023-10-21"
         },
         {
           title: "PSYCHOPATH",
@@ -2180,7 +2361,8 @@ background-clip: text;
           verifier: "BOON GD",
           id: "103925676",
           videoUrl: "https://youtu.be/1luL7tTE8p8",
-          releaseDate: "2024-05-16"
+          releaseDate: "2024-05-16",
+          lenght: "126",
         },
         {
           title: "ETERNALtheory",
@@ -2189,6 +2371,7 @@ background-clip: text;
           id: "92196326",
           videoUrl: "https://youtu.be/3LfjQWk9Hyg",
           releaseDate: "2023-07-07",
+          lenght: "89",
           tags: ["Unrated"]
         },
         {
@@ -2198,6 +2381,7 @@ background-clip: text;
           id: "112242564",
           videoUrl: "https://youtu.be/fSvk4tLlQzQ",
           releaseDate: "2024-11-18",
+          lenght: "81",
           tags: ["Unrated"]
         },
         {
@@ -2206,7 +2390,8 @@ background-clip: text;
           verifier: "Gokill",
           id: "113220284",
           videoUrl: "https://youtu.be/8gW1-_u1K0Y",
-          releaseDate: "2024-12-19"
+          releaseDate: "2024-12-19",
+          lenght: "62",
         },
         {
           title: "Nautical Nebula",
@@ -2215,6 +2400,7 @@ background-clip: text;
           id: "110891882",
           videoUrl: "https://youtu.be/JdmURAYP1-k",
           releaseDate: "2024-10-08",
+          lenght: "76",
           tags: ["Unrated"]
         },
         {
@@ -2223,7 +2409,8 @@ background-clip: text;
           verifier: "Dorami",
           id: "110500920",
           videoUrl: "https://youtu.be/V3FjIorIfWg",
-          releaseDate: "2024-09-25"
+          releaseDate: "2024-09-25",
+          lenght: "149",
         },
         {
           title: "Battle of the Shades",
@@ -2232,6 +2419,7 @@ background-clip: text;
           id: "79166683",
           videoUrl: "https://youtu.be/jsrqMqs1-Ao",
           releaseDate: "2025-01-17",
+          lenght: "146",
           tags: ["Unrated"]
         },
         {
@@ -2240,7 +2428,8 @@ background-clip: text;
           verifier: "skzyl",
           id: "95998005",
           videoUrl: "https://youtu.be/rRlyvmjcz_4",
-          releaseDate: "2023-10-30"
+          releaseDate: "2023-10-30",
+          lenght: "97",
         },
         {
           title: "DEATHWISH",
@@ -2249,6 +2438,7 @@ background-clip: text;
           id: "116136112",
           videoUrl: "https://youtu.be/VzP1phX8_aA",
           releaseDate: "2025-03-16",
+          lenght: "74",
           tags: ["Unrated"]
         },
         {
@@ -2258,15 +2448,8 @@ background-clip: text;
           id: "104232191",
           videoUrl: "https://youtu.be/T9-75lfKVQg",
           releaseDate: "2024-04-21",
+          lenght: "73",
           tags: ["Unrated"]
-        },
-        {
-          title: "Collapse",
-          author: "rnexel",
-          verifier: "Nexel",
-          id: "113256247",
-          videoUrl: "https://youtu.be/RCFpXyf6bn0",
-          releaseDate: "2024-12-20"
         },
         {
           title: "Decks Dark",
@@ -2275,6 +2458,7 @@ background-clip: text;
           id: "95719795",
           videoUrl: "https://youtu.be/l52ApE4HWkY",
           releaseDate: "2023-10-24",
+          lenght: "133",
           tags: ["Unrated"]
         },
         {
@@ -2284,6 +2468,7 @@ background-clip: text;
           id: "116655839",
           videoUrl: "https://youtu.be/ewFErRTvinc",
           releaseDate: "2025-03-30",
+          lenght: "77",
           tags: ["Unrated"]
         },
         {
@@ -2293,6 +2478,7 @@ background-clip: text;
           id: "96660287",
           videoUrl: "https://youtu.be/4_C6BaxD1D4",
           releaseDate: "2023-11-26",
+          lenght: "300",
           tags: ["Unrated"]
         },
         {
@@ -2302,6 +2488,7 @@ background-clip: text;
           id: "115505711",
           videoUrl: "https://youtu.be/pEQ3e7yne2k",
           releaseDate: "2025-02-26",
+          lenght: "74",
           tags: ["Unrated"]
         },
         {
@@ -2310,7 +2497,8 @@ background-clip: text;
           verifier: "nei",
           id: "96083028",
           videoUrl: "https://youtu.be/NhkN_a9cNi8",
-          releaseDate: "2023-11-03"
+          releaseDate: "2023-11-03",
+          lenght: "66",
         },
         {
           title: "Netherix",
@@ -2319,15 +2507,8 @@ background-clip: text;
           id: "122506177",
           videoUrl: "https://youtu.be/mNiyj653aSo",
           releaseDate: "2025-07-08",
+          lenght: "108",
           tags: ["Unrated"]
-        },
-        {
-          title: "arcturus",
-          author: "maxfs",
-          verifier: "ultracauaHD",
-          id: "72315402",
-          videoUrl: "https://youtu.be/a_Bqa8l9Xtc",
-          releaseDate: "2021-08-08"
         },
         {
           title: "BEELINE",
@@ -2336,6 +2517,7 @@ background-clip: text;
           id: "93792764",
           videoUrl: "https://youtu.be/nt6T9YDb6gw",
           releaseDate: "2024-11-15",
+          lenght: "71",
           tags: ["2Player"]
         },
         {
@@ -2344,7 +2526,8 @@ background-clip: text;
           verifier: "amplitron",
           id: "108708033",
           videoUrl: "https://youtu.be/do-a2EzZ4R8",
-          releaseDate: "2024-08-06"
+          releaseDate: "2024-08-06",
+          lenght: "93",
         },
         {
           title: "RUTHLESS Unnerfed",
@@ -2353,6 +2536,7 @@ background-clip: text;
           id: "90219949",
           videoUrl: "https://youtu.be/RmItPs84OOk",
           releaseDate: "2022-11-12",
+          lenght: "125",
           tags: ["Unrated"]
         },
         {
@@ -2362,6 +2546,7 @@ background-clip: text;
           id: "73214186",
           videoUrl: "https://youtu.be/BN7DxkMaQfg",
           releaseDate: "2021-09-01",
+          lenght: "87",
           tags: ["Unrated"]
         },
         {
@@ -2370,7 +2555,8 @@ background-clip: text;
           verifier: "Timo",
           id: "93339534",
           videoUrl: "https://youtu.be/MWQyCUGt76Y",
-          releaseDate: "2023-08-13"
+          releaseDate: "2023-08-13",
+          lenght: "309",
         },
         {
           title: "Aftermath v2",
@@ -2379,6 +2565,7 @@ background-clip: text;
           id: "117036430",
           videoUrl: "https://youtu.be/42rHnHtuGuE",
           releaseDate: "2025-04-08",
+          lenght: "63",
           tags: ["Unrated"]
         },
         {
@@ -2387,7 +2574,8 @@ background-clip: text;
           verifier: "wwdonut",
           id: "82249742",
           videoUrl: "https://youtu.be/6N8u_byYoZo",
-          releaseDate: "2023-08-03"
+          releaseDate: "2023-08-03",
+          lenght: "525",
         },
         {
           title: "Buffbath",
@@ -2396,6 +2584,7 @@ background-clip: text;
           id: "107190648",
           videoUrl: "https://youtu.be/gM-OF3NoJIs",
           releaseDate: "2024-08-02",
+          lenght: "112",
           tags: ["Unrated"]
         },
         {
@@ -2405,23 +2594,8 @@ background-clip: text;
           id: "94858072",
           videoUrl: "https://youtu.be/iQ3RzYCvLvA",
           releaseDate: "2023-09-27",
+          lenght: "64",
           tags: ["Unrated"]
-        },
-        {
-          title: "BPATA MPAKA",
-          author: "Inex",
-          verifier: "maybee",
-          id: "109947627",
-          videoUrl: "https://youtu.be/sSbHYzYgYfA",
-          releaseDate: "2024-10-26"
-        },
-        {
-          title: "Waterfall",
-          author: "cherryteam",
-          verifier: "LordVadercraft",
-          id: "110991117",
-          videoUrl: "https://youtu.be/VKuVdqneG9Y",
-          releaseDate: "2024-10-12"
         },
         {
           title: "Levigo",
@@ -2430,15 +2604,17 @@ background-clip: text;
           id: "97086864",
           videoUrl: "https://youtu.be/AROmUo7DNkE",
           releaseDate: "2023-12-06",
+          lenght: "97",
           tags: ["Unrated"]
         },
         {
           title: "Climax",
-          author: "YoonHush",
+          author: "HushLC",
           verifier: "Wain",
           id: "95049815",
           videoUrl: "https://youtu.be/E4ppq2WeAAs",
-          releaseDate: "2023-10-02"
+          releaseDate: "2023-10-02",
+          lenght: "67",
         },
         {
           title: "ORDINARY",
@@ -2446,7 +2622,8 @@ background-clip: text;
           verifier: "wPopoff",
           id: "105593215",
           videoUrl: "https://youtu.be/4QiHP3jpGnk",
-          releaseDate: "2024-05-23"
+          releaseDate: "2024-05-23",
+          lenght: "78",
         },
         {
           title: "Skystrike",
@@ -2455,6 +2632,7 @@ background-clip: text;
           id: "114227287",
           videoUrl: "https://youtu.be/4CMBWP8hD4M",
           releaseDate: "2025-01-17",
+          lenght: "81",
           tags: ["Unrated"]
         },
         {
@@ -2463,7 +2641,17 @@ background-clip: text;
           verifier: "cobrablitz",
           id: "114999625",
           videoUrl: "https://youtu.be/WsVF-ayipvY",
-          releaseDate: "2025-02-10"
+          releaseDate: "2025-02-10",
+          lenght: "305",
+        },
+        {
+          title: "arcturus",
+          author: "maxfs",
+          verifier: "ultracauaHD",
+          id: "72315402",
+          videoUrl: "https://youtu.be/a_Bqa8l9Xtc",
+          releaseDate: "2021-08-08",
+          lenght: "60",
         },
         {
           title: "Eternal Flame",
@@ -2472,6 +2660,7 @@ background-clip: text;
           id: "109508736",
           videoUrl: "https://youtu.be/WpBT2-mYXco",
           releaseDate: "2024-08-27",
+          lenght: "37",
           tags: ["Unrated"]
         },
         {
@@ -2480,7 +2669,37 @@ background-clip: text;
           verifier: "Xanii",
           id: "69685815",
           videoUrl: "https://youtu.be/C3-l_fFikpQ",
-          releaseDate: "2021-05-31"
+          releaseDate: "2021-05-31",
+          lenght: "148",
+        },
+        {
+          title: "Waterfall",
+          author: "cherryteam",
+          verifier: "LordVadercraft",
+          id: "110991117",
+          videoUrl: "https://youtu.be/VKuVdqneG9Y",
+          releaseDate: "2024-10-12",
+          lenght: "97",
+        },  
+        {
+          title: "Crystal Edge",
+          author: "IcEDCave",
+          verifier: "UFokinWotM8",
+          id: "64530439",
+          videoUrl: "https://youtu.be/MFNIDirFmNk",
+          releaseDate: "2021-07-14",
+          lenght: "68",
+          tags: ["Unrated"]
+        },
+        {
+          title: "E N D",
+          author: "SumoMonke",
+          verifier: "Karmakaze",
+          id: "117427403",
+          videoUrl: "https://youtu.be/CQsy56smO3E",
+          releaseDate: "2025-04-16",
+          lenght: "52",
+          tags: ["Unrated"]
         },
         {
           title: "Crystal Crusher",
@@ -2489,6 +2708,7 @@ background-clip: text;
           id: "93732702",
           videoUrl: "https://youtu.be/qirwgz-haVQ",
           releaseDate: "2025-01-13",
+          lenght: "60",
           tags: ["2Player"]
         },
         {
@@ -2497,7 +2717,8 @@ background-clip: text;
           verifier: "Diamond",
           id: "88203501",
           videoUrl: "https://youtu.be/a1sQxQqU6EM",
-          releaseDate: "2023-01-31"
+          releaseDate: "2023-01-31",
+          lenght: "42",
         },
         {
           title: "Endless Travel",
@@ -2506,15 +2727,26 @@ background-clip: text;
           id: "63917440",
           videoUrl: "https://youtu.be/RzNL0RBL1-s",
           releaseDate: "2021-04-24",
+          lenght: "3957",
           tags: ["Unrated"]
         },
         {
           title: "Tartarus",
           author: "ItzDolphy",
-          verifier: "Dolphy",
+          verifier: "ItzDolphy",
           id: "59075347",
           videoUrl: "https://youtu.be/9YYQBbrsV5Y",
-          releaseDate: "2020-01-07"
+          releaseDate: "2020-01-07",
+          lenght: "87",
+        },
+        {
+          title: "BPATA MPAKA",
+          author: "Inex",
+          verifier: "maybee",
+          id: "109947627",
+          videoUrl: "https://youtu.be/sSbHYzYgYfA",
+          releaseDate: "2024-10-26",
+          lenght: "107",
         },
         {
           title: "Delta",
@@ -2522,7 +2754,8 @@ background-clip: text;
           verifier: "Doggie",
           id: "93917362",
           videoUrl: "https://youtu.be/_rr3J8DkIm4",
-          releaseDate: "2023-08-31"
+          releaseDate: "2023-08-31",
+          lenght: "145",
         },
         {
           title: "Jigsaw",
@@ -2530,15 +2763,27 @@ background-clip: text;
           verifier: "Gokill",
           id: "95031870",
           videoUrl: "https://youtu.be/FPfSqlI0T30",
-          releaseDate: "2023-10-02"
+          releaseDate: "2023-10-02",
+          lenght: "95",
         },
         {
-          title: "Crystal Edge",
-          author: "IcEDCave",
-          verifier: "UFokinWotM8",
-          id: "64530439",
-          videoUrl: "https://youtu.be/MFNIDirFmNk",
-          releaseDate: "2021-07-14",
+          title: "Sightless Sandstorm",
+          author: "BradenbowlPro",
+          verifier: "Bradenbowl",
+          id: "68904235",
+          videoUrl: "https://youtu.be/0DAojkSfR-8",
+          releaseDate: "2021-05-07",
+          lenght: "116",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Blind Blizzard",
+          author: "BradenbowlPro",
+          verifier: "Bradenbowl",
+          id: "65679976",
+          videoUrl: "https://youtu.be/veFJtgFFvNM",
+          releaseDate: "2020-12-10",
+          lenght: "100",
           tags: ["Unrated"]
         },
         {
@@ -2548,23 +2793,7 @@ background-clip: text;
           id: "112788538",
           videoUrl: "https://youtu.be/6LhxJhOgJEw",
           releaseDate: "2024-12-05",
-          tags: ["Unrated"]
-        },
-        {
-          title: "Cimmerian Shade",
-          author: "spcreat",
-          verifier: "spcreat",
-          id: "93340783",
-          videoUrl: "https://youtu.be/lUNvV1k19HA",
-          releaseDate: "2023-08-13"
-        },
-        {
-          title: "Henken",
-          author: "PLoLek",
-          verifier: "Gokill",
-          id: "80714349",
-          videoUrl: "https://youtu.be/M--2oQKrV68",
-          releaseDate: "2022-06-04",
+          lenght: "155",
           tags: ["Unrated"]
         },
         {
@@ -2574,6 +2803,26 @@ background-clip: text;
           id: "76483916",
           videoUrl: "https://youtu.be/Soc-JeRJtqM",
           releaseDate: "2024-07-13",
+          lenght: "74",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Cimmerian Shade",
+          author: "spcreat",
+          verifier: "spcreat",
+          id: "93340783",
+          videoUrl: "https://youtu.be/lUNvV1k19HA",
+          releaseDate: "2023-08-13",
+          lenght: "77",
+        },
+        {
+          title: "Henken",
+          author: "PLoLek",
+          verifier: "Gokill",
+          id: "80714349",
+          videoUrl: "https://youtu.be/M--2oQKrV68",
+          releaseDate: "2022-06-04",
+          lenght: "76",
           tags: ["Unrated"]
         },
         {
@@ -2582,7 +2831,8 @@ background-clip: text;
           verifier: "iIiLaSeRiIi",
           id: "107741051",
           videoUrl: "https://youtu.be/_0GqdSFmG_8",
-          releaseDate: "2022-10-31"
+          releaseDate: "2022-10-31",
+          lenght: "81",
         },
         {
           title: "The Golden",
@@ -2590,7 +2840,8 @@ background-clip: text;
           verifier: "nSwish",
           id: "60978746",
           videoUrl: "https://youtu.be/wpS5PSHmji0",
-          releaseDate: "2020-04-18"
+          releaseDate: "2020-04-18",
+          lenght: "84",
         },
         {
           title: "Oblivion",
@@ -2598,7 +2849,8 @@ background-clip: text;
           verifier: "dice88",
           id: "71025973",
           videoUrl: "https://youtu.be/ZcmDAm50BB0",
-          releaseDate: "2021-07-6"
+          releaseDate: "2021-07-6",
+          lenght: "68",
         },
         {
           title: "NETWORK",
@@ -2606,7 +2858,8 @@ background-clip: text;
           verifier: "vulcanium4",
           id: "95176417",
           videoUrl: "https://youtu.be/K7wJi01J5D8",
-          releaseDate: "2023-10-07"
+          releaseDate: "2023-10-07",
+          lenght: "124",
         },
         {
           title: "Viprin UFO",
@@ -2614,15 +2867,17 @@ background-clip: text;
           verifier: "Cookie",
           id: "107238250",
           videoUrl: "https://youtu.be/LTMW9Py-nHE",
-          releaseDate: "2024-06-30"
+          releaseDate: "2024-06-30",
+          lenght: "97",
         },
         {
           title: "Verdant Landscape",
           author: "ItzNisha",
-          verifier: "Nisha",
+          verifier: "ItzNisha",
           id: "76543324",
           videoUrl: "https://youtu.be/wjZxkS5KC0A",
-          releaseDate: "2021-12-14"
+          releaseDate: "2021-12-14",
+          lenght: "129",
         },
         {
           title: "ATOMIC CANNON Mk III",
@@ -2630,7 +2885,8 @@ background-clip: text;
           verifier: "Zeronium",
           id: "104672501",
           videoUrl: "https://youtu.be/5nM4hlnLDyM",
-          releaseDate: "2024-05-01"
+          releaseDate: "2024-05-01",
+          lenght: "77",
         },
         {
           title: "Shukketsu",
@@ -2638,8 +2894,8 @@ background-clip: text;
           verifier: "Baeru",
           id: "75286957",
           videoUrl: "https://youtu.be/nkG4hKJIz2g",
-          previewImg: "http://i3.ytimg.com/vi/nkG4hKJIz2g/hqdefault.jpg",
-          releaseDate: "2022-04-03"
+          releaseDate: "2022-04-03",
+          lenght: "65",
         },
         {
           title: "Starlight Summit",
@@ -2647,8 +2903,8 @@ background-clip: text;
           verifier: "Pengi1",
           id: "114530859",
           videoUrl: "https://youtu.be/LB9xx41M4Ns",
-          previewImg: "http://i3.ytimg.com/vi/LB9xx41M4Ns/hqdefault.jpg",
-          releaseDate: "2025-01-27"
+          releaseDate: "2025-01-27",
+          lenght: "56",
         },
         {
           title: "Paranoia",
@@ -2656,8 +2912,8 @@ background-clip: text;
           verifier: "amplitron",
           id: "113364415",
           videoUrl: "https://youtu.be/Aw83i8Zmh_0",
-          previewImg: "http://i3.ytimg.com/vi/Aw83i8Zmh_0/hqdefault.jpg",
           releaseDate: "2024-12-23",
+          lenght: "76",
           tags: ["Unrated"]
         },
         {
@@ -2666,8 +2922,8 @@ background-clip: text;
           verifier: "turtle",
           id: "87071894",
           videoUrl: "https://youtu.be/nq3i1qJQeEk",
-          previewImg: "http://i3.ytimg.com/vi/nq3i1qJQeEk/hqdefault.jpg",
-          releaseDate: "2022-12-24"
+          releaseDate: "2022-12-24",
+          lenght: "98",
         },
         {
           title: "Terminal Rampancy",
@@ -2675,28 +2931,8 @@ background-clip: text;
           verifier: "Bigthunder556",
           id: "90057148",
           videoUrl: "https://youtu.be/29hRhhqQTLc",
-          previewImg: "http://i3.ytimg.com/vi/29hRhhqQTLc/hqdefault.jpg",
-          releaseDate: "2023-04-15"
-        },
-        {
-          title: "Sightless Sandstorm",
-          author: "BradenbowlPro",
-          verifier: "Bradenbowl",
-          id: "68904235",
-          videoUrl: "https://youtu.be/0DAojkSfR-8",
-          previewImg: "http://i3.ytimg.com/vi/0DAojkSfR-8/hqdefault.jpg",
-          releaseDate: "2021-05-07",
-          tags: ["Unrated"]
-        },
-        {
-          title: "Blind Blizzard",
-          author: "BradenbowlPro",
-          verifier: "Bradenbowl",
-          id: "65679976",
-          videoUrl: "https://youtu.be/veFJtgFFvNM",
-          previewImg: "http://i3.ytimg.com/vi/veFJtgFFvNM/hqdefault.jpg",
-          releaseDate: "2020-12-10",
-          tags: ["Unrated"]
+          releaseDate: "2023-04-15",
+          lenght: "99",
         },
         {
           title: "Critical Heat",
@@ -2704,8 +2940,8 @@ background-clip: text;
           verifier: "hstorm",
           id: "88442157",
           videoUrl: "https://youtu.be/UjYIt2jy_BY",
-          previewImg: "http://i3.ytimg.com/vi/UjYIt2jy_BY/hqdefault.jpg",
-          releaseDate: "2023-02-09"
+          releaseDate: "2023-02-09",
+          lenght: "62",
         },
         {
           title: "THE ROCK HOUSE",
@@ -2713,132 +2949,8 @@ background-clip: text;
           verifier: "Dragoon",
           id: "83828637",
           videoUrl: "https://youtu.be/A76WxInuqos",
-          previewImg: "http://i3.ytimg.com/vi/A76WxInuqos/hqdefault.jpg",
           releaseDate: "2022-12-24",
-          tags: ["Unrated"]
-        },
-        {
-          title: "Aerial Gleam",
-          author: "EndLevel",
-          verifier: "Doggie",
-          id: "79771070",
-          videoUrl: "https://youtu.be/eyZjKtrGVYw",
-          previewImg: "http://i3.ytimg.com/vi/eyZjKtrGVYw/hqdefault.jpg",
-          releaseDate: "2022-08-24"
-        },
-        {
-          title: "Starlit Stroll",
-          author: "Enfur",
-          verifier: "NoctaXI",
-          id: "115380769",
-          videoUrl: "https://youtu.be/U7MM74dTXuI",
-          previewImg: "https://thumbnails.demonlist.org/115380769.png",
-          releaseDate: "2025-02-22"
-        },
-        {
-          title: "Trueffet",
-          author: "SyQual",
-          verifier: "Baeru",
-          id: "71434979",
-          videoUrl: "https://youtu.be/yHESkazVD4Q",
-          previewImg: "http://i3.ytimg.com/vi/yHESkazVD4Q/hqdefault.jpg",
-          releaseDate: "2021-07-16"
-        },
-        {
-          title: "Broken Tube",
-          author: "Goanga",
-          verifier: "Goanga",
-          id: "110787692",
-          videoUrl: "https://youtu.be/vbbNEGg5LeY",
-          previewImg: "http://i3.ytimg.com/vi/vbbNEGg5LeY/hqdefault.jpg",
-          releaseDate: "2024-10-04",
-          tags: ["Unrated"]
-        },
-        {
-          title: "Enjoy",
-          author: "SeptaGon7",
-          verifier: "Hipo",
-          id: "78004719",
-          videoUrl: "https://youtu.be/eo0o8YNiVSc",
-          previewImg: "http://i3.ytimg.com/vi/eo0o8YNiVSc/hqdefault.jpg",
-          releaseDate: "2022-02-10",
-          tags: ["Unrated"]
-        },
-        {
-          title: "Checked Steam",
-          author: "Gruzzy",
-          verifier: "Whizkid05",
-          id: "105748155",
-          videoUrl: "https://youtu.be/cq6047eYGXs",
-          previewImg: "https://thumbnails.demonlist.org/105748155.png",
-          releaseDate: "2024-05-27"
-        },
-        {
-          title: "Cannon Bay",
-          author: "LordVadercraft",
-          verifier: "Whizkid05",
-          id: "83403926",
-          videoUrl: "https://youtu.be/UBXN6H4zck4",
-          previewImg: "http://i3.ytimg.com/vi/UBXN6H4zck4/hqdefault.jpg",
-          releaseDate: "2022-10-04",
-          tags: ["Unrated"]
-        },
-        {
-          title: "The Nautical",
-          author: "nayf",
-          verifier: "Timo",
-          id: "68567516",
-          videoUrl: "https://youtu.be/xDKFca4HMDk",
-          previewImg: "https://thumbnails.demonlist.org/68567516.png",
-          releaseDate: "2022-01-02",
-          tags: ["Unrated"]
-        },
-        {
-          title: "Judgement Knights",
-          author: "HangerLord",
-          verifier: "Helix",
-          id: "110913375",
-          videoUrl: "https://youtu.be/MzzY8nWfxnk",
-          previewImg: "http://i3.ytimg.com/vi/MzzY8nWfxnk/hqdefault.jpg",
-          releaseDate: "2025-01-17"
-        },
-        {
-          title: "Hard Machine",
-          author: "komp",
-          verifier: "Varium",
-          id: "72744364",
-          videoUrl: "https://youtu.be/6i0pdTDAo1c",
-          previewImg: "http://i3.ytimg.com/vi/6i0pdTDAo1c/hqdefault.jpg",
-          releaseDate: "2021-08-20"
-        },
-        {
-          title: "Multiplicity",
-          author: "S3rios",
-          verifier: "cobrablitz",
-          id: "101502608",
-          videoUrl: "https://youtu.be/6YVLBQ8xKyo",
-          previewImg: "http://i3.ytimg.com/vi/6YVLBQ8xKyo/hqdefault.jpg",
-          releaseDate: "2024-02-26",
-          tags: ["Unrated"]
-        },
-        {
-          title: "Zirconium Misery",
-          author: "SaturMan",
-          verifier: "BONN GD",
-          id: "97380378",
-          videoUrl: "https://youtu.be/iZWpNF3zicc",
-          previewImg: "http://i3.ytimg.com/vi/iZWpNF3zicc/hqdefault.jpg",
-          releaseDate: "2023-12-16",
-          tags: ["Unrated"]
-        },
-        {
-          title: "Graceful",
-          author: "DaGYT",
-          verifier: "D a G",
-          id: "71885708",
-          videoUrl: "https://youtu.be/aUEiQXEYncc",
-          previewImg: "http://i3.ytimg.com/vi/aUEiQXEYncc/hqdefault.jpg",
-          releaseDate: "2021-07-28",
+          lenght: "49",
           tags: ["Unrated"]
         },
         {
@@ -2847,8 +2959,161 @@ background-clip: text;
           verifier: "npesta",
           id: "58673581",
           videoUrl: "https://youtu.be/Bs1kVySdUtI",
-          previewImg: "http://i3.ytimg.com/vi/Bs1kVySdUtI/hqdefault.jpg",
-          releaseDate: "2019-12-15"
+          releaseDate: "2019-12-15",
+          lenght: "118",
+        },
+        {
+          title: "Aerial Gleam",
+          author: "EndLevel",
+          verifier: "Doggie",
+          id: "79771070",
+          videoUrl: "https://youtu.be/eyZjKtrGVYw",
+          releaseDate: "2022-08-24",
+          lenght: "65",
+        },
+        {
+          title: "Starlit Stroll",
+          author: "Enfur",
+          verifier: "NoctaXI",
+          id: "115380769",
+          videoUrl: "https://youtu.be/U7MM74dTXuI",
+          releaseDate: "2025-02-22",
+          lenght: "123",
+        },
+        {
+          title: "Trueffet",
+          author: "SyQual",
+          verifier: "Baeru",
+          id: "71434979",
+          videoUrl: "https://youtu.be/yHESkazVD4Q",
+          releaseDate: "2021-07-16",
+          lenght: "74",
+        },
+        {
+          title: "Broken Tube",
+          author: "Goanga",
+          verifier: "Goanga",
+          id: "110787692",
+          videoUrl: "https://youtu.be/vbbNEGg5LeY",
+          releaseDate: "2024-10-04",
+          lenght: "162",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Achenus",
+          author: "CringeLord GD",
+          verifier: "Serpentical",
+          id: "111249217",
+          videoUrl: "https://youtu.be/LhnsbWg62lY",
+          releaseDate: "2024-10-18",
+          lenght: "61",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Enjoy",
+          author: "SeptaGon7",
+          verifier: "Hipo",
+          id: "78004719",
+          videoUrl: "https://youtu.be/eo0o8YNiVSc",
+          releaseDate: "2022-02-10",
+          lenght: "60",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Checked Steam",
+          author: "gruzyGD",
+          verifier: "Whizkid05",
+          id: "105748155",
+          videoUrl: "https://youtu.be/cq6047eYGXs",
+          releaseDate: "2024-05-27",
+          lenght: "65",
+        },
+        {
+          title: "Cannon Bay",
+          author: "LordVadercraft",
+          verifier: "Whizkid05",
+          id: "83403926",
+          videoUrl: "https://youtu.be/UBXN6H4zck4",
+          releaseDate: "2022-10-04",
+          lenght: "80",
+          tags: ["Unrated"]
+        },
+        {
+          title: "The Nautical",
+          author: "nayf",
+          verifier: "Timo",
+          id: "68567516",
+          videoUrl: "https://youtu.be/xDKFca4HMDk",
+          releaseDate: "2022-01-02",
+          lenght: "58",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Judgement Knights",
+          author: "HangerLord",
+          verifier: "Helix",
+          id: "110913375",
+          videoUrl: "https://youtu.be/MzzY8nWfxnk",
+          releaseDate: "2025-01-17",
+          lenght: "69",
+        },
+        {
+          title: "Hard Machine",
+          author: "komp",
+          verifier: "Varium",
+          id: "72744364",
+          videoUrl: "https://youtu.be/6i0pdTDAo1c",
+          releaseDate: "2021-08-20",
+          lenght: "97",
+        },
+        {
+          title: "Multiplicity",
+          author: "S3rios",
+          verifier: "cobrablitz",
+          id: "101502608",
+          videoUrl: "https://youtu.be/6YVLBQ8xKyo",
+          releaseDate: "2024-02-26",
+          lenght: "420",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Nostalgia",
+          author: "BoN4iK1772",
+          verifier: "BONN GD",
+          id: "93619038",
+          videoUrl: "https://youtu.be/Ho58nTcsZLs",
+          releaseDate: "2023-08-21",
+          lenght: "72",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Zirconium Misery",
+          author: "SaturMan",
+          verifier: "BONN GD",
+          id: "97380378",
+          videoUrl: "https://youtu.be/iZWpNF3zicc",
+          releaseDate: "2023-12-16",
+          lenght: "93",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Graceful",
+          author: "DaGYT",
+          verifier: "DaGYT",
+          id: "71885708",
+          videoUrl: "https://youtu.be/aUEiQXEYncc",
+          releaseDate: "2021-07-28",
+          lenght: "145",
+          tags: ["Unrated"]
+        },
+        {
+          title: "Forsaken Hell",
+          author: "MatheDeath",
+          verifier: "SpirteX",
+          id: "67073198",
+          videoUrl: "https://youtu.be/ZQsSRZpcWsY",
+          releaseDate: "2023-08-03",
+          lenght: "83",
         },
         {
           title: "Sakupen Circles fi",
@@ -2856,8 +3121,8 @@ background-clip: text;
           verifier: "nensa",
           id: "63702523",
           videoUrl: "https://youtu.be/w_SfQ5RJTj4",
-          previewImg: "http://i3.ytimg.com/vi/w_SfQ5RJTj4/hqdefault.jpg",
           releaseDate: "2025-05-10",
+          lenght: "51",
           tags: ["Unrated"]
         },
         {
@@ -2866,8 +3131,8 @@ background-clip: text;
           verifier: "Technical",
           id: "52374843",
           videoUrl: "https://youtu.be/N4QjElo58_o",
-          previewImg: "https://thumbnails.demonlist.org/52374843.png",
-          releaseDate: "2019-01-29"
+          releaseDate: "2019-01-29",
+          lenght: "194",
         },
         {
           title: "Esfera",
@@ -2875,8 +3140,8 @@ background-clip: text;
           verifier: "Baeru",
           id: "78435955",
           videoUrl: "https://youtu.be/GK0Z8rgziH4",
-          previewImg: "http://i3.ytimg.com/vi/GK0Z8rgziH4/hqdefault.jpg",
-          releaseDate: "2022-02-27"
+          releaseDate: "2022-02-27",
+          lenght: "266",
         },
         {
           title: "Axinie",
@@ -2884,8 +3149,17 @@ background-clip: text;
           verifier: "SaturMan",
           id: "107299600",
           videoUrl: "https://youtu.be/LjfO2fqnozI",
-          previewImg: "http://i3.ytimg.com/vi/LjfO2fqnozI/hqdefault.jpg",
-          releaseDate: "2024-07-02"
+          releaseDate: "2024-07-02",
+          lenght: "119",
+        },
+        {
+          title: "DISSONANCE",
+          author: "ImMaxX1",
+          verifier: "zSquidKnight",
+          id: "108141323",
+          videoUrl: "https://youtu.be/IfFser-f9c0",
+          releaseDate: "2024-07-23",
+          lenght: "106",
         },
         {
           title: "Mona Megistus",
@@ -2893,45 +3167,8 @@ background-clip: text;
           verifier: "kbar66",
           id: "111929897",
           videoUrl: "https://youtu.be/KUQ3MrFbpfY",
-          previewImg: "http://i3.ytimg.com/vi/KUQ3MrFbpfY/hqdefault.jpg",
           releaseDate: "2024-11-09",
-          tags: ["Unrated"]
-        },
-        {
-          title: "NEUTRA",
-          author: "Jenkins",
-          verifier: "AeonAir",
-          id: "88611404",
-          videoUrl: "https://youtu.be/0fNBFwNS1qg",
-          previewImg: "http://i3.ytimg.com/vi/0fNBFwNS1qg/hqdefault.jpg",
-          releaseDate: "2023-02-14"
-        },
-        {
-          title: "Dry Out Copyable 2",
-          author: "tenzk",
-          verifier: "s3batr0nic",
-          id: "106522770",
-          videoUrl: "https://youtu.be/FXW9J9CaREU",
-          previewImg: "http://i3.ytimg.com/vi/FXW9J9CaREU/hqdefault.jpg",
-          releaseDate: "2024-06-15"
-        },
-        {
-          title: "Crackhead Circles",
-          author: "AlrexX",
-          verifier: "teraaa",
-          id: "95524621",
-          videoUrl: "https://youtu.be/_4MDq8Us5gM",
-          previewImg: "http://i3.ytimg.com/vi/_4MDq8Us5gM/hqdefault.jpg",
-          releaseDate: "2023-10-17"
-        },
-        {
-          title: "Time Lapse",
-          author: "HappyMoby",
-          verifier: "Arshadow",
-          id: "97705490",
-          videoUrl: "https://youtu.be/MnI1mM_wjzc",
-          previewImg: "https://thumbnails.demonlist.org/97705490.png",
-          releaseDate: "2023-12-21",
+          lenght: "63",
           tags: ["Unrated"]
         },
         {
@@ -2940,8 +3177,54 @@ background-clip: text;
           verifier: "razsta4ax",
           id: "99495619",
           videoUrl: "https://youtu.be/UUyzGg_4mqs",
-          previewImg: "http://i3.ytimg.com/vi/UUyzGg_4mqs/hqdefault.jpg",
-          releaseDate: "2024-01-22"
+          releaseDate: "2024-01-22",
+          lenght: "64",
+        },
+        {
+          title: "NEUTRA",
+          author: "Jenkins",
+          verifier: "AeonAir",
+          id: "88611404",
+          videoUrl: "https://youtu.be/0fNBFwNS1qg",
+          releaseDate: "2023-02-14",
+          lenght: "87",
+        },
+        {
+          title: "Dry Out Copyable 2",
+          author: "tenzk",
+          verifier: "s3batr0nic",
+          id: "106522770",
+          videoUrl: "https://youtu.be/FXW9J9CaREU",
+          releaseDate: "2024-06-15",
+          lenght: "201",
+        },
+        {
+          title: "Guideless Goobering",
+          author: "Enfur",
+          verifier: "Zytrox",
+          id: "105625871",
+          videoUrl: "https://youtu.be/pFxdGKYQrcg",
+          releaseDate: "2024-05-24",
+          lenght: "98",
+        },
+        {
+          title: "Crackhead Circles",
+          author: "AlrexX",
+          verifier: "teraaa",
+          id: "95524621",
+          videoUrl: "https://youtu.be/_4MDq8Us5gM",
+          releaseDate: "2023-10-17",
+          lenght: "85",
+        },
+        {
+          title: "Time Lapse",
+          author: "HappyMoby",
+          verifier: "Arshadow",
+          id: "97705490",
+          videoUrl: "https://youtu.be/MnI1mM_wjzc",
+          releaseDate: "2023-12-21",
+          lenght: "68",
+          tags: ["Unrated"]
         },
         {
           title: "Widestep",
@@ -2949,8 +3232,8 @@ background-clip: text;
           verifier: "Demishio",
           id: "69289606",
           videoUrl: "https://youtu.be/TN8fHN_XV3o",
-          previewImg: "https://thumbnails.demonlist.org/69289606.png",
-          releaseDate: "2021-05-21"
+          releaseDate: "2021-05-21",
+          lenght: "75",
         },
         {
           title: "Lotus Flower",
@@ -2958,8 +3241,8 @@ background-clip: text;
           verifier: "BrianTheBurger",
           id: "75813671",
           videoUrl: "https://youtu.be/pTgOHcwJhd0",
-          previewImg: "https://thumbnails.demonlist.org/75813671.png",
-          releaseDate: "2021-11-18"
+          releaseDate: "2021-11-18",
+          lenght: "93",
         },
         {
           title: "limbo but uwu ig idk",
@@ -2967,8 +3250,8 @@ background-clip: text;
           verifier: "ViperVenom95",
           id: "110705712",
           videoUrl: "https://youtu.be/3B36N-qfOD8",
-          previewImg: "https://thumbnails.demonlist.org/110705712.png",
-          releaseDate: "2024-10-03"
+          releaseDate: "2024-10-03",
+          lenght: "137",
         },
         {
           title: "FACESHOPPING",
@@ -2976,18 +3259,9 @@ background-clip: text;
           verifier: "WatchPiggy",
           id: "82139734",
           videoUrl: "https://youtu.be/Lyre-ZkGfLQ",
-          previewImg: "http://i3.ytimg.com/vi/Lyre-ZkGfLQ/hqdefault.jpg",
           releaseDate: "2022-07-25",
+          lenght: "67",
           tags: ["Unrated"]
-        },
-        {
-          title: "DISSONANCE",
-          author: "ImMaxX1",
-          verifier: "zSquidKnight",
-          id: "108141323",
-          videoUrl: "https://youtu.be/IfFser-f9c0",
-          previewImg: "http://i3.ytimg.com/vi/IfFser-f9c0/hqdefault.jpg",
-          releaseDate: "2024-07-23"
         },
         {
           title: "Fragile",
@@ -2995,8 +3269,8 @@ background-clip: text;
           verifier: "vaen",
           id: "65588448",
           videoUrl: "https://youtu.be/XfXzGv0oALw",
-          previewImg: "http://i3.ytimg.com/vi/XfXzGv0oALw/hqdefault.jpg",
-          releaseDate: "2022-07-20"
+          releaseDate: "2022-07-20",
+          lenght: "101",
         },
         {
           title: "Thinking Space",
@@ -3004,8 +3278,8 @@ background-clip: text;
           verifier: "Atomic",
           id: "54953085",
           videoUrl: "https://youtu.be/iHf2nanWjvE",
-          previewImg: "https://thumbnails.demonlist.org/54953085.png",
-          releaseDate: "2019-04-10"
+          releaseDate: "2019-04-10",
+          lenght: "99",
         },
         {
           title: "Keres",
@@ -3013,8 +3287,8 @@ background-clip: text;
           verifier: "Crisis",
           id: "74391640",
           videoUrl: "https://youtu.be/MFFIjZP7PxQ",
-          previewImg: "http://i3.ytimg.com/vi/MFFIjZP7PxQ/hqdefault.jpg",
-          releaseDate: "2021-10-07"
+          releaseDate: "2021-10-07",
+          lenght: "99",
         },
         {
           title: "Frost Spirit",
@@ -3022,8 +3296,8 @@ background-clip: text;
           verifier: "Varium",
           id: "95767653",
           videoUrl: "https://youtu.be/c4cIFs7d63c",
-          previewImg: "http://i3.ytimg.com/vi/c4cIFs7d63c/hqdefault.jpg",
-          releaseDate: "2023-10-25"
+          releaseDate: "2023-10-25",
+          lenght: "170",
         },
         {
           title: "VOID",
@@ -3031,8 +3305,8 @@ background-clip: text;
           verifier: "Whizkid05",
           id: "100990392",
           videoUrl: "https://youtu.be/kN1FUoucoSc",
-          previewImg: "http://i3.ytimg.com/vi/kN1FUoucoSc/hqdefault.jpg",
-          releaseDate: "2024-02-18"
+          releaseDate: "2024-02-18",
+          lenght: "64",
         },
         {
           title: "Lithium",
@@ -3040,8 +3314,8 @@ background-clip: text;
           verifier: "kloone",
           id: "97364686",
           videoUrl: "https://youtu.be/IfVM56qNVdA",
-          previewImg: "http://i3.ytimg.com/vi/IfVM56qNVdA/hqdefault.jpg",
-          releaseDate: "2025-01-22"
+          releaseDate: "2025-01-22",
+          lenght: "124",
         },
         {
           title: "Neon Skyline",
@@ -3049,8 +3323,8 @@ background-clip: text;
           verifier: "joeingly",
           id: "88822041",
           videoUrl: "https://youtu.be/HvGjIAeLv_8",
-          previewImg: "https://thumbnails.demonlist.org/88822041.png",
-          releaseDate: "2023-02-23"
+          releaseDate: "2023-02-23",
+          lenght: "106",
         },
         {
           title: "Dead Petals",
@@ -3058,8 +3332,8 @@ background-clip: text;
           verifier: "Whizkid05",
           id: "93844446",
           videoUrl: "https://youtu.be/FclcqrTDPn0",
-          previewImg: "http://i3.ytimg.com/vi/FclcqrTDPn0/hqdefault.jpg",
           releaseDate: "2023-08-29",
+          lenght: "92",
           tags: ["Unrated"]
         },
         {
@@ -3068,8 +3342,8 @@ background-clip: text;
           verifier: "Whizkid05",
           id: "112231282",
           videoUrl: "https://youtu.be/_hL9hFU3WI4",
-          previewImg: "http://i3.ytimg.com/vi/_hL9hFU3WI4/hqdefault.jpg",
-          releaseDate: "2024-11-18"
+          releaseDate: "2024-11-18",
+          lenght: "100",
         },
         {
           title: "Scream Machine",
@@ -3077,8 +3351,8 @@ background-clip: text;
           verifier: "WatchPiggy",
           id: "96035641",
           videoUrl: "https://youtu.be/n-KeSGEX7Jg",
-          previewImg: "http://i3.ytimg.com/vi/n-KeSGEX7Jg/hqdefault.jpg",
-          releaseDate: "2023-11-01"
+          releaseDate: "2023-11-01",
+          lenght: "194",
         },
         {
           title: "Ascent",
@@ -3086,8 +3360,8 @@ background-clip: text;
           verifier: "LordVadercraft",
           id: "112046512",
           videoUrl: "https://youtu.be/sII8zQZIJlg",
-          previewImg: "http://i3.ytimg.com/vi/sII8zQZIJlg/hqdefault.jpg",
-          releaseDate: "2024-11-12"
+          releaseDate: "2024-11-12",
+          lenght: "82",
         },
         {
           title: "Promethean",
@@ -3095,8 +3369,17 @@ background-clip: text;
           verifier: "RicoLP",
           id: "69333212",
           videoUrl: "https://youtu.be/19kE_Yo8puE",
-          previewImg: "http://i3.ytimg.com/vi/19kE_Yo8puE/hqdefault.jpg",
-          releaseDate: "2021-05-22"
+          releaseDate: "2021-05-22",
+          lenght: "52",
+        },
+        {
+          title: "Disconnected Descent",
+          author: "TheSkeletonGMD",
+          verifier: "KirimeKuki",
+          id: "118664383",
+          videoUrl: "https://youtu.be/TP7OAAVH-uA",
+          releaseDate: "2025-05-10",
+          lenght: "143",
         },
         {
           title: "qoUEO",
@@ -3104,26 +3387,17 @@ background-clip: text;
           verifier: "Franzy",
           id: "81721025",
           videoUrl: "https://youtu.be/PJbfroH0sok",
-          previewImg: "http://i3.ytimg.com/vi/PJbfroH0sok/hqdefault.jpg",
-          releaseDate: "2022-07-12"
-        },
-        {
-          title: "Guideless Goobering",
-          author: "Enfur",
-          verifier: "Zytrox",
-          id: "105625871",
-          videoUrl: "https://youtu.be/pFxdGKYQrcg",
-          previewImg: "http://i3.ytimg.com/vi/pFxdGKYQrcg/hqdefault.jpg",
-          releaseDate: "2024-05-24"
+          releaseDate: "2022-07-12",
+          lenght: "52",
         },
         {
           title: "Sky Shredder",
-          author: "Dorvict",
-          verifier: "Dorvict",
+          author: "dorvict",
+          verifier: "dorvict",
           id: "88136707",
           videoUrl: "https://youtu.be/Z-69-4RKRgk",
-          previewImg: "http://i3.ytimg.com/vi/Z-69-4RKRgk/hqdefault.jpg",
-          releaseDate: "2023-01-28"
+          releaseDate: "2023-01-28",
+          lenght: "62",
         },
         {
           title: "Spectrolux",
@@ -3131,8 +3405,8 @@ background-clip: text;
           verifier: "fusion425",
           id: "89152371",
           videoUrl: "https://youtu.be/bCPTwheR08I",
-          previewImg: "https://thumbnails.demonlist.org/89152371.png",
           releaseDate: "2025-01-29",
+          lenght: "76",
           tags: ["Unrated"]
         },
         {
@@ -3141,8 +3415,8 @@ background-clip: text;
           verifier: "Kapinapi",
           id: "63996127",
           videoUrl: "https://youtu.be/tBpEPXGhQug",
-          previewImg: "https://thumbnails.demonlist.org/63996127.png",
-          releaseDate: "2020-09-14"
+          releaseDate: "2020-09-14",
+          lenght: "113",
         },
         {
           title: "Renevant",
@@ -3150,8 +3424,8 @@ background-clip: text;
           verifier: "rori",
           id: "58161496",
           videoUrl: "https://youtu.be/2Y8kBw8YxO8",
-          previewImg: "http://i3.ytimg.com/vi/2Y8kBw8YxO8/hqdefault.jpg",
-          releaseDate: "2019-11-11"
+          releaseDate: "2019-11-11",
+          lenght: "98",
         },
         {
           title: "Trotil",
@@ -3159,8 +3433,8 @@ background-clip: text;
           verifier: "ItzTayfun",
           id: "94578424",
           videoUrl: "https://youtu.be/kblnO7LfQn4",
-          previewImg: "http://i3.ytimg.com/vi/kblnO7LfQn4/hqdefault.jpg",
-          releaseDate: "2023-09-18"
+          releaseDate: "2023-09-18",
+          lenght: "82",
         },
         {
           title: "Calculator Core",
@@ -3168,8 +3442,8 @@ background-clip: text;
           verifier: "crazen",
           id: "58355141",
           videoUrl: "https://youtu.be/1B1b5EvaIw8",
-          previewImg: "https://thumbnails.demonlist.org/58355141.png",
-          releaseDate: "2019-11-24"
+          releaseDate: "2019-11-24",
+          lenght: "204",
         },
         {
           title: "Void of Thought",
@@ -3177,8 +3451,8 @@ background-clip: text;
           verifier: "Victurkey",
           id: "76798772",
           videoUrl: "https://youtu.be/jtcTIK0fK1M",
-          previewImg: "http://i3.ytimg.com/vi/jtcTIK0fK1M/hqdefault.jpg",
           releaseDate: "2021-12-24",
+          lenght: "99",
           tags: ["Unrated"]
         },
         {
@@ -3187,8 +3461,8 @@ background-clip: text;
           verifier: "BrowarKedawar",
           id: "96471171",
           videoUrl: "https://youtu.be/wpuPFFqnJFY",
-          previewImg: "http://i3.ytimg.com/vi/wpuPFFqnJFY/hqdefault.jpg",
-          releaseDate: "2023-11-13"
+          releaseDate: "2023-11-13",
+          lenght: "85",
         },
         {
           title: "SUPERHATEMEWORLD",
@@ -3196,8 +3470,8 @@ background-clip: text;
           verifier: "Cursed",
           id: "57571983",
           videoUrl: "https://youtu.be/fhmgZYCJ29M",
-          previewImg: "http://i3.ytimg.com/vi/fhmgZYCJ29M/hqdefault.jpg",
-          releaseDate: "2022-10-01"
+          releaseDate: "2022-10-01",
+          lenght: "66",
         },
         {
           title: "We Are Not The Same",
@@ -3205,8 +3479,8 @@ background-clip: text;
           verifier: "GuitGuit",
           id: "90104288",
           videoUrl: "https://youtu.be/yLLd4mpeYC4",
-          previewImg: "http://i3.ytimg.com/vi/yLLd4mpeYC4/hqdefault.jpg",
           releaseDate: "2025-02-20",
+          lenght: "87",
           tags: ["2Player"]
         },
         {
@@ -3215,8 +3489,8 @@ background-clip: text;
           verifier: "amplitron",
           id: "94156085",
           videoUrl: "https://youtu.be/J89j-_l7ezg",
-          previewImg: "http://i3.ytimg.com/vi/J89j-_l7ezg/hqdefault.jpg",
-          releaseDate: "2023-09-05"
+          releaseDate: "2023-09-05",
+          lenght: "74",
         },
         {
           title: "Crimson Planet",
@@ -3224,8 +3498,8 @@ background-clip: text;
           verifier: "rWooshi",
           id: "45866767",
           videoUrl: "https://youtu.be/euMInLjyG6k",
-          previewImg: "http://i3.ytimg.com/vi/euMInLjyG6k/hqdefault.jpg",
-          releaseDate: "2018-05-19"
+          releaseDate: "2018-05-19",
+          lenght: "67",
         },
         {
           title: "Exosphere",
@@ -3233,8 +3507,8 @@ background-clip: text;
           verifier: "Doggie",
           id: "93247638",
           videoUrl: "https://youtu.be/iYztPegByr8",
-          previewImg: "http://i3.ytimg.com/vi/iYztPegByr8/hqdefault.jpg",
           releaseDate: "2023-08-11",
+          lenght: "170",
           tags: ["Unrated"]
         },
         {
@@ -3243,8 +3517,8 @@ background-clip: text;
           verifier: "Arshadow",
           id: "115151904",
           videoUrl: "https://youtu.be/w-NH14vgMb8",
-          previewImg: "http://i3.ytimg.com/vi/w-NH14vgMb8/hqdefault.jpg",
-          releaseDate: "2025-02-15"
+          releaseDate: "2025-02-15",
+          lenght: "50",
         },
         {
           title: "Gloxinia",
@@ -3252,8 +3526,8 @@ background-clip: text;
           verifier: "rose",
           id: "110038200",
           videoUrl: "https://youtu.be/WN4bqhsnGp8",
-          previewImg: "http://i3.ytimg.com/vi/WN4bqhsnGp8/hqdefault.jpg",
-          releaseDate: "2024-09-12"
+          releaseDate: "2024-09-12",
+          lenght: "129",
         },
         {
           title: "Cognition",
@@ -3261,8 +3535,8 @@ background-clip: text;
           verifier: "nSwish",
           id: "57600307",
           videoUrl: "https://youtu.be/sUFxTATYEdQ",
-          previewImg: "https://thumbnails.demonlist.org/57600307.png",
-          releaseDate: "2023-11-09"
+          releaseDate: "2023-11-09",
+          lenght: "62",
         },
         {
           title: "Xtreme DoggieGD Map",
@@ -3270,8 +3544,8 @@ background-clip: text;
           verifier: "Sigma",
           id: "113104109",
           videoUrl: "https://youtu.be/nhfoY_6gTp0",
-          previewImg: "http://i3.ytimg.com/vi/nhfoY_6gTp0/hqdefault.jpg",
           releaseDate: "2024-12-15",
+          lenght: "64",
           tags: ["Unrated"]
         },
         {
@@ -3280,18 +3554,18 @@ background-clip: text;
           verifier: "IcaroX",
           id: "97303030",
           videoUrl: "https://youtu.be/n3cdX8Pr8Hc",
-          previewImg: "http://i3.ytimg.com/vi/n3cdX8Pr8Hc/hqdefault.jpg",
           releaseDate: "2024-07-20",
+          lenght: "59",
           tags: ["Unrated"]
         },
         {
           title: "DIRECTIONS",
-          author: "ryli06",
+          author: "wokecat",
           verifier: "SwordBx",
           id: "88233955",
           videoUrl: "https://youtu.be/-SEgSgxpRxo",
-          previewImg: "https://thumbnails.demonlist.org/88233955.png",
-          releaseDate: "2023-01-31"
+          releaseDate: "2023-01-31",
+          lenght: "120",
         },
         {
           title: "Akuma",
@@ -3299,18 +3573,18 @@ background-clip: text;
           verifier: "LordVadercraft",
           id: "108404920",
           videoUrl: "https://youtu.be/bnU3jQDz8Mc",
-          previewImg: "http://i3.ytimg.com/vi/bnU3jQDz8Mc/hqdefault.jpg",
           releaseDate: "2024-07-29",
+          lenght: "53",
           tags: ["Unrated"]
         },
         {
           title: "Instinct",
-          author: "Krazyman50Real",
+          author: "Krazyman50",
           verifier: "Blitzer",
           id: "94043690",
           videoUrl: "https://youtu.be/6W3Gvi9ft0w",
-          previewImg: "https://thumbnails.demonlist.org/94043690.png",
-          releaseDate: "2023-09-03"
+          releaseDate: "2023-09-03",
+          lenght: "104",
         },
         {
           title: "Cerise Cavern",
@@ -3318,18 +3592,18 @@ background-clip: text;
           verifier: "Surpl3x",
           id: "113933812",
           videoUrl: "https://youtu.be/XPmjX0vnw2o",
-          previewImg: "http://i3.ytimg.com/vi/XPmjX0vnw2o/hqdefault.jpg",
           releaseDate: "2025-01-07",
+          lenght: "78",
           tags: ["Unrated"]
         },
         {
           title: "Akashic Records",
-          author: "VoTcHi",
-          verifier: "VoTcHi",
+          author: "VotcHi",
+          verifier: "VotcHi",
           id: "58150142",
           videoUrl: "https://youtu.be/qnZnV6q-mt4",
-          previewImg: "https://thumbnails.demonlist.org/58150142.png",
-          releaseDate: "2019-11-10"
+          releaseDate: "2019-11-10",
+          lenght: "144",
         },
         {
           title: "ATOMIC CANNON Mk II",
@@ -3337,17 +3611,8 @@ background-clip: text;
           verifier: "Zeronium",
           id: "91180835",
           videoUrl: "https://youtu.be/4-lOnZsfhNQ",
-          previewImg: "http://i3.ytimg.com/vi/4-lOnZsfhNQ/hqdefault.jpg",
-          releaseDate: "2023-06-02"
-        },
-        {
-          title: "Disconnected Descent",
-          author: "TheSkeletonGMD",
-          verifier: "KirimeKuki",
-          id: "118664383",
-          videoUrl: "https://youtu.be/TP7OAAVH-uA",
-          previewImg: "http://i3.ytimg.com/vi/TP7OAAVH-uA/hqdefault.jpg",
-          releaseDate: "2025-05-10"
+          releaseDate: "2023-06-02",
+          lenght: "74",
         },
         {
           title: "SARY NEVER CLEAR",
@@ -3355,8 +3620,8 @@ background-clip: text;
           verifier: "Spamdrew128",
           id: "33498127",
           videoUrl: "https://youtu.be/23u3SlwrOMw",
-          previewImg: "http://i3.ytimg.com/vi/23u3SlwrOMw/hqdefault.jpg",
-          releaseDate: "2020-12-24"
+          releaseDate: "2020-12-24",
+          lenght: "79",
         },
         {
           title: "Cosmic Cyclone",
@@ -3364,8 +3629,8 @@ background-clip: text;
           verifier: "DoSh7t",
           id: "76159410",
           videoUrl: "https://youtu.be/0I9xCfTOpXg",
-          previewImg: "http://i3.ytimg.com/vi/0I9xCfTOpXg/hqdefault.jpg",
-          releaseDate: "2021-11-30"
+          releaseDate: "2021-11-30",
+          lenght: "117",
         },
         {
           title: "Indivine",
@@ -3373,8 +3638,8 @@ background-clip: text;
           verifier: "Bigthunder556",
           id: "112586799",
           videoUrl: "https://youtu.be/g2CVts-tX70",
-          previewImg: "https://thumbnails.demonlist.org/112586799.png",
-          releaseDate: "2024-11-29"
+          releaseDate: "2024-11-29",
+          lenght: "122",
         },
         {
           title: "FARBIDI THEORY",
@@ -3382,8 +3647,8 @@ background-clip: text;
           verifier: "WatchPiggy",
           id: "103373693",
           videoUrl: "https://youtu.be/MQD6klwhcsM",
-          previewImg: "http://i3.ytimg.com/vi/MQD6klwhcsM/hqdefault.jpg",
-          releaseDate: "2024-04-02"
+          releaseDate: "2024-04-02",
+          lenght: "84",
         },
         {
           title: "RUST",
@@ -3391,8 +3656,8 @@ background-clip: text;
           verifier: "Keir",
           id: "71912451",
           videoUrl: "https://youtu.be/mEXGlrNMyR4",
-          previewImg: "https://thumbnails.demonlist.org/71912451.png",
-          releaseDate: "2021-07-28"
+          releaseDate: "2021-07-28",
+          lenght: "84",
         },
         {
           title: "CORRODERE",
@@ -3400,8 +3665,8 @@ background-clip: text;
           verifier: "Gzeee",
           id: "90597202",
           videoUrl: "https://youtu.be/-V87Bh44lAU",
-          previewImg: "http://i3.ytimg.com/vi/-V87Bh44lAU/hqdefault.jpg",
-          releaseDate: "2023-05-08"
+          releaseDate: "2023-05-08",
+          lenght: "114",
         },
         {
           title: "SAND SAILOR",
@@ -3409,8 +3674,8 @@ background-clip: text;
           verifier: "nei",
           id: "88868682",
           videoUrl: "https://youtu.be/QPmzn9X77Uo",
-          previewImg: "http://i3.ytimg.com/vi/QPmzn9X77Uo/hqdefault.jpg",
-          releaseDate: "2023-02-24"
+          releaseDate: "2023-02-24",
+          lenght: "83",
         },
         {
           title: "Lucid Nightmares",
@@ -3418,8 +3683,8 @@ background-clip: text;
           verifier: "rWooshi",
           id: "52310333",
           videoUrl: "https://youtu.be/G7hBE5qWx6M",
-          previewImg: "https://thumbnails.demonlist.org/52310333.png",
-          releaseDate: "2019-01-27"
+          releaseDate: "2019-01-27",
+          lenght: "91",
         },    
         {
           title: "Iceberg",
@@ -3427,8 +3692,8 @@ background-clip: text;
           verifier: "fusion425",
           id: "101377930",
           videoUrl: "https://youtu.be/cOxFhUMx4SI",
-          previewImg: "http://i3.ytimg.com/vi/cOxFhUMx4SI/hqdefault.jpg",
           releaseDate: "2024-09-15",
+          lenght: "71",
           tags: ["Unrated"]
         },       
         {
@@ -3437,8 +3702,8 @@ background-clip: text;
           verifier: "Dan2D",
           id: "93155813",
           videoUrl: "https://youtu.be/VmYt32YBpSE",
-          previewImg: "http://i3.ytimg.com/vi/VmYt32YBpSE/hqdefault.jpg",
-          releaseDate: "2023-09-02"
+          releaseDate: "2023-09-02",
+          lenght: "62",
         },   
         {
           title: "RUTHLESS",
@@ -3446,8 +3711,8 @@ background-clip: text;
           verifier: "vaen",
           id: "85612571",
           videoUrl: "https://youtu.be/9jwVeYtc6H4",
-          previewImg: "http://i3.ytimg.com/vi/9jwVeYtc6H4/hqdefault.jpg",
-          releaseDate: "2023-04-21"
+          releaseDate: "2023-04-21",
+          lenght: "125",
         },      
         {
           title: "Scrubbabingo force",
@@ -3455,8 +3720,8 @@ background-clip: text;
           verifier: "Popsi",
           id: "111193316",
           videoUrl: "https://youtu.be/eT_izuCxGUU",
-          previewImg: "https://thumbnails.demonlist.org/111193316.png",
-          releaseDate: "2024-10-17"
+          releaseDate: "2024-10-17",
+          lenght: "95",
         },                  
         {
           title: "Ykds1479ymdppr",
@@ -3464,27 +3729,47 @@ background-clip: text;
           verifier: "BONN GD",
           id: "104464785",
           videoUrl: "https://youtu.be/t7w2HNfD0eI",
-          previewImg: "http://i3.ytimg.com/vi/t7w2HNfD0eI/hqdefault.jpg",
-          releaseDate: "2024-04-26"
+          releaseDate: "2024-04-26",
+          lenght: "60",
         },   
+        {
+          title: "Volcanic Gleam",
+          author: "NotNickOk",
+          verifier: "NotNickOk",
+          id: "96512397",
+          videoUrl: "https://youtu.be/8quWIffBSvU",
+          releaseDate: "2023-11-15",
+          lenght: "94",
+          tags: ["Unrated"]
+        },
         {
           title: "Ringy Paracosm",
           author: "GDNachoo",
           verifier: "SpeedyMuffin",
           id: "78745224",
           videoUrl: "https://youtu.be/RIDuh4IVGiw",
-          previewImg: "http://i3.ytimg.com/vi/RIDuh4IVGiw/hqdefault.jpg",
           releaseDate: "2022-03-13",
+          lenght: "78",
           tags: ["Unrated"]
-        },                    
+        },
+        {
+          title: "Unaltered",
+          author: "TheBigCheese69",
+          verifier: "TheBigCheese69",
+          id: "122938934",
+          videoUrl: "https://youtu.be/Sybzhb26EWA",
+          releaseDate: "2025-07-02",
+          lenght: "64",
+          tags: ["Unrated"]
+        },                
         {
           title: "Launchpad Labyrinth",
           author: "Moffe",
           verifier: "WSCKR",
           id: "85426437",
           videoUrl: "https://youtu.be/CfhbnDCOWHs",
-          previewImg: "http://i3.ytimg.com/vi/CfhbnDCOWHs/hqdefault.jpg",
-          releaseDate: "2022-11-07"
+          releaseDate: "2022-11-07",
+          lenght: "107",
         },   
         {
           title: "Tenkai",
@@ -3492,8 +3777,8 @@ background-clip: text;
           verifier: "Motor8",
           id: "64100176",
           videoUrl: "https://youtu.be/AM2KHSZkjcc",
-          previewImg: "http://i3.ytimg.com/vi/EiF_4-4p08E/hqdefault.jpg",
           releaseDate: "2022-06-08",
+          lenght: "147",
           tags: ["2Player"]
         },   
         {
@@ -3502,8 +3787,8 @@ background-clip: text;
           verifier: "rqd",
           id: "91042484",
           videoUrl: "https://youtu.be/d3d2KPVgCAk",
-          previewImg: "http://i3.ytimg.com/vi/d3d2KPVgCAk/hqdefault.jpg",
           releaseDate: "2023-10-14",
+          lenght: "62",
           tags: ["2Player"]
         },   
         {
@@ -3512,8 +3797,8 @@ background-clip: text;
           verifier: "Ryclix",
           id: "85670310",
           videoUrl: "https://youtu.be/OS46C-zvqDA",
-          previewImg: "http://i3.ytimg.com/vi/QkziJbUJ3Vc/hqdefault.jpg",
           releaseDate: "2023-10-04",
+          lenght: "71",
           tags: ["2Player"]
         },   
         {
@@ -3522,8 +3807,8 @@ background-clip: text;
           verifier: "Astrala",
           id: "86180516",
           videoUrl: "https://youtu.be/YSYDdlU1HnI",
-          previewImg: "http://i3.ytimg.com/vi/YSYDdlU1HnI/hqdefault.jpg",
           releaseDate: "2022-11-28",
+          lenght: "90",
           tags: ["Unrated"]
         },             
         {
@@ -3532,8 +3817,8 @@ background-clip: text;
           verifier: "Waterbound",
           id: "112351854",
           videoUrl: "https://youtu.be/6ZuEWp1dJ0c",
-          previewImg: "http://i3.ytimg.com/vi/6ZuEWp1dJ0c/hqdefault.jpg",
-          releaseDate: "2024-11-22"
+          releaseDate: "2024-11-22",
+          lenght: "88",
         },             
         {
           title: "Twilight",
@@ -3541,8 +3826,8 @@ background-clip: text;
           verifier: "nei",
           id: "90193093",
           videoUrl: "https://youtu.be/5bZ3RQP7fjs",
-          previewImg: "http://i3.ytimg.com/vi/5bZ3RQP7fjs/hqdefault.jpg",
-          releaseDate: "2023-04-20"
+          releaseDate: "2023-04-20",
+          lenght: "100",
         },             
         {
           title: "Axiom Asterism",
@@ -3550,8 +3835,8 @@ background-clip: text;
           verifier: "fusion425",
           id: "114340057",
           videoUrl: "https://youtu.be/LnFdka3HekA",
-          previewImg: "http://i3.ytimg.com/vi/LnFdka3HekA/hqdefault.jpg",
-          releaseDate: "2025-01-20"
+          releaseDate: "2025-01-20",
+          lenght: "67",
         },          
         {
           title: "Shardscapes",
@@ -3559,8 +3844,8 @@ background-clip: text;
           verifier: "Eiruni",
           id: "79997992",
           videoUrl: "https://youtu.be/1cW8T58Azh4",
-          previewImg: "http://i3.ytimg.com/vi/1cW8T58Azh4/hqdefault.jpg",
-          releaseDate: "2022-05-06"
+          releaseDate: "2022-05-06",
+          lenght: "79",
         },          
         {
           title: "venetia",
@@ -3568,8 +3853,8 @@ background-clip: text;
           verifier: "Slithium",
           id: "96348490",
           videoUrl: "https://youtu.be/KVgm7ocPC38",
-          previewImg: "https://thumbnails.demonlist.org/96348490.png",
           releaseDate: "2023-11-10",
+          lenght: "36",
           tags: ["Unrated"]
         },     
         {
@@ -3578,8 +3863,8 @@ background-clip: text;
           verifier: "Technical",
           id: "55624478",
           videoUrl: "https://youtu.be/aGtXqn9HL2o",
-          previewImg: "http://i3.ytimg.com/vi/aGtXqn9HL2o/hqdefault.jpg",
-          releaseDate: "2019-05-20"
+          releaseDate: "2019-05-20",
+          lenght: "191",
         },   
         {
           title: "me when machine gang",
@@ -3587,8 +3872,8 @@ background-clip: text;
           verifier: "Motor8",
           id: "93281587",
           videoUrl: "https://youtu.be/C8uSFs01qwc",
-          previewImg: "http://i3.ytimg.com/vi/IvOmCjliLrI/hqdefault.jpg",
           releaseDate: "2024-02-21",
+          lenght: "79",
           tags: ["2Player"]
         },           
         {
@@ -3597,8 +3882,8 @@ background-clip: text;
           verifier: "Zeronium",
           id: "91558130",
           videoUrl: "https://youtu.be/WFu5H7yi9hA",
-          previewImg: "http://i3.ytimg.com/vi/WFu5H7yi9hA/hqdefault.jpg",
           releaseDate: "2023-06-20",
+          lenght: "140",
           tags: ["Unrated"]
         },          
         {
@@ -3607,8 +3892,8 @@ background-clip: text;
           verifier: "Cursed",
           id: "82172844",
           videoUrl: "https://youtu.be/iEznd6B-uig",
-          previewImg: "http://i3.ytimg.com/vi/iEznd6B-uig/hqdefault.jpg",
-          releaseDate: "2022-07-26"
+          releaseDate: "2022-07-26",
+          lenght: "30",
         },       
         {
           title: "Amalgam",
@@ -3616,8 +3901,8 @@ background-clip: text;
           verifier: "rWooshi",
           id: "95675702",
           videoUrl: "https://youtu.be/82DDR2BjXSI",
-          previewImg: "http://i3.ytimg.com/vi/82DDR2BjXSI/hqdefault.jpg",
-          releaseDate: "2023-10-22"
+          releaseDate: "2023-10-22",
+          lenght: "67",
         },     
         {
           title: "Moving Forward",
@@ -3625,8 +3910,8 @@ background-clip: text;
           verifier: "LuigiDB",
           id: "99692910",
           videoUrl: "https://youtu.be/2wYnXim6TYY",
-          previewImg: "http://i3.ytimg.com/vi/2wYnXim6TYY/hqdefault.jpg",
-          releaseDate: "2024-01-25"
+          releaseDate: "2024-01-25",
+          lenght: "150",
         },       
         {
           title: "Pandemonium",
@@ -3634,8 +3919,8 @@ background-clip: text;
           verifier: "TGM05",
           id: "92583725",
           videoUrl: "https://youtu.be/OKEHsJPaeQY",
-          previewImg: "http://i3.ytimg.com/vi/OKEHsJPaeQY/hqdefault.jpg",
-          releaseDate: "2023-07-19"
+          releaseDate: "2023-07-19",
+          lenght: "154",
         },       
         {
           title: "Jupiter My Favourite",
@@ -3643,8 +3928,8 @@ background-clip: text;
           verifier: "LuigiDB",
           id: "92466083",
           videoUrl: "https://youtu.be/nHdEUIPpS2k",
-          previewImg: "https://thumbnails.demonlist.org/92466083.png",
-          releaseDate: "2023-07-18"
+          releaseDate: "2023-07-18",
+          lenght: "95",
         },      
         {
           title: "Omega Interface",
@@ -3652,8 +3937,8 @@ background-clip: text;
           verifier: "RG",
           id: "68654380",
           videoUrl: "https://youtu.be/sVngEgj0who",
-          previewImg: "https://thumbnails.demonlist.org/68654380.png",
-          releaseDate: "2021-04-28"
+          releaseDate: "2021-04-28",
+          lenght: "69",
         },   
         {
           title: "Deep Bass",
@@ -3661,17 +3946,17 @@ background-clip: text;
           verifier: "WatchPiggy",
           id: "96383663",
           videoUrl: "https://youtu.be/5uu8xXgz_4s",
-          previewImg: "http://i3.ytimg.com/vi/5uu8xXgz_4s/hqdefault.jpg",
-          releaseDate: "2023-11-11"
+          releaseDate: "2023-11-11",
+          lenght: "76",
         },   
         {
           title: "poocu",
-          author: "btLisp",
+          author: "Liisp",
           verifier: "Baeru",
           id: "75867791",
           videoUrl: "https://youtu.be/6n3419JUP1M",
-          previewImg: "http://i3.ytimg.com/vi/6n3419JUP1M/hqdefault.jpg",
           releaseDate: "2021-11-20",
+          lenght: "70",
           tags: ["Unrated"]
         },  
         {
@@ -3680,17 +3965,17 @@ background-clip: text;
           verifier: "Washed",
           id: "90891227",
           videoUrl: "https://youtu.be/kTOM1nSEF3I",
-          previewImg: "http://i3.ytimg.com/vi/kTOM1nSEF3I/hqdefault.jpg",
-          releaseDate: "2023-05-21"
+          releaseDate: "2023-05-21",
+          lenght: "100",
         },  
         {
           title: "Fracture",
-          author: "foopoa",
-          verifier: "Destro",
+          author: "Flooder1704",
+          verifier: "destroyer0912",
           id: "99703915",
           videoUrl: "https://youtu.be/iCxG8xoOtv8",
-          previewImg: "http://i3.ytimg.com/vi/iCxG8xoOtv8/hqdefault.jpg",
           releaseDate: "2024-01-25",
+          lenght: "85",
           tags: ["Unrated"]
         },  
         {
@@ -3699,8 +3984,8 @@ background-clip: text;
           verifier: "nSwish",
           id: "59800588",
           videoUrl: "https://youtu.be/eIfc1zUuOPU",
-          previewImg: "https://thumbnails.demonlist.org/59800588.png",
-          releaseDate: "2021-09-06"
+          releaseDate: "2021-09-06",
+          lenght: "106",
         },  
         {
           title: "BarbarosFinaleFinale",
@@ -3708,8 +3993,8 @@ background-clip: text;
           verifier: "AeonAir",
           id: "102712028",
           videoUrl: "https://youtu.be/F32ekXnS3a4",
-          previewImg: "http://i3.ytimg.com/vi/F32ekXnS3a4/hqdefault.jpg",
-          releaseDate: "2024-03-23"
+          releaseDate: "2024-03-23",
+          lenght: "95",
         },  
         {
           title: "Jesse Pinkman",
@@ -3717,8 +4002,8 @@ background-clip: text;
           verifier: "Comlayze",
           id: "79918576",
           videoUrl: "https://youtu.be/fYcBtp4X8GA",
-          previewImg: "https://thumbnails.demonlist.org/79918576.png",
-          releaseDate: "2022-05-02"
+          releaseDate: "2022-05-02",
+          lenght: "72",
         },  
         {
           title: "PROTON LAUNCHER",
@@ -3726,8 +4011,8 @@ background-clip: text;
           verifier: "Tyson",
           id: "108514663",
           videoUrl: "https://youtu.be/Zps2ejald5g",
-          previewImg: "http://i3.ytimg.com/vi/Zps2ejald5g/hqdefault.jpg",
-          releaseDate: "2024-08-01"
+          releaseDate: "2024-08-01",
+          lenght: "62",
         },  
         {
           title: "Nabil Let Go",
@@ -3735,8 +4020,8 @@ background-clip: text;
           verifier: "Voltren",
           id: "110965084",
           videoUrl: "https://youtu.be/p5aD6SFeUlI",
-          previewImg: "http://i3.ytimg.com/vi/p5aD6SFeUlI/hqdefault.jpg",
-          releaseDate: "2024-10-10"
+          releaseDate: "2024-10-10",
+          lenght: "88",
         },  
         {
           title: "The Rupture",
@@ -3744,8 +4029,8 @@ background-clip: text;
           verifier: "Dolphy",
           id: "57828784",
           videoUrl: "https://youtu.be/SaU454afkKY",
-          previewImg: "https://thumbnails.demonlist.org/57828784.png",
-          releaseDate: "2019-10-16"
+          releaseDate: "2019-10-16",
+          lenght: "85",
         },  
         {
           title: "disruption",
@@ -3753,8 +4038,8 @@ background-clip: text;
           verifier: "syrcx",
           id: "114726615",
           videoUrl: "https://youtu.be/I0nXXCFYu4A",
-          previewImg: "http://i3.ytimg.com/vi/I0nXXCFYu4A/hqdefault.jpg",
-          releaseDate: "2025-02-01"
+          releaseDate: "2025-02-01",
+          lenght: "69",
         },  
         {
           title: "Haunted Corridor",
@@ -3762,8 +4047,8 @@ background-clip: text;
           verifier: "fusion425",
           id: "75638264",
           videoUrl: "https://youtu.be/mvroqJQBvCo",
-          previewImg: "http://i3.ytimg.com/vi/mvroqJQBvCo/hqdefault.jpg",
           releaseDate: "2023-07-26",
+          lenght: "102",
           tags: ["Unrated"]
         },  
         {
@@ -3772,8 +4057,8 @@ background-clip: text;
           verifier: "BUNNYGRAM",
           id: "77518059",
           videoUrl: "https://youtu.be/whtt_WkG_20",
-          previewImg: "http://i3.ytimg.com/vi/whtt_WkG_20/hqdefault.jpg",
-          releaseDate: "2022-01-22"
+          releaseDate: "2022-01-22",
+          lenght: "99",
         },  
         {
           title: "Asterios",
@@ -3781,8 +4066,8 @@ background-clip: text;
           verifier: "Atomic",
           id: "60870688",
           videoUrl: "https://youtu.be/YG3taML8WjA",
-          previewImg: "https://thumbnails.demonlist.org/60870688.png",
-          releaseDate: "2020-04-13"
+          releaseDate: "2020-04-13",
+          lenght: "125",
         },  
         {
           title: "Bloodlust",
@@ -3790,17 +4075,17 @@ background-clip: text;
           verifier: "Knobbelboy",
           id: "42584142",
           videoUrl: "https://youtu.be/5SzKetF2btw",
-          previewImg: "http://i3.ytimg.com/vi/5SzKetF2btw/hqdefault.jpg",
-          releaseDate: "2018-02-21"
+          releaseDate: "2018-02-21",
+          lenght: "170",
         },  
         {
           title: "Deimos",
           author: "EndLevel",
           verifier: "npesta",
           id: "52955167",
-          videoUrl: "https://youtu.be/FgxsNzQnF5o",
-          previewImg: "https://thumbnails.demonlist.org/52955167.png",
-          releaseDate: "2019-02-18"
+          videoUrl: "https://youtu.be/FgxsNzQnF5o",  
+          releaseDate: "2019-02-18",
+          lenght: "136",
         },  
         {
           title: "Escape Room",
@@ -3808,8 +4093,8 @@ background-clip: text;
           verifier: "MiniShoey",
           id: "90420966",
           videoUrl: "https://youtu.be/2Z-7Yscs62c",
-          previewImg: "http://i3.ytimg.com/vi/2Z-7Yscs62c/hqdefault.jpg",
-          releaseDate: "2023-04-30"
+          releaseDate: "2023-04-30",
+          lenght: "97",
         },  
         {
           title: "Time Extreme",
@@ -3817,8 +4102,8 @@ background-clip: text;
           verifier: "vortrox",
           id: "116730903",
           videoUrl: "https://youtu.be/gzqeoJK_UvM",
-          previewImg: "http://i3.ytimg.com/vi/gzqeoJK_UvM/hqdefault.jpg",
           releaseDate: "2025-04-09",
+          lenght: "96",
           tags: ["Unrated"]
         },  
         {
@@ -3827,17 +4112,17 @@ background-clip: text;
           verifier: "Magmeta",
           id: "109447394",
           videoUrl: "https://youtu.be/yWfbbEbTK9w",
-          previewImg: "http://i3.ytimg.com/vi/yWfbbEbTK9w/hqdefault.jpg",
-          releaseDate: "2024-08-25"
+          releaseDate: "2024-08-25",
+          lenght: "198",
         },  
         {
           title: "twocu",
-          author: "btLisp",
+          author: "Liisp",
           verifier: "Baeru",
           id: "76208118",
           videoUrl: "https://youtu.be/2CIpEYs4cGE",
-          previewImg: "https://thumbnails.demonlist.org/76208118.png",
           releaseDate: "2021-12-02",
+          lenght: "70",
           tags: ["Unrated"]
         },  
         {
@@ -3846,8 +4131,8 @@ background-clip: text;
           verifier: "Luqualizer",
           id: "68600127",
           videoUrl: "https://youtu.be/NjEiHIokTGM",
-          previewImg: "https://thumbnails.demonlist.org/68600127.png",
-          releaseDate: "2021-04-27"
+          releaseDate: "2021-04-27",
+          lenght: "83",
         },  
         {
           title: "Excruciation Chamber",
@@ -3855,17 +4140,17 @@ background-clip: text;
           verifier: "spcreat",
           id: "93020424",
           videoUrl: "https://youtu.be/BdkuNdFfY-o",
-          previewImg: "http://i3.ytimg.com/vi/BdkuNdFfY-o/hqdefault.jpg",
-          releaseDate: "2023-08-03"
+          releaseDate: "2023-08-03",
+          lenght: "61",
         },  
         {
           title: "Elbus",
-          author: "OmegaTeam18",
+          author: "Norbex",
           verifier: "skzyl",
-          id: "102385712",
+          id: "116308371",
           videoUrl: "https://youtu.be/JpLAr3Xgzmk",
-          previewImg: "https://thumbnails.demonlist.org/102385712.png",
           releaseDate: "2024-03-14",
+          lenght: "106",
           tags: ["Unrated"]
         },  
         {
@@ -3874,8 +4159,8 @@ background-clip: text;
           verifier: "Floofle",
           id: "68668045",
           videoUrl: "https://youtu.be/KVlcdvGYcj0",
-          previewImg: "http://i3.ytimg.com/vi/KVlcdvGYcj0/hqdefault.jpg",
-          releaseDate: "2021-04-28"
+          releaseDate: "2021-04-28",
+          lenght: "184",
         },  
         {
           title: "meow hard",
@@ -3883,8 +4168,8 @@ background-clip: text;
           verifier: "Jenath",
           id: "111862459",
           videoUrl: "https://youtu.be/jOhGH2TckDA",
-          previewImg: "http://i3.ytimg.com/vi/jOhGH2TckDA/hqdefault.jpg",
           releaseDate: "2024-11-06",
+          lenght: "91",
           tags: ["Unrated"]
         },  
         {
@@ -3893,8 +4178,8 @@ background-clip: text;
           verifier: "Zeronium",
           id: "84507862",
           videoUrl: "https://youtu.be/oVhGYiQ8fBc",
-          previewImg: "http://i3.ytimg.com/vi/oVhGYiQ8fBc/hqdefault.jpg",
-          releaseDate: "2022-10-11"
+          releaseDate: "2022-10-11",
+          lenght: "39",
         },  
         {
           title: "LD50",
@@ -3902,8 +4187,8 @@ background-clip: text;
           verifier: "Blitzer",
           id: "103947139",
           videoUrl: "https://youtu.be/2OiS9mVDlmQ",
-          previewImg: "http://i3.ytimg.com/vi/2OiS9mVDlmQ/hqdefault.jpg",
-          releaseDate: "2024-04-14"
+          releaseDate: "2024-04-14",
+          lenght: "89",
         },  
         {
           title: "Gracefully",
@@ -3911,8 +4196,8 @@ background-clip: text;
           verifier: "theworldofme",
           id: "88226064",
           videoUrl: "https://youtu.be/ILzPn3Ig-D8",
-          previewImg: "http://i3.ytimg.com/vi/ILzPn3Ig-D8/hqdefault.jpg",
-          releaseDate: "2023-08-01"
+          releaseDate: "2023-08-01",
+          lenght: "147",
         },  
         {
           title: "DsinK",
@@ -3920,8 +4205,8 @@ background-clip: text;
           verifier: "Laurendi",
           id: "98284764",
           videoUrl: "https://youtu.be/kYGpxnuyysk",
-          previewImg: "http://i3.ytimg.com/vi/kYGpxnuyysk/hqdefault.jpg",
-          releaseDate: "2023-12-31"
+          releaseDate: "2023-12-31",
+          lenght: "89",
         },  
         {
           title: "untitled unmastered",
@@ -3929,8 +4214,8 @@ background-clip: text;
           verifier: "vinny",
           id: "82217720",
           videoUrl: "https://youtu.be/zzPsYgyU4n4",
-          previewImg: "http://i3.ytimg.com/vi/zzPsYgyU4n4/hqdefault.jpg",
-          releaseDate: "2022-07-27"
+          releaseDate: "2022-07-27",
+          lenght: "93",
         },  
         {
           title: "Keoro",
@@ -3938,8 +4223,8 @@ background-clip: text;
           verifier: "Wadur",
           id: "114422410",
           videoUrl: "https://youtu.be/QZOl1uDf2E8",
-          previewImg: "https://thumbnails.demonlist.org/114422410.png",
           releaseDate: "2025-01-23",
+          lenght: "36",
           tags: ["Unrated"]
         },  
         {
@@ -3948,8 +4233,8 @@ background-clip: text;
           verifier: "kyoto",
           id: "82606722",
           videoUrl: "https://youtu.be/KSJl4A9eUW4",
-          previewImg: "https://thumbnails.demonlist.org/82606722.png",
-          releaseDate: "2022-08-10"
+          releaseDate: "2022-08-10",
+          lenght: "81",
         },  
         {
           title: "Hexagram",
@@ -3957,8 +4242,8 @@ background-clip: text;
           verifier: "skzyl",
           id: "104148006",
           videoUrl: "https://youtu.be/SapGa6vAX3Y",
-          previewImg: "https://thumbnails.demonlist.org/104148006.png",
           releaseDate: "2024-04-07",
+          lenght: "110",
           tags: ["Unrated"]
         },  
         {
@@ -3967,8 +4252,8 @@ background-clip: text;
           verifier: "Kotamon",
           id: "65986727",
           videoUrl: "https://youtu.be/e7mK0YAGsKU",
-          previewImg: "http://i3.ytimg.com/vi/e7mK0YAGsKU/hqdefault.jpg",
           releaseDate: "2020-12-25",
+          lenght: "95",
           tags: ["Unrated"]
         },  
         {
@@ -3977,8 +4262,8 @@ background-clip: text;
           verifier: "Kotamon",
           id: "60564010",
           videoUrl: "https://youtu.be/eJe3i5KyKOk",
-          previewImg: "https://thumbnails.demonlist.org/60564010.png",
-          releaseDate: "2020-03-31"
+          releaseDate: "2020-03-31",
+          lenght: "79",
         },  
         {
           title: "Enira",
@@ -3986,18 +4271,18 @@ background-clip: text;
           verifier: "SpirteX",
           id: "69990515",
           videoUrl: "https://youtu.be/A67U4oAdkko",
-          previewImg: "http://i3.ytimg.com/vi/A67U4oAdkko/hqdefault.jpg",
           releaseDate: "2021-06-09",
+          lenght: "72",
           tags: ["Unrated"]
         },  
         {
           title: "CITRA",
-          author: "varse",
+          author: "autechregd",
           verifier: "varse",
           id: "80966089",
           videoUrl: "https://youtu.be/VxbsQLnDOA0",
-          previewImg: "http://i3.ytimg.com/vi/VxbsQLnDOA0/hqdefault.jpg",
-          releaseDate: "2022-06-12"
+          releaseDate: "2022-06-12",
+          lenght: "39",
         },  
         {
           title: "the wiener",
@@ -4005,8 +4290,8 @@ background-clip: text;
           verifier: "Taiago",
           id: "91019161",
           videoUrl: "https://youtu.be/rgMruLorH1c",
-          previewImg: "http://i3.ytimg.com/vi/rgMruLorH1c/hqdefault.jpg",
-          releaseDate: "2023-05-09"
+          releaseDate: "2023-05-09",
+          lenght: "65",
         },    
         {
           title: "Sazerix",
@@ -4014,8 +4299,8 @@ background-clip: text;
           verifier: "Skycrab",
           id: "86787878",
           videoUrl: "https://youtu.be/l8aBStUgYOs",
-          previewImg: "http://i3.ytimg.com/vi/l8aBStUgYOs/hqdefault.jpg",
-          releaseDate: "2022-12-17"
+          releaseDate: "2022-12-17",
+          lenght: "94",
         },  
         {
           title: "Nhelv",
@@ -4023,8 +4308,8 @@ background-clip: text;
           verifier: "SrGuillester",
           id: "68353244",
           videoUrl: "https://youtu.be/k117h9HUt6s",
-          previewImg: "https://thumbnails.demonlist.org/68353244.png",
-          releaseDate: "2021-04-14"
+          releaseDate: "2021-04-14",
+          lenght: "156",
         },  
         {
           title: "TORN",
@@ -4032,8 +4317,8 @@ background-clip: text;
           verifier: "Slijee",
           id: "91816388",
           videoUrl: "https://youtu.be/QUpzux7AoTI",
-          previewImg: "http://i3.ytimg.com/vi/QUpzux7AoTI/hqdefault.jpg",
-          releaseDate: "2023-08-30"
+          releaseDate: "2023-08-30",
+          lenght: "72",
         },  
         {
           title: "Phasmvola",
@@ -4041,8 +4326,8 @@ background-clip: text;
           verifier: "ignDoom",
           id: "112313530",
           videoUrl: "https://youtu.be/i_Yvm0fpIoI",
-          previewImg: "http://i3.ytimg.com/vi/i_Yvm0fpIoI/hqdefault.jpg",
           releaseDate: "2024-12-13",
+          lenght: "62",
           tags: ["Unrated"]
         },  
         {
@@ -4051,8 +4336,8 @@ background-clip: text;
           verifier: "Swib",
           id: "97183213",
           videoUrl: "https://youtu.be/-AJl65nhTEA",
-          previewImg: "https://thumbnails.demonlist.org/97183213.png",
-          releaseDate: "2023-12-10"
+          releaseDate: "2023-12-10",
+          lenght: "100",
         },  
         {
           title: "Stormy Earthscape",
@@ -4060,8 +4345,8 @@ background-clip: text;
           verifier: "DraxitIII",
           id: "92539829",
           videoUrl: "https://youtu.be/IKOJS6r1L9U",
-          previewImg: "http://i3.ytimg.com/vi/IKOJS6r1L9U/hqdefault.jpg",
-          releaseDate: "2023-07-18" ,
+          releaseDate: "2023-07-18",
+          lenght: "74",
           tags: ["Unrated"]
         },  
         {
@@ -4070,8 +4355,8 @@ background-clip: text;
           verifier: "Zeronium",
           id: "92132505",
           videoUrl: "https://youtu.be/hx5ebE8e6Eo",
-          previewImg: "http://i3.ytimg.com/vi/hx5ebE8e6Eo/hqdefault.jpg",
-          releaseDate: "2023-07-13"
+          releaseDate: "2023-07-13",
+          lenght: "82",
         },  
         {
           title: "Terminux",
@@ -4079,8 +4364,8 @@ background-clip: text;
           verifier: "Laniakea",
           id: "76865589",
           videoUrl: "https://youtu.be/-UgocJ3WYn4",
-          previewImg: "https://thumbnails.demonlist.org/76865589.png",
-          releaseDate: "2021-12-27"
+          releaseDate: "2021-12-27",
+          lenght: "77",
         },  
         {
           title: "Ploink",
@@ -4088,8 +4373,8 @@ background-clip: text;
           verifier: "rWooshi",
           id: "96590328",
           videoUrl: "https://youtu.be/BV19Dg09LN0",
-          previewImg: "http://i3.ytimg.com/vi/BV19Dg09LN0/hqdefault.jpg",
-          releaseDate: "2023-11-18"
+          releaseDate: "2023-11-18",
+          lenght: "60",
         },  
         {
           title: "-critical error-",
@@ -4097,8 +4382,8 @@ background-clip: text;
           verifier: "SpeedyMuffin",
           id: "19761735",
           videoUrl: "https://youtu.be/18x88-2JIIY",
-          previewImg: "http://i3.ytimg.com/vi/18x88-2JIIY/hqdefault.jpg",
           releaseDate: "2022-05-21",
+          lenght: "137",
           tags: ["Unrated"]
         },  
         {
@@ -4107,8 +4392,8 @@ background-clip: text;
           verifier: "cobrablitz",
           id: "80293947",
           videoUrl: "https://youtu.be/n4nbu_fZcf4",
-          previewImg: "http://i3.ytimg.com/vi/n4nbu_fZcf4/hqdefault.jpg",
-          releaseDate: "2022-05-19"
+          releaseDate: "2022-05-19",
+          lenght: "175",
         },  
         {
           title: "Shutdown",
@@ -4116,8 +4401,8 @@ background-clip: text;
           verifier: "MiniShoey",
           id: "78164953",
           videoUrl: "https://youtu.be/A-A6_ybDY2I",
-          previewImg: "http://i3.ytimg.com/vi/A-A6_ybDY2I/hqdefault.jpg",
-          releaseDate: "2022-02-17"
+          releaseDate: "2022-02-17",
+          lenght: "110",
         },  
         {
           title: "ERYX",
@@ -4125,27 +4410,27 @@ background-clip: text;
           verifier: "Magilex",
           id: "102731401",
           videoUrl: "https://youtu.be/xmrpo4EWYAs",
-          previewImg: "http://i3.ytimg.com/vi/xmrpo4EWYAs/hqdefault.jpg",
           releaseDate: "2024-03-21",
+          lenght: "62",
           tags: ["Unrated"]
         },  
         {
           title: "Fog",
-          author: "Notesxd",
+          author: "notesxd",
           verifier: "Slayer",
           id: "90853661",
           videoUrl: "https://youtu.be/n3dIaFHT-fI",
-          previewImg: "http://i3.ytimg.com/vi/n3dIaFHT-fI/hqdefault.jpg",
-          releaseDate: "2023-05-20"
+          releaseDate: "2023-05-20",
+          lenght: "66",
         },  
         {
           title: "Gumi",
-          author: "btLisp",
+          author: "Liisp",
           verifier: "Swooker",
           id: "76857114",
           videoUrl: "https://youtu.be/JPZsQGaocQM",
-          previewImg: "http://i3.ytimg.com/vi/JPZsQGaocQM/hqdefault.jpg",
           releaseDate: "2021-12-26",
+          lenght: "49",
           tags: ["Unrated"]
         },  
         {
@@ -4154,8 +4439,8 @@ background-clip: text;
           verifier: "Gablor",
           id: "46763581",
           videoUrl: "https://youtu.be/wxWBFaZYHPM",
-          previewImg: "https://thumbnails.demonlist.org/46763581.png",
-          releaseDate: "2019-01-01"
+          releaseDate: "2019-01-01",
+          lenght: "49",
         },  
         {
           title: "Ghoul",
@@ -4163,8 +4448,8 @@ background-clip: text;
           verifier: "XavT",
           id: "111751101",
           videoUrl: "https://youtu.be/W1kgdxV_8E0",
-          previewImg: "https://thumbnails.demonlist.org/111751101.png",
-          releaseDate: "2024-11-02"
+          releaseDate: "2024-11-02",
+          lenght: "110",
         },  
         {
           title: "Crescent",
@@ -4172,8 +4457,8 @@ background-clip: text;
           verifier: "GDClutter",
           id: "94858950",
           videoUrl: "https://youtu.be/2l2eTFcUvQk",
-          previewImg: "http://i3.ytimg.com/vi/2l2eTFcUvQk/hqdefault.jpg",
           releaseDate: "2023-09-26",
+          lenght: "47",
           tags: ["Unrated"]
         },  
         {
@@ -4182,8 +4467,8 @@ background-clip: text;
           verifier: "Zeronium",
           id: "77681476",
           videoUrl: "https://youtu.be/VZS5Yn9Y-OI",
-          previewImg: "https://thumbnails.demonlist.org/77681476.png",
-          releaseDate: "2022-01-28"
+          releaseDate: "2022-01-28",
+          lenght: "60",
         },  
         {
           title: "Sigma",
@@ -4191,8 +4476,8 @@ background-clip: text;
           verifier: "Technical",
           id: "51657783",
           videoUrl: "https://youtu.be/3INdO0esQRw",
-          previewImg: "http://i3.ytimg.com/vi/3INdO0esQRw/hqdefault.jpg",
-          releaseDate: "2019-01-03"
+          releaseDate: "2019-01-03",
+          lenght: "154",
         },  
         {
           title: "A Wolf At the Door",
@@ -4200,8 +4485,8 @@ background-clip: text;
           verifier: "skzyl",
           id: "90428346",
           videoUrl: "https://youtu.be/pXtkFe6l4Xc",
-          previewImg: "http://i3.ytimg.com/vi/pXtkFe6l4Xc/hqdefault.jpg",
           releaseDate: "2023-05-01",
+          lenght: "84",
           tags: ["Unrated"]
         },  
         {
@@ -4210,8 +4495,8 @@ background-clip: text;
           verifier: "Luqualizer",
           id: "96265352",
           videoUrl: "https://youtu.be/MSyXPvgINqU",
-          previewImg: "http://i3.ytimg.com/vi/MSyXPvgINqU/hqdefault.jpg",
-          releaseDate: "2024-03-15"
+          releaseDate: "2024-03-15",
+          lenght: "145",
         },  
         {
           title: "Ourwa",
@@ -4219,8 +4504,8 @@ background-clip: text;
           verifier: "Demishio",
           id: "61598653",
           videoUrl: "https://youtu.be/ci11Bh-_CNk",
-          previewImg: "https://thumbnails.demonlist.org/61598653.png",
-          releaseDate: "2023-04-11"
+          releaseDate: "2023-04-11",
+          lenght: "93",
         },  
         {
           title: "Cobalt Hell",
@@ -4228,8 +4513,8 @@ background-clip: text;
           verifier: "JesseGamingGD",
           id: "122060729",
           videoUrl: "https://youtu.be/GzY2tXBo6fg",
-          previewImg: "https://thumbnails.demonlist.org/122060729.png",
-          releaseDate: "2025-07-01"
+          releaseDate: "2025-07-01",
+          lenght: "61",
         },  
         {
           title: "FRIDAY",
@@ -4237,8 +4522,8 @@ background-clip: text;
           verifier: "Metalface221",
           id: "94107500",
           videoUrl: "https://youtu.be/YUoFhrN3aKw",
-          previewImg: "https://thumbnails.demonlist.org/94107500.png",
-          releaseDate: "2023-09-03"
+          releaseDate: "2023-09-03",
+          lenght: "110",
         },  
         {
           title: "Pagoda",
@@ -4246,8 +4531,8 @@ background-clip: text;
           verifier: "Seturan",
           id: "77669659",
           videoUrl: "https://youtu.be/KVomsNjGalQ",
-          previewImg: "http://i3.ytimg.com/vi/KVomsNjGalQ/hqdefault.jpg",
-          releaseDate: "2022-01-27"
+          releaseDate: "2022-01-27",
+          lenght: "87",
         },  
         {
           title: "Gustavo Fring",
@@ -4255,8 +4540,8 @@ background-clip: text;
           verifier: "Acratic",
           id: "80585951",
           videoUrl: "https://youtu.be/OB0YiqyEp2E",
-          previewImg: "http://i3.ytimg.com/vi/OB0YiqyEp2E/hqdefault.jpg",
-          releaseDate: "2022-05-29"
+          releaseDate: "2022-05-29",
+          lenght: "68",
         },  
         {
           title: "Cicatrize",
@@ -4264,8 +4549,8 @@ background-clip: text;
           verifier: "Bleamer",
           id: "93941971",
           videoUrl: "https://youtu.be/QfF3jgPQZk0",
-          previewImg: "https://thumbnails.demonlist.org/93941971.png",
-          releaseDate: "2023-08-30"
+          releaseDate: "2023-08-30",
+          lenght: "82",
         },  
         {
           title: "Pootis Engage XTREME",
@@ -4273,8 +4558,8 @@ background-clip: text;
           verifier: "Falloostic",
           id: "102243781",
           videoUrl: "https://youtu.be/2SqKRRphIVI",
-          previewImg: "http://i3.ytimg.com/vi/2SqKRRphIVI/hqdefault.jpg",
-          releaseDate: "2024-05-11"
+          releaseDate: "2024-05-11",
+          lenght: "66",
         },  
         {
           title: "kakoyta extrim",
@@ -4282,8 +4567,8 @@ background-clip: text;
           verifier: "pashai",
           id: "121400360",
           videoUrl: "https://youtu.be/_E29g643Wik",
-          previewImg: "http://i3.ytimg.com/vi/_E29g643Wik/hqdefault.jpg",
           releaseDate: "2025-06-21",
+          lenght: "106",
           tags: ["Unrated"]
         },  
         {
@@ -4292,8 +4577,8 @@ background-clip: text;
           verifier: "ProudGiraffe311",
           id: "94120931",
           videoUrl: "https://youtu.be/ioiVKZts5So",
-          previewImg: "http://i3.ytimg.com/vi/ioiVKZts5So/hqdefault.jpg",
-          releaseDate: "2023-09-11"
+          releaseDate: "2023-09-11",
+          lenght: "102",
         },  
         {
           title: "Knights of Thunder",
@@ -4301,8 +4586,8 @@ background-clip: text;
           verifier: "Helix",
           id: "86412942",
           videoUrl: "https://youtu.be/npIZ8TGMDvk",
-          previewImg: "http://i3.ytimg.com/vi/npIZ8TGMDvk/hqdefault.jpg",
-          releaseDate: "2022-12-05"
+          releaseDate: "2022-12-05",
+          lenght: "72",
         },  
         {
           title: "Dump",
@@ -4310,17 +4595,17 @@ background-clip: text;
           verifier: "ZeusGD",
           id: "89513590",
           videoUrl: "https://youtu.be/UDrCb0rzuQo",
-          previewImg: "https://thumbnails.demonlist.org/89513590.png",
-          releaseDate: "2023-03-25"
+          releaseDate: "2023-03-25",
+          lenght: "66",
         },  
         {
           title: "ROCKY ROAD",
-          author: "arclighttt",
+          author: "arclightt",
           verifier: "raingmd",
           id: "113775365",
           videoUrl: "https://youtu.be/zF4T0Fat5Ng",
-          previewImg: "http://i3.ytimg.com/vi/zF4T0Fat5Ng/hqdefault.jpg",
           releaseDate: "2025-01-02",
+          lenght: "93",
           tags: ["Unrated"]
         },  
         {
@@ -4329,8 +4614,8 @@ background-clip: text;
           verifier: "Blitzer",
           id: "96491450",
           videoUrl: "https://youtu.be/Dxk3ReMjfuc",
-          previewImg: "http://i3.ytimg.com/vi/Dxk3ReMjfuc/hqdefault.jpg",
           releaseDate: "2023-11-18",
+          lenght: "201",
           tags: ["Unrated"]
         },  
         {
@@ -4339,8 +4624,8 @@ background-clip: text;
           verifier: "JakeEP",
           id: "61603616",
           videoUrl: "https://youtu.be/gKRCG9bAY8M",
-          previewImg: "https://thumbnails.demonlist.org/61603616.png",
           releaseDate: "2020-05-17",
+          lenght: "65",
           tags: ["Unrated"]
         },  
         {
@@ -4349,8 +4634,8 @@ background-clip: text;
           verifier: "cobrablitz",
           id: "106362836",
           videoUrl: "https://youtu.be/x9s3nSRUM7A",
-          previewImg: "http://i3.ytimg.com/vi/x9s3nSRUM7A/hqdefault.jpg",
-          releaseDate: "2024-06-11"
+          releaseDate: "2024-06-11",
+          lenght: "75",
         },  
         {
           title: "wind",
@@ -4358,8 +4643,8 @@ background-clip: text;
           verifier: "exsii",
           id: "80259838",
           videoUrl: "https://youtu.be/Kxx28QBnl4g",
-          previewImg: "http://i3.ytimg.com/vi/Kxx28QBnl4g/hqdefault.jpg",
           releaseDate: "2022-05-16",
+          lenght: "58",
           tags: ["Unrated"]
         },  
         {
@@ -4368,8 +4653,8 @@ background-clip: text;
           verifier: "khrizmass",
           id: "68908396",
           videoUrl: "https://youtu.be/BFaqgkw-Hg0",
-          previewImg: "https://thumbnails.demonlist.org/68908396.png",
-          releaseDate: "2021-05-07"
+          releaseDate: "2021-05-07",
+          lenght: "73",
         },  
         {
           title: "Call Me Maybe",
@@ -4377,8 +4662,8 @@ background-clip: text;
           verifier: "LordVadercraft",
           id: "80178903",
           videoUrl: "https://youtu.be/Jc-98ND5OJk",
-          previewImg: "http://i3.ytimg.com/vi/Jc-98ND5OJk/hqdefault.jpg",
           releaseDate: "2022-05-14",
+          lenght: "65",
           tags: ["Unrated"]
         },  
         {
@@ -4387,8 +4672,8 @@ background-clip: text;
           verifier: "LordVadercraft",
           id: "87361821",
           videoUrl: "https://youtu.be/yErjeLWnqDA",
-          previewImg: "http://i3.ytimg.com/vi/yErjeLWnqDA/hqdefault.jpg",
           releaseDate: "2023-01-02",
+          lenght: "99",
           tags: ["Unrated"]
         },  
         {
@@ -4397,8 +4682,8 @@ background-clip: text;
           verifier: "Blebae",
           id: "122916682",
           videoUrl: "https://youtu.be/_90khInpk9k",
-          previewImg: "http://i3.ytimg.com/vi/_90khInpk9k/hqdefault.jpg",
           releaseDate: "2025-07-14",
+          lenght: "102",
           tags: ["Unrated"]
         },  
         {
@@ -4407,8 +4692,8 @@ background-clip: text;
           verifier: "Technical",
           id: "56703691",
           videoUrl: "https://youtu.be/hLTnewDC2Hs",
-          previewImg: "http://i3.ytimg.com/vi/hLTnewDC2Hs/hqdefault.jpg",
-          releaseDate: "2019-07-27"
+          releaseDate: "2019-07-27",
+          lenght: "155",
         },  
         {
           title: "Farthest Outpost",
@@ -4416,8 +4701,8 @@ background-clip: text;
           verifier: "kyoto",
           id: "95138230",
           videoUrl: "https://youtu.be/HvQJB1SgEvo",
-          previewImg: "https://thumbnails.demonlist.org/95138230.png",
-          releaseDate: "2023-10-06"
+          releaseDate: "2023-10-06",
+          lenght: "79",
         },  
         {
           title: "Th3Dev0n",
@@ -4425,8 +4710,18 @@ background-clip: text;
           verifier: "Smokes",
           id: "95929957",
           videoUrl: "https://youtu.be/f7s6i0M1n-g",
-          previewImg: "http://i3.ytimg.com/vi/f7s6i0M1n-g/hqdefault.jpg",
-          releaseDate: "2023-10-29"
+          releaseDate: "2023-10-29",
+          lenght: "69",
+        },  
+        {
+          title: "WcairoX",
+          author: "CairoX",
+          verifier: "CairoX",
+          id: "86503022",
+          videoUrl: "https://youtu.be/74sWGM8Wiu0",
+          releaseDate: "2022-12-08",
+          lenght: "81",
+          tags: ["Unrated"]
         },  
         {
           title: "Fever Dream",
@@ -4434,8 +4729,8 @@ background-clip: text;
           verifier: "BUNNYGRAM",
           id: "57571964",
           videoUrl: "https://youtu.be/Mc3vZeM_VYw",
-          previewImg: "https://thumbnails.demonlist.org/57571964.png",
-          releaseDate: "2023-07-28"
+          releaseDate: "2023-07-28",
+          lenght: "64",
         },  
         {
           title: "Avaddon",
@@ -4443,8 +4738,8 @@ background-clip: text;
           verifier: "LordVadercraft",
           id: "81174074",
           videoUrl: "https://youtu.be/JpzpA6FhD28",
-          previewImg: "http://i3.ytimg.com/vi/JpzpA6FhD28/hqdefault.jpg",
           releaseDate: "2022-06-20",
+          lenght: "64",
           tags: ["Unrated"]
         },  
         {
@@ -4453,8 +4748,8 @@ background-clip: text;
           verifier: "mac",
           id: "95089240",
           videoUrl: "https://youtu.be/oo_PqnEHZvo",
-          previewImg: "http://i3.ytimg.com/vi/oo_PqnEHZvo/hqdefault.jpg",
-          releaseDate: "2023-10-04"
+          releaseDate: "2023-10-04",
+          lenght: "270",
         },  
         {
           title: "XRAY",
@@ -4462,8 +4757,8 @@ background-clip: text;
           verifier: "GMDElite",
           id: "99465112",
           videoUrl: "https://youtu.be/zk1G8Spw1hg",
-          previewImg: "http://i3.ytimg.com/vi/zk1G8Spw1hg/hqdefault.jpg",
-          releaseDate: "2024-01-21"
+          releaseDate: "2024-01-21",
+          lenght: "152",
         },  
         {
           title: "On Sight",
@@ -4471,8 +4766,8 @@ background-clip: text;
           verifier: "lazerezal",
           id: "93334196",
           videoUrl: "https://youtu.be/gi4eIiZzl_0",
-          previewImg: "https://thumbnails.demonlist.org/93334196.png",
           releaseDate: "2023-08-29",
+          lenght: "157",
           tags: ["Unrated"]
         },  
         {
@@ -4481,8 +4776,8 @@ background-clip: text;
           verifier: "Varium",
           id: "67387461",
           videoUrl: "https://youtu.be/34Xmjg35GQ4",
-          previewImg: "http://i3.ytimg.com/vi/34Xmjg35GQ4/hqdefault.jpg",
           releaseDate: "2021-03-05",
+          lenght: "71",
           tags: ["Unrated"]
         },  
         {
@@ -4491,8 +4786,8 @@ background-clip: text;
           verifier: "Seturan",
           id: "48267315",
           videoUrl: "https://youtu.be/hHpaB752peM",
-          previewImg: "http://i3.ytimg.com/vi/hHpaB752peM/hqdefault.jpg",
-          releaseDate: "2018-08-15"
+          releaseDate: "2018-08-15",
+          lenght: "157",
         },  
         {
           title: "Hardry",
@@ -4500,8 +4795,8 @@ background-clip: text;
           verifier: "IcaroX",
           id: "94928487",
           videoUrl: "https://youtu.be/59JlNpDlhH8",
-          previewImg: "http://i3.ytimg.com/vi/59JlNpDlhH8/hqdefault.jpg",
-          releaseDate: "2023-09-29"
+          releaseDate: "2023-09-29",
+          lenght: "82",
         },  
         {
           title: "Demon Ranched",
@@ -4509,8 +4804,8 @@ background-clip: text;
           verifier: "Magmeta",
           id: "122703533",
           videoUrl: "https://youtu.be/rDO89ob7XUg",
-          previewImg: "http://i3.ytimg.com/vi/rDO89ob7XUg/hqdefault.jpg",
           releaseDate: "2025-07-11",
+          lenght: "79",
           tags: ["Unrated"]
         },  
         {
@@ -4519,8 +4814,8 @@ background-clip: text;
           verifier: "Dorami",
           id: "54615662",
           videoUrl: "https://youtu.be/MN6Dra6yAys",
-          previewImg: "https://thumbnails.demonlist.org/54615662.png",
-          releaseDate: "2019-03-20"
+          releaseDate: "2019-03-20",
+          lenght: "151",
         },  
         {
           title: "Arctic Lights",
@@ -4528,8 +4823,8 @@ background-clip: text;
           verifier: "Metalface221",
           id: "52919433",
           videoUrl: "https://youtu.be/yd5cH9nvDvg",
-          previewImg: "https://thumbnails.demonlist.org/52919433.png",
-          releaseDate: "2019-02-17"
+          releaseDate: "2019-02-17",
+          lenght: "61",
         }, 
         {
           title: "EGO KILLING",
@@ -4537,8 +4832,8 @@ background-clip: text;
           verifier: "Wolvez",
           id: "90463207",
           videoUrl: "https://youtu.be/xnCsfVFygC4",
-          previewImg: "https://thumbnails.demonlist.org/90463207.png",
-          releaseDate: "2023-06-04"
+          releaseDate: "2023-06-04",
+          lenght: "61",
         },   
         {
           title: "PARTHENON",
@@ -4546,8 +4841,8 @@ background-clip: text;
           verifier: "GMD xeox",
           id: "79060051",
           videoUrl: "https://youtu.be/C2YtMvfsfSg",
-          previewImg: "https://thumbnails.demonlist.org/79060051.png",
           releaseDate: "2022-03-26",
+          lenght: "73",
           tags: ["Unrated"]
         },   
         {
@@ -4556,8 +4851,8 @@ background-clip: text;
           verifier: "fusion425",
           id: "105960212",
           videoUrl: "https://youtu.be/NTDAtnFEJ04",
-          previewImg: "http://i3.ytimg.com/vi/NTDAtnFEJ04/hqdefault.jpg",
           releaseDate: "2024-06-01",
+          lenght: "61",
           tags: ["Unrated"]
         },   
         {
@@ -4566,8 +4861,8 @@ background-clip: text;
           verifier: "lTemp",
           id: "59209010",
           videoUrl: "https://youtu.be/IN0XeMo2SmM",
-          previewImg: "https://thumbnails.demonlist.org/59209010.png",
-          releaseDate: "2020-09-13"
+          releaseDate: "2020-09-13",
+          lenght: "124",
         },   
         {
           title: "X84",
@@ -4575,8 +4870,8 @@ background-clip: text;
           verifier: "XavT",
           id: "110791899",
           videoUrl: "https://youtu.be/ZzGVEmS5D8s",
-          previewImg: "http://i3.ytimg.com/vi/ZzGVEmS5D8s/hqdefault.jpg",
           releaseDate: "2024-10-05",
+          lenght: "73",
           tags: ["Unrated"]
         },   
         {
@@ -4585,8 +4880,8 @@ background-clip: text;
           verifier: "Kurumi",
           id: "64766514",
           videoUrl: "https://youtu.be/2u4xxNUtJLI",
-          previewImg: "https://thumbnails.demonlist.org/64766514.png",
-          releaseDate: "2021-04-20"
+          releaseDate: "2021-04-20",
+          lenght: "131",
         },  
         {
           title: "CHROMA FINALE",
@@ -4594,17 +4889,17 @@ background-clip: text;
           verifier: "saturn",
           id: "72570152",
           videoUrl: "https://youtu.be/ByJ9rz4-WUI",
-          previewImg: "http://i3.ytimg.com/vi/ByJ9rz4-WUI/hqdefault.jpg",
-          releaseDate: "2021-08-15"
+          releaseDate: "2021-08-15",
+          lenght: "82",
         },  
         {
           title: "Plasma Pulse Finale",
-          author: "Zeostar",
-          verifier: "Smokes",
+          author: "xSmokes",
+          verifier: "xSmokes",
           id: "38655495",
           videoUrl: "https://youtu.be/xqzx9cu6XoA",
-          previewImg: "https://thumbnails.demonlist.org/38655495.png",
-          releaseDate: "2017-10-30"
+          releaseDate: "2017-10-30",
+          lenght: "127",
         },  
         {
           title: "Fragmented",
@@ -4612,8 +4907,8 @@ background-clip: text;
           verifier: "TGM05",
           id: "71571300",
           videoUrl: "https://youtu.be/7wrpprd9nOw",
-          previewImg: "http://i3.ytimg.com/vi/7wrpprd9nOw/hqdefault.jpg",
-          releaseDate: "2020-08-06"
+          releaseDate: "2020-08-06",
+          lenght: "63",
         },  
         {
           title: "Toxic Core",
@@ -4621,8 +4916,8 @@ background-clip: text;
           verifier: "Baeru",
           id: "73277097",
           videoUrl: "https://youtu.be/9w-ed-sGfpQ",
-          previewImg: "http://i3.ytimg.com/vi/9w-ed-sGfpQ/hqdefault.jpg",
           releaseDate: "2021-09-03",
+          lenght: "60",
           tags: ["Unrated"]
         },  
         {
@@ -4631,8 +4926,8 @@ background-clip: text;
           verifier: "Denni",
           id: "88421468",
           videoUrl: "https://youtu.be/lAgPh86coPQ",
-          previewImg: "https://thumbnails.demonlist.org/88421468.png",
-          releaseDate: "2023-02-07"
+          releaseDate: "2023-02-07",
+          lenght: "71",
         },  
         {
           title: "REPENTLESS",
@@ -4640,8 +4935,8 @@ background-clip: text;
           verifier: "Blankb",
           id: "87666648",
           videoUrl: "https://youtu.be/-lexD6huBlg",
-          previewImg: "http://i3.ytimg.com/vi/-lexD6huBlg/hqdefault.jpg",
-          releaseDate: "2023-05-05"
+          releaseDate: "2023-05-05",
+          lenght: "100",
         },  
         {
           title: "SZYSLAK",
@@ -4649,17 +4944,17 @@ background-clip: text;
           verifier: "Maxis044",
           id: "84114885",
           videoUrl: "https://youtu.be/CUov9IB5wjg",
-          previewImg: "http://i3.ytimg.com/vi/CUov9IB5wjg/hqdefault.jpg",
-          releaseDate: "2022-09-28"
+          releaseDate: "2022-09-28",
+          lenght: "71",
         },  
         {
           title: "Quicksand",
-          author: "Colorbolt",
-          verifier: "Colorbolt",
+          author: "ColorBolt",
+          verifier: "ColorBolt",
           id: "57972509",
           videoUrl: "https://youtu.be/5pu2kCbws44",
-          previewImg: "https://thumbnails.demonlist.org/57972509.png",
           releaseDate: "2020-06-20",
+          lenght: "207",
           tags: ["Unrated"]
         },  
         {
@@ -4668,8 +4963,8 @@ background-clip: text;
           verifier: "Zachiechan",
           id: "79184565",
           videoUrl: "https://youtu.be/C1RTKyS6Uow",
-          previewImg: "http://i3.ytimg.com/vi/C1RTKyS6Uow/hqdefault.jpg",
           releaseDate: "2022-04-02",
+          lenght: "101",
           tags: ["Unrated"]
         },  
         {
@@ -4678,27 +4973,27 @@ background-clip: text;
           verifier: "teraaa",
           id: "94390380",
           videoUrl: "https://youtu.be/IS3AcckWUT8",
-          previewImg: "http://i3.ytimg.com/vi/IS3AcckWUT8/hqdefault.jpg",
-          releaseDate: "2023-09-12"
+          releaseDate: "2023-09-12",
+          lenght: "73",
         },  
         {
           title: "Death Corridor Z",
-          author: "Sunix",
-          verifier: "Sunix",
+          author: "lSunix",
+          verifier: "lSunix",
           id: "38403655",
           videoUrl: "https://youtu.be/9799msdH394",
-          previewImg: "http://i3.ytimg.com/vi/9799msdH394/hqdefault.jpg",
           releaseDate: "2017-10-21",
+          lenght: "129",
           tags: ["Unrated"]
         },  
         {
           title: "LUMINA",
-          author: "hechie",
+          author: "Hechie",
           verifier: "Lia",
           id: "89488413",
           videoUrl: "https://youtu.be/ug9mjzRT7Ao",
-          previewImg: "http://i3.ytimg.com/vi/ug9mjzRT7Ao/hqdefault.jpg",
-          releaseDate: "2023-07-04"
+          releaseDate: "2023-07-04",
+          lenght: "142",
         },  
         {
           title: "Sparkling",
@@ -4706,8 +5001,8 @@ background-clip: text;
           verifier: "Johnfree",
           id: "77765367",
           videoUrl: "https://youtu.be/4r9hkMxpiQw",
-          previewImg: "http://i3.ytimg.com/vi/4r9hkMxpiQw/hqdefault.jpg",
-          releaseDate: "2022-01-31"
+          releaseDate: "2022-01-31",
+          lenght: "86",
         },  
         {
           title: "RAM",
@@ -4715,8 +5010,8 @@ background-clip: text;
           verifier: "Zipi",
           id: "95440955",
           videoUrl: "https://youtu.be/5cl7WAQJKdY",
-          previewImg: "https://thumbnails.demonlist.org/95440955.png",
-          releaseDate: "2023-10-15"
+          releaseDate: "2023-10-15",
+          lenght: "83",
         },  
         {
           title: "Requiem",
@@ -4724,8 +5019,8 @@ background-clip: text;
           verifier: "Zylenox",
           id: "52303420",
           videoUrl: "https://youtu.be/sRCQ1JjhBq4",
-          previewImg: "http://i3.ytimg.com/vi/sRCQ1JjhBq4/hqdefault.jpg",
-          releaseDate: "2019-01-27"
+          releaseDate: "2019-01-27",
+          lenght: "74",
         },  
         {
           title: "of Ambrosia",
@@ -4733,8 +5028,8 @@ background-clip: text;
           verifier: "cobrablitz",
           id: "81583127",
           videoUrl: "https://youtu.be/0KtPsPVpj78",
-          previewImg: "http://i3.ytimg.com/vi/0KtPsPVpj78/hqdefault.jpg",
-          releaseDate: "2022-07-05"
+          releaseDate: "2022-07-05",
+          lenght: "106",
         },  
         {
           title: "Aquatic Auroras",
@@ -4742,8 +5037,8 @@ background-clip: text;
           verifier: "kyoto",
           id: "60740290",
           videoUrl: "https://youtu.be/cD0zZ9OJkBE",
-          previewImg: "https://thumbnails.demonlist.org/60740290.png",
-          releaseDate: "2021-10-09"
+          releaseDate: "2021-10-09",
+          lenght: "69",
         },  
         {
           title: "I WILL",
@@ -4751,8 +5046,8 @@ background-clip: text;
           verifier: "Bosonic",
           id: "92065123",
           videoUrl: "https://youtu.be/O2879gsKoEY",
-          previewImg: "http://i3.ytimg.com/vi/O2879gsKoEY/hqdefault.jpg",
           releaseDate: "2023-07-02",
+          lenght: "117",
           tags: ["Unrated"]
         },  
         {
@@ -4761,8 +5056,8 @@ background-clip: text;
           verifier: "BONN GD",
           id: "88148706",
           videoUrl: "https://youtu.be/ilHNPZ3d8jc",
-          previewImg: "http://i3.ytimg.com/vi/ilHNPZ3d8jc/hqdefault.jpg",
           releaseDate: "2023-01-29",
+          lenght: "60",
           tags: ["Unrated"]
         },  
         {
@@ -4771,17 +5066,17 @@ background-clip: text;
           verifier: "kovosrutek",
           id: "94761797",
           videoUrl: "https://youtu.be/VSxu7YnyGsQ",
-          previewImg: "http://i3.ytimg.com/vi/VSxu7YnyGsQ/hqdefault.jpg",
-          releaseDate: "2023-09-24"
+          releaseDate: "2023-09-24",
+          lenght: "87",
         },  
         {
           title: "WORSTBRAINMAP",
           author: "Bimms",
-          verifier: "bims",
+          verifier: "Bimms",
           id: "102144924",
           videoUrl: "https://youtu.be/GWjIIFktU04",
-          previewImg: "http://i3.ytimg.com/vi/GWjIIFktU04/hqdefault.jpg",
-          releaseDate: "2024-03-09"
+          releaseDate: "2024-03-09",
+          lenght: "91",
         },  
         {
           title: "Storming Summit",
@@ -4789,8 +5084,8 @@ background-clip: text;
           verifier: "Ozzy",
           id: "76653933",
           videoUrl: "https://youtu.be/ymmMnZLpfQU",
-          previewImg: "http://i3.ytimg.com/vi/ymmMnZLpfQU/hqdefault.jpg",
-          releaseDate: "2021-12-18"
+          releaseDate: "2021-12-18",
+          lenght: "170",
         },  
         {
           title: "Mirrored Calamity",
@@ -4798,8 +5093,8 @@ background-clip: text;
           verifier: "IINimbusII",
           id: "59157630",
           videoUrl: "https://youtu.be/5Wo0eFR8Lwk",
-          previewImg: "https://thumbnails.demonlist.org/59157630.png",
-          releaseDate: "2020-01-12"
+          releaseDate: "2020-01-12",
+          lenght: "121",
         },  
         {
           title: "Golden Club",
@@ -4807,8 +5102,8 @@ background-clip: text;
           verifier: "Skycrab",
           id: "89490128",
           videoUrl: "https://youtu.be/YBs04o1ZVQY",
-          previewImg: "https://thumbnails.demonlist.org/89490128.png",
-          releaseDate: "2023-03-23"
+          releaseDate: "2023-03-23",
+          lenght: "94",
         },  
         {
           title: "The Nebula",
@@ -4816,8 +5111,8 @@ background-clip: text;
           verifier: "Kapinapi",
           id: "57936568",
           videoUrl: "https://youtu.be/0iJpJSVojZs",
-          previewImg: "http://i3.ytimg.com/vi/0iJpJSVojZs/hqdefault.jpg",
           releaseDate: "2019-10-24",
+          lenght: "60",
           tags: ["Unrated"]
         },  
         {
@@ -4826,8 +5121,8 @@ background-clip: text;
           verifier: "Lia",
           id: "114867361",
           videoUrl: "https://youtu.be/IHXcmu7XrxQ",
-          previewImg: "http://i3.ytimg.com/vi/IHXcmu7XrxQ/hqdefault.jpg",
-          releaseDate: "2025-02-06"
+          releaseDate: "2025-02-06",
+          lenght: "163",
         },  
         {
           title: "too high",
@@ -4835,8 +5130,8 @@ background-clip: text;
           verifier: "Floofle",
           id: "75733053",
           videoUrl: "https://youtu.be/obS6Yq-d0Pw",
-          previewImg: "http://i3.ytimg.com/vi/obS6Yq-d0Pw/hqdefault.jpg",
           releaseDate: "2021-11-15",
+          lenght: "73",
           tags: ["Unrated"]
         },  
         {
@@ -4845,8 +5140,8 @@ background-clip: text;
           verifier: "Lucidium",
           id: "107725613",
           videoUrl: "https://youtu.be/eRWnopJUqxc",
-          previewImg: "http://i3.ytimg.com/vi/eRWnopJUqxc/hqdefault.jpg",
           releaseDate: "2024-07-12",
+          lenght: "67",
           tags: ["Unrated"]
         },  
         {
@@ -4855,8 +5150,8 @@ background-clip: text;
           verifier: "BONN GD",
           id: "96470224",
           videoUrl: "https://youtu.be/FgOR1jwsXww",
-          previewImg: "http://i3.ytimg.com/vi/FgOR1jwsXww/hqdefault.jpg",
-          releaseDate: "2023-11-13"
+          releaseDate: "2023-11-13",
+          lenght: "60",
         },  
         {
           title: "SisuSonic",
@@ -4864,8 +5159,8 @@ background-clip: text;
           verifier: "JHDash77",
           id: "103035376",
           videoUrl: "https://youtu.be/epTEemVtIqY",
-          previewImg: "http://i3.ytimg.com/vi/epTEemVtIqY/hqdefault.jpg",
-          releaseDate: "2024-03-27"
+          releaseDate: "2024-03-27",
+          lenght: "140",
         },  
         {
           title: "SUPER SERIOUS WORLD",
@@ -4873,8 +5168,8 @@ background-clip: text;
           verifier: "iIPrototypeIi",
           id: "112491891",
           videoUrl: "https://youtu.be/RJj5niMDX30",
-          previewImg: "http://i3.ytimg.com/vi/RJj5niMDX30/hqdefault.jpg",
-          releaseDate: "2024-11-26"
+          releaseDate: "2024-11-26",
+          lenght: "109",
         },  
         {
           title: "Golden Paracosm",
@@ -4882,8 +5177,8 @@ background-clip: text;
           verifier: "Dice88",
           id: "49416063",
           videoUrl: "https://youtu.be/z2FR-DhjHMU",
-          previewImg: "http://i3.ytimg.com/vi/z2FR-DhjHMU/hqdefault.jpg",
           releaseDate: "2020-04-18",
+          lenght: "62",
           tags: ["Unrated"]
         },  
         {
@@ -4892,8 +5187,8 @@ background-clip: text;
           verifier: "DreamZoneGD",
           id: "79619086",
           videoUrl: "https://youtu.be/kXLBuSDagOE",
-          previewImg: "http://i3.ytimg.com/vi/kXLBuSDagOE/hqdefault.jpg",
-          releaseDate: "2022-04-20"
+          releaseDate: "2022-04-20",
+          lenght: "73",
         },  
         {
           title: "Frigid",
@@ -4901,8 +5196,8 @@ background-clip: text;
           verifier: "rlYqAz123",
           id: "113910678",
           videoUrl: "https://youtu.be/fOfy9JPJ-2c",
-          previewImg: "http://i3.ytimg.com/vi/fOfy9JPJ-2c/hqdefault.jpg",
           releaseDate: "2025-01-06",
+          lenght: "64",
           tags: ["Unrated"]
         },
         {
@@ -4911,8 +5206,8 @@ background-clip: text;
           verifier: "notd4n1",
           id: "114243863",
           videoUrl: "https://youtu.be/doCS2keLRhE",
-          previewImg: "http://i3.ytimg.com/vi/FjsJEEWW0_o/hqdefault.jpg",
           releaseDate: "2025-01-18",
+          lenght: "51",
           tags: ["Unrated"]
         },
         {
@@ -4921,8 +5216,8 @@ background-clip: text;
           verifier: "Bibu",
           id: "83914474",
           videoUrl: "https://youtu.be/tp6-hpqtnWk",
-          previewImg: "http://i3.ytimg.com/vi/tp6-hpqtnWk/hqdefault.jpg",
-          releaseDate: "2022-09-22"
+          releaseDate: "2022-09-22",
+          lenght: "102",
         },
         {
           title: "Wasureta",
@@ -4930,8 +5225,8 @@ background-clip: text;
           verifier: "VaporWubz",
           id: "64658786",
           videoUrl: "https://youtu.be/9jkCtNDbDt0",
-          previewImg: "https://thumbnails.demonlist.org/64658786.png",
-          releaseDate: "2021-05-28"
+          releaseDate: "2021-05-28",
+          lenght: "56",
         },
         {
           title: "RANDOM ACCESS MEMORY",
@@ -4939,8 +5234,8 @@ background-clip: text;
           verifier: "Zeronium",
           id: "81372683",
           videoUrl: "https://youtu.be/2Lc4Vsbf1o0",
-          previewImg: "https://thumbnails.demonlist.org/81372683.png",
-          releaseDate: "2022-11-19"
+          releaseDate: "2022-11-19",
+          lenght: "117",
         },
         {
           title: "Edge of the World",
@@ -4948,8 +5243,8 @@ background-clip: text;
           verifier: "L4TeZk",
           id: "83697006",
           videoUrl: "https://youtu.be/QWy1RnPDCWk",
-          previewImg: "http://i3.ytimg.com/vi/QWy1RnPDCWk/hqdefault.jpg",
-          releaseDate: "2022-09-15"
+          releaseDate: "2022-09-15",
+          lenght: "97",
         },
         {
           title: "Beyond Hell",
@@ -4957,8 +5252,8 @@ background-clip: text;
           verifier: "fakeblast",
           id: "77016475",
           videoUrl: "https://youtu.be/Q6GCkukQabQ",
-          previewImg: "http://i3.ytimg.com/vi/Q6GCkukQabQ/hqdefault.jpg",
-          releaseDate: "2022-01-01"
+          releaseDate: "2022-01-01",
+          lenght: "81",
         },
         {
           title: "EUPHORIA",
@@ -4966,8 +5261,8 @@ background-clip: text;
           verifier: "Yossarian",
           id: "85399519",
           videoUrl: "https://youtu.be/1nuPbw7HX1k",
-          previewImg: "http://i3.ytimg.com/vi/1nuPbw7HX1k/hqdefault.jpg",
           releaseDate: "2022-11-06",
+          lenght: "94",
           tags: ["Unrated"]
         },
         {
@@ -4976,8 +5271,18 @@ background-clip: text;
           verifier: "Xander",
           id: "59706883",
           videoUrl: "https://youtu.be/VqOMZLoiwAs",
-          previewImg: "http://i3.ytimg.com/vi/VqOMZLoiwAs/hqdefault.jpg",
-          releaseDate: "2020-10-27"
+          releaseDate: "2020-10-27",
+          lenght: "156",
+        },
+        {
+          title: "Radiance",
+          author: "Sensawa",
+          verifier: "GDClutter",
+          id: "108317604",
+          videoUrl: "https://youtu.be/6WdptnMi9rM",
+          releaseDate: "2024-07-27",
+          lenght: "47",
+          tags: ["Unrated"]
         },
         {
           title: "Dance of the Violins",
@@ -4985,8 +5290,8 @@ background-clip: text;
           verifier: "WatchPiggy",
           id: "91595507",
           videoUrl: "https://youtu.be/PYwI_ODrrlw",
-          previewImg: "http://i3.ytimg.com/vi/PYwI_ODrrlw/hqdefault.jpg",
-          releaseDate: "2023-06-16"
+          releaseDate: "2023-06-16",
+          lenght: "97",
         },  
         {
           title: "Gamma",
@@ -4994,8 +5299,8 @@ background-clip: text;
           verifier: "Technical",
           id: "39832454",
           videoUrl: "https://youtu.be/HTXRWzS2aw8",
-          previewImg: "https://thumbnails.demonlist.org/39832454.png",
-          releaseDate: "2018-06-18"
+          releaseDate: "2018-06-18",
+          lenght: "103",
         },
         {
           title: "network",
@@ -5003,8 +5308,8 @@ background-clip: text;
           verifier: "Allex",
           id: "90400834",
           videoUrl: "https://youtu.be/uA5i_jBW2hY",
-          previewImg: "http://i3.ytimg.com/vi/uA5i_jBW2hY/hqdefault.jpg",
-          releaseDate: "2023-06-12"
+          releaseDate: "2023-06-12",
+          lenght: "43",
         },
         {
           title: "Spacial Rend",
@@ -5012,8 +5317,8 @@ background-clip: text;
           verifier: "DiamondSplash",
           id: "40292513",
           videoUrl: "https://youtu.be/VgiRJRBzacM",
-          previewImg: "https://thumbnails.demonlist.org/40292513.png",
-          releaseDate: "2017-12-25"
+          releaseDate: "2017-12-25",
+          lenght: "126",
         },
         {
           title: "Omnitoxin",
@@ -5021,8 +5326,8 @@ background-clip: text;
           verifier: "Zagros",
           id: "56756350",
           videoUrl: "https://youtu.be/U68CdUK7_IE",
-          previewImg: "http://i3.ytimg.com/vi/U68CdUK7_IE/hqdefault.jpg",
           releaseDate: "2019-07-30",
+          lenght: "203",
           tags: ["Unrated"]
         },
         {
@@ -5031,8 +5336,8 @@ background-clip: text;
           verifier: "Wolvez",
           id: "79617131",
           videoUrl: "https://youtu.be/-6AOn-o7mQo",
-          previewImg: "http://i3.ytimg.com/vi/-6AOn-o7mQo/hqdefault.jpg",
           releaseDate: "2022-04-20",
+          lenght: "93",
           tags: ["Unrated"]
         },
         {
@@ -5041,8 +5346,8 @@ background-clip: text;
           verifier: "Plus",
           id: "65596575",
           videoUrl: "https://youtu.be/HMbWi59wd6c",
-          previewImg: "http://i3.ytimg.com/vi/HMbWi59wd6c/hqdefault.jpg",
           releaseDate: "2020-12-05",
+          lenght: "150",
           tags: ["Unrated"]
         },
         {
@@ -5051,8 +5356,8 @@ background-clip: text;
           verifier: "BreadDemon",
           id: "92127272",
           videoUrl: "https://youtu.be/9dy1afi-fo4",
-          previewImg: "https://thumbnails.demonlist.org/92127272.png",
-          releaseDate: "2025-06-24"
+          releaseDate: "2025-06-24",
+          lenght: "82",
         },
         {
           title: "Dedohexdragon",
@@ -5060,8 +5365,8 @@ background-clip: text;
           verifier: "royen",
           id: "81998680",
           videoUrl: "https://youtu.be/z_zegPqfqr4",
-          previewImg: "http://i3.ytimg.com/vi/z_zegPqfqr4/hqdefault.jpg",
-          releaseDate: "2022-07-20"
+          releaseDate: "2022-07-20",
+          lenght: "91",
         },
         {
           title: "Ryft",
@@ -5069,8 +5374,8 @@ background-clip: text;
           verifier: "DreamLightGD",
           id: "87565954",
           videoUrl: "https://youtu.be/Wxjk0A09XNU",
-          previewImg: "http://i3.ytimg.com/vi/Wxjk0A09XNU/hqdefault.jpg",
-          releaseDate: "2023-01-09"
+          releaseDate: "2023-01-09",
+          lenght: "166",
         },
         {
           title: "Dark Flare",
@@ -5078,8 +5383,8 @@ background-clip: text;
           verifier: "Plusxenon",
           id: "48942548",
           videoUrl: "https://youtu.be/Pb8GVDjiiQQ",
-          previewImg: "https://thumbnails.demonlist.org/48942548.png",
-          releaseDate: "2018-09-15"
+          releaseDate: "2018-09-15",
+          lenght: "177",
         },
         {
           title: "Iris of a Puppeteer",
@@ -5087,8 +5392,8 @@ background-clip: text;
           verifier: "zoe",
           id: "89243963",
           videoUrl: "https://youtu.be/DK3BShj1zYc",
-          previewImg: "http://i3.ytimg.com/vi/DK3BShj1zYc/hqdefault.jpg",
-          releaseDate: "2023-03-12"
+          releaseDate: "2023-03-12",
+          lenght: "137",
         },
         {
           title: "Cybernetic Crescent",
@@ -5096,8 +5401,8 @@ background-clip: text;
           verifier: "Technical",
           id: "66291197",
           videoUrl: "https://youtu.be/0yKtq1PJeDQ",
-          previewImg: "http://i3.ytimg.com/vi/0yKtq1PJeDQ/hqdefault.jpg",
-          releaseDate: "2021-01-08"
+          releaseDate: "2021-01-08",
+          lenght: "113",
         },
         {
           title: "Macabre",
@@ -5105,8 +5410,8 @@ background-clip: text;
           verifier: "MrSpaghetti",
           id: "56782662",
           videoUrl: "https://youtu.be/b2kGqEY8E1Q",
-          previewImg: "http://i3.ytimg.com/vi/b2kGqEY8E1Q/hqdefault.jpg",
-          releaseDate: "2019-08-01"
+          releaseDate: "2019-08-01",
+          lenght: "93",
         },
         {
           title: "Memento",
@@ -5985,6 +6290,15 @@ background-clip: text;
           releaseDate: "2021-01-11"
         },
         {
+          title: "Y4v",
+          author: "JustixGD",
+          verifier: "JustixGD",
+          id: "122906276",
+          videoUrl: "https://youtu.be/1cR5FS6pS60",
+          releaseDate: "2025-07-14",
+          tags: ["Unrated"]
+        },
+        {
           title: "Phantasma",
           author: "Blakejm",
           verifier: "Blakejm",
@@ -6230,7 +6544,7 @@ background-clip: text;
         {
           title: "Jelly Shots",
           author: "Xanii",
-          verifier: "D a G",
+          verifier: "DaGYT",
           id: "73268756",
           videoUrl: "https://youtu.be/aQTgOrERpv0",
           previewImg: "https://thumbnails.demonlist.org/73268756.png",
@@ -7003,6 +7317,112 @@ background-clip: text;
           videoUrl: "https://youtu.be/QYNWtkoQt8E",
           releaseDate: "2022-09-29"
         },
+        {
+          title: "Crystal",
+          author: "Zeroniumm",
+          verifier: "Zeroniumm",
+          id: "73645039",
+          videoUrl: "https://youtu.be/FvUmaJib5uo",
+          releaseDate: "2021-09-14"
+        },
+        {
+          title: "Quaoar",
+          author: "Flosia",
+          verifier: "zPlasmaLust",
+          id: "73294395",
+          videoUrl: "https://youtu.be/gTfxUYbs1nM",
+          releaseDate: "2021-09-04"
+        },
+        {
+          title: "Phantasmagoria",
+          author: "XavT",
+          verifier: "Polyden",
+          id: "89781336",
+          videoUrl: "https://youtu.be/7636NLvlBe8",
+          releaseDate: "2025-01-31",
+          tags: ["Unrated"],
+        },
+        {
+          title: "Flyway",
+          author: "PlayerHungry",
+          verifier: "Nerhy",
+          id: "93873140",
+          videoUrl: "https://youtu.be/uDFsNMHNnLw",
+          releaseDate: "2023-08-28"
+        },
+        {
+          title: "DESOLATE",
+          author: "Billzer",
+          verifier: "Katz3n",
+          id: "89487717",
+          videoUrl: "https://youtu.be/Xwj0L4dsPbA",
+          releaseDate: "2023-03-22"
+        },
+        {
+          title: "Rate Demon",
+          author: "RoiMousti",
+          verifier: "Dorami",
+          id: "44860762",
+          videoUrl: "https://youtu.be/3rKI-n69bzY",
+          releaseDate: "2018-04-17"
+        },
+        {
+          title: "Power Grid",
+          author: "YraX",
+          verifier: "Lucidium",
+          id: "93516660",
+          videoUrl: "https://youtu.be/5hcQKR1dNkI",
+          releaseDate: "2023-12-02"
+        },
+        {
+          title: "Beztana Vortex",
+          author: "invicttt",
+          verifier: "Cersia",
+          id: "68928710",
+          videoUrl: "https://youtu.be/9hdBbTEiz9Y",
+          releaseDate: "2021-04-12",
+          tags: ["Unrated"],
+        },
+        {
+          title: "Yuh",
+          author: "lFritz",
+          verifier: "Moosh",
+          id: "62557486",
+          videoUrl: "https://youtu.be/wi-FR0SfCow",
+          releaseDate: "2020-07-04"
+        },
+        {
+          title: "Void Wave",
+          author: "cherryteam",
+          verifier: "Dorami",
+          id: "59620684",
+          videoUrl: "https://youtu.be/wxfNGETjTnU",
+          releaseDate: "2021-01-17"
+        },
+        {
+          title: "Spectrum Rave",
+          author: "Ryder",
+          verifier: "Floppy",
+          id: "72308725",
+          videoUrl: "https://youtu.be/_7pazRdnms4",
+          releaseDate: "2021-08-08"
+        },
+        {
+          title: "Death",
+          author: "AleeXhey",
+          verifier: "TheyCallMeEvan",
+          id: "98929172",
+          videoUrl: "https://youtu.be/uLZ6JZnHNVA",
+          releaseDate: "2023-12-21"
+        },
+        {
+          title: "Black Blizzard",
+          author: "KrmaL",
+          verifier: "KrmaL",
+          id: "34057654",
+          videoUrl: "https://youtu.be/lsT5TjQ1Ubc",
+          releaseDate: "2017-05-22"
+        },
       ],
       challenges: [
         {
@@ -7011,8 +7431,8 @@ background-clip: text;
           verifier: "OverGD",
           id: "38230726",
           videoUrl: "https://youtu.be/nBmjrlmzUxE",
-          previewImg: "http://i3.ytimg.com/vi/nBmjrlmzUxE/hqdefault.jpg",
-          releaseDate: "2025-04-25"
+          releaseDate: "2025-04-25",
+          lenght: "29",
         },
         {
           title: "VSC",
@@ -7020,8 +7440,8 @@ background-clip: text;
           verifier: "Yossarian",
           id: "60805571",
           videoUrl: "https://youtu.be/ewlMbTR-c_w",
-          previewImg: "http://i3.ytimg.com/vi/ewlMbTR-c_w/hqdefault.jpg",
-          releaseDate: "2021-09-21"
+          releaseDate: "2021-09-21",
+          lenght: "16",
         },
         {
           title: "FINAL FANTASY",
@@ -7029,8 +7449,8 @@ background-clip: text;
           verifier: "telepracity",
           id: "76767195",
           videoUrl: "https://youtu.be/Fb6w_l0Q5DM",
-          previewImg: "http://i3.ytimg.com/vi/Fb6w_l0Q5DM/hqdefault.jpg",
-          releaseDate: "2021-12-23"
+          releaseDate: "2021-12-23",
+          lenght: "19",
         },
         {
           title: "my backyard",
@@ -7038,8 +7458,8 @@ background-clip: text;
           verifier: "Revenant",
           id: "116528569",
           videoUrl: "https://youtu.be/WVMOzhJlGrw",
-          previewImg: "http://i3.ytimg.com/vi/WVMOzhJlGrw/hqdefault.jpg",
-          releaseDate: "2025-03-25"
+          releaseDate: "2025-03-25",
+          lenght: "9",
         },
         {
           title: "anodyne",
@@ -7047,8 +7467,8 @@ background-clip: text;
           verifier: "zXdasfsa",
           id: "105191372",
           videoUrl: "https://youtu.be/zl7cgZI0jrU",
-          previewImg: "http://i3.ytimg.com/vi/0vdlm_yINBc/hqdefault.jpg",
-          releaseDate: "2024-08-28"
+          releaseDate: "2024-08-28",
+          lenght: "12",
         },
         {
           title: "EXPIRATION DATE",
@@ -7056,8 +7476,8 @@ background-clip: text;
           verifier: "QuadLK",
           id: "95357570",
           videoUrl: "https://youtu.be/1nltyMOpLqI",
-          previewImg: "http://i3.ytimg.com/vi/1nltyMOpLqI/hqdefault.jpg",
-          releaseDate: "2023-10-13"
+          releaseDate: "2023-10-13",
+          lenght: "17",
         },
         {
           title: "bosco busch",
@@ -7065,8 +7485,8 @@ background-clip: text;
           verifier: "Sydno",
           id: "95259962",
           videoUrl: "https://youtu.be/sPmCPA8K7nU",
-          previewImg: "http://i3.ytimg.com/vi/70PcRAaDNFo/hqdefault.jpg",
-          releaseDate: "2025-01-26  "
+          releaseDate: "2025-01-26",
+          lenght: "17",
         },
         {
           title: "Oblivers",
@@ -7074,8 +7494,8 @@ background-clip: text;
           verifier: "OverGD",
           id: "85042202",
           videoUrl: "https://youtu.be/cfcVzI2Ag1A",
-          previewImg: "http://i3.ytimg.com/vi/cfcVzI2Ag1A/hqdefault.jpg",
-          releaseDate: "2023-10-07"
+          releaseDate: "2023-10-07",
+          lenght: "15",
         },
         {
           title: "CorroZ B",
@@ -7083,8 +7503,8 @@ background-clip: text;
           verifier: "Diamond",
           id: "67044214",
           videoUrl: "https://youtu.be/geJpHgm15yU",
-          previewImg: "http://i3.ytimg.com/vi/geJpHgm15yU/hqdefault.jpg",
-          releaseDate: "2025-04-20"
+          releaseDate: "2025-04-20",
+          lenght: "19",
         },
         {
           title: "aztec rave monkey",
@@ -7092,8 +7512,8 @@ background-clip: text;
           verifier: "Revenant",
           id: "112667786",
           videoUrl: "https://youtu.be/WVe_x-lcLbs",
-          previewImg: "http://i3.ytimg.com/vi/WVe_x-lcLbs/hqdefault.jpg",
-          releaseDate: "2024-12-01"
+          releaseDate: "2024-12-01",
+          lenght: "9",
         },
         {
           title: "Solaria",
@@ -7101,8 +7521,8 @@ background-clip: text;
           verifier: "Scorch9",
           id: "116055074",
           videoUrl: "https://youtu.be/NbWxdFm3hrI",
-          previewImg: "http://i3.ytimg.com/vi/NbWxdFm3hrI/hqdefault.jpg",
-          releaseDate: "2025-03-16"
+          releaseDate: "2025-03-16",
+          lenght: "25",
         },
         {
           title: "SADOMASOCHISM",
@@ -7110,8 +7530,8 @@ background-clip: text;
           verifier: "Nyan Cat",
           id: "76213334",
           videoUrl: "https://youtu.be/1tjmKs4lyB4",
-          previewImg: "http://i3.ytimg.com/vi/1tjmKs4lyB4/hqdefault.jpg",
-          releaseDate: "2021-12-02"
+          releaseDate: "2021-12-02",
+          lenght: "15",
         },
         {
           title: "NcaT Challenge",
@@ -7119,8 +7539,8 @@ background-clip: text;
           verifier: "Kolzaru",
           id: "105336929",
           videoUrl: "https://youtu.be/pSGZ7-pHlks",
-          previewImg: "http://i3.ytimg.com/vi/pSGZ7-pHlks/hqdefault.jpg",
-          releaseDate: "2024-05-16"
+          releaseDate: "2024-05-16",
+          lenght: "29",
         },
         {
           title: "50",
@@ -7128,8 +7548,8 @@ background-clip: text;
           verifier: "IAmNot60hz",
           id: "110460436",
           videoUrl: "https://youtu.be/w6ZW2KV8oGU",
-          previewImg: "http://i3.ytimg.com/vi/w6ZW2KV8oGU/hqdefault.jpg",
-          releaseDate: "2024-09-24"
+          releaseDate: "2024-09-24",
+          lenght: "6",
         },
         {
           title: "EVIL",
@@ -7137,8 +7557,8 @@ background-clip: text;
           verifier: "Hellfire2603",
           id: "110453861",
           videoUrl: "https://youtu.be/sRYv66oZeJk",
-          previewImg: "http://i3.ytimg.com/vi/sRYv66oZeJk/hqdefault.jpg",
-          releaseDate: "2024-09-23"
+          releaseDate: "2024-09-23",
+          lenght: "17",
         },
         {
           title: "Paraballa",
@@ -7146,8 +7566,8 @@ background-clip: text;
           verifier: "Gorling",
           id: "68963370",
           videoUrl: "https://youtu.be/kTNwsbxiQmQ",
-          previewImg: "http://i3.ytimg.com/vi/wqimhxjE9yg/hqdefault.jpg",
-          releaseDate: "2021-11-07"
+          releaseDate: "2021-11-07",
+          lenght: "14",
         },
         {
           title: "mystic haze",
@@ -7155,8 +7575,8 @@ background-clip: text;
           verifier: "seels55",
           id: "73332806",
           videoUrl: "https://youtu.be/Gd6iLL16oOk",
-          previewImg: "http://i3.ytimg.com/vi/Gd6iLL16oOk/hqdefault.jpg",
-          releaseDate: "2024-01-29"
+          releaseDate: "2024-01-29",
+          lenght: "28",
         },
         {
           title: "Stercore",
@@ -7164,8 +7584,8 @@ background-clip: text;
           verifier: "anixlol",
           id: "69766474",
           videoUrl: "https://youtu.be/WYGRrBTHxnk",
-          previewImg: "http://i3.ytimg.com/vi/-l49YQh4bhg/hqdefault.jpg",
-          releaseDate: "2022-06-12"
+          releaseDate: "2022-06-12",
+          lenght: "14",
         },
         {
           title: "Vomit Rose",
@@ -7173,8 +7593,8 @@ background-clip: text;
           verifier: "DarkBear5",
           id: "103635148",
           videoUrl: "https://youtu.be/7ar_0g8JTXs",
-          previewImg: "http://i3.ytimg.com/vi/7ar_0g8JTXs/hqdefault.jpg",
-          releaseDate: "2025-02-12"
+          releaseDate: "2025-02-12",
+          lenght: "12",
         },
         {
           title: "3SH in Hell",
@@ -7182,8 +7602,8 @@ background-clip: text;
           verifier: "UFokinWotM8",
           id: "61614466",
           videoUrl: "https://youtu.be/E3-9s2DyjJI",
-          previewImg: "http://i3.ytimg.com/vi/mmLwqAG_8qE/hqdefault.jpg",
-          releaseDate: "2020-05-18"
+          releaseDate: "2020-05-18",
+          lenght: "12",
         },
         {
           title: "Chromium",
@@ -7191,8 +7611,8 @@ background-clip: text;
           verifier: "iamfinley",
           id: "111230305",
           videoUrl: "https://youtu.be/pDwnU8nTHfk",
-          previewImg: "http://i3.ytimg.com/vi/pDwnU8nTHfk/hqdefault.jpg",
-          releaseDate: "2024-10-18"
+          releaseDate: "2024-10-18",
+          lenght: "12",
         },
         {
           title: "Falling Illusion",
@@ -7200,8 +7620,8 @@ background-clip: text;
           verifier: "GMDomy",
           id: "50542904",
           videoUrl: "https://youtu.be/C7VDi2RXe3E",
-          previewImg: "http://i3.ytimg.com/vi/C7VDi2RXe3E/hqdefault.jpg",
-          releaseDate: "2022-08-16"
+          releaseDate: "2022-08-16",
+          lenght: "29",
         },
         {
           title: "GRIM",
@@ -7209,8 +7629,8 @@ background-clip: text;
           verifier: "NucDev",
           id: "108435960",
           videoUrl: "https://youtu.be/oS4DPqHwP6w",
-          previewImg: "http://i3.ytimg.com/vi/oS4DPqHwP6w/hqdefault.jpg",
-          releaseDate: "2024-07-30"
+          releaseDate: "2024-07-30",
+          lenght: "19",
         },
         {
           title: "Our Special Place",
@@ -7218,8 +7638,8 @@ background-clip: text;
           verifier: "DaGYT",
           id: "94294850",
           videoUrl: "https://youtu.be/dDKecxZYIl4",
-          previewImg: "http://i3.ytimg.com/vi/dDKecxZYIl4/hqdefault.jpg",
-          releaseDate: "2023-09-10"
+          releaseDate: "2023-09-10",
+          lenght: "29",
         },
         {
           title: "VENUS",
@@ -7227,8 +7647,8 @@ background-clip: text;
           verifier: "shaurya",
           id: "89065307",
           videoUrl: "https://youtu.be/nuJIPTVRkGQ",
-          previewImg: "http://i3.ytimg.com/vi/nuJIPTVRkGQ/hqdefault.jpg",
-          releaseDate: "2023-03-04"
+          releaseDate: "2023-03-04",
+          lenght: "11",
         },
         {
           title: "Fried lEgg",
@@ -7236,8 +7656,8 @@ background-clip: text;
           verifier: "IAmNot60hz",
           id: "90202908",
           videoUrl: "https://youtu.be/harwFhCwYlA",
-          previewImg: "http://i3.ytimg.com/vi/harwFhCwYlA/hqdefault.jpg",
-          releaseDate: "2023-06-06"
+          releaseDate: "2023-06-06",
+          lenght: "3",
         },  
         {
           title: "Torrent",
@@ -7245,8 +7665,8 @@ background-clip: text;
           verifier: "Fossa88",
           id: "80993342",
           videoUrl: "https://youtu.be/5D2gTvCJwAk",
-          previewImg: "http://i3.ytimg.com/vi/5D2gTvCJwAk/hqdefault.jpg",
-          releaseDate: "2022-06-14"
+          releaseDate: "2022-06-14",
+          lenght: "15",
         },  
         {
           title: "Zapped Balls",
@@ -7254,8 +7674,8 @@ background-clip: text;
           verifier: "RevenantIsHere",
           id: "90589855",
           videoUrl: "https://youtu.be/3Rk-W0yl6oA",
-          previewImg: "http://i3.ytimg.com/vi/3Rk-W0yl6oA/hqdefault.jpg",
-          releaseDate: "2023-05-08"
+          releaseDate: "2023-05-08",
+          lenght: "16",
         },
         {
           title: "racketeering v2",
@@ -7263,8 +7683,8 @@ background-clip: text;
           verifier: "seels55",
           id: "114046961",
           videoUrl: "https://youtu.be/8f8sjWX4Pjs",
-          previewImg: "http://i3.ytimg.com/vi/8f8sjWX4Pjs/hqdefault.jpg",
-          releaseDate: "2025-01-15"
+          releaseDate: "2025-01-15",
+          lenght: "9",
         },
         {
           title: "HAZARD",
@@ -7272,8 +7692,8 @@ background-clip: text;
           verifier: "iamfinley",
           id: "116511814",
           videoUrl: "https://youtu.be/RNdMztbZrTk",
-          previewImg: "http://i3.ytimg.com/vi/RNdMztbZrTk/hqdefault.jpg",
-          releaseDate: "2025-03-25"
+          releaseDate: "2025-03-25",
+          lenght: "18",
         },
         {
           title: "Murder Mitten",
@@ -7281,8 +7701,8 @@ background-clip: text;
           verifier: "nobbbin",
           id: "81973761",
           videoUrl: "https://youtu.be/K7S0du_5b4U",
-          previewImg: "http://i3.ytimg.com/vi/8IndHQYszNY/hqdefault.jpg",
-          releaseDate: "2024-01-24"
+          releaseDate: "2024-01-24",
+          lenght: "24",
         },
         {
           title: "Blissful",
@@ -7290,8 +7710,8 @@ background-clip: text;
           verifier: "zHelixx",
           id: "110934881",
           videoUrl: "https://youtu.be/Leeh5_KUUAM",
-          previewImg: "http://i3.ytimg.com/vi/Leeh5_KUUAM/hqdefault.jpg",
-          releaseDate: "2024-10-09"
+          releaseDate: "2024-10-09",
+          lenght: "26",
         },
         {
           title: "Hell Ball Finale",
@@ -7299,8 +7719,8 @@ background-clip: text;
           verifier: "cringmobilplayer",
           id: "86047466",
           videoUrl: "https://youtu.be/sj3BGHe5qTc",
-          previewImg: "http://i3.ytimg.com/vi/sj3BGHe5qTc/hqdefault.jpg",
-          releaseDate: "2022-11-25"
+          releaseDate: "2022-11-25",
+          lenght: "28",
         },
       ],
       platformer: [
@@ -7821,6 +8241,7 @@ background-clip: text;
     };
 
 let searchMode = 'contains'; // 'contains' или 'startsWith'
+let lastSubmitTime = 0; // Для кулдауна
 
 // Функция для определения, был ли уровень на первом месте при выходе
 function wasFirstPlaceOnRelease(level, listType) {
@@ -7869,13 +8290,30 @@ function generateLevelHTML(level, position, listType) {
       }
   }
   
+  // Определяем цвет названия в зависимости от условий
+  let titleColorClass = '';
+  if (!level.lenght && !level.previewImg) {
+      // Нет ни lenght, ни previewImg - оставляем стандартный цвет
+  } else if (!level.lenght) {
+      // Нет lenght - оранжевый
+      titleColorClass = 'no-length-title';
+  } else if (level.previewImg) {
+      // Есть previewImg - желтый
+      titleColorClass = 'has-preview-title';
+  }
+  
+  // Если нет lenght И есть previewImg - красный (переопределяем предыдущие условия)
+  if (!level.lenght && level.previewImg) {
+      titleColorClass = 'no-length-has-preview-title';
+  }
+  
   // Определяем URL превью: если явно указан - используем его, иначе генерируем из ID
   const previewUrl = level.previewImg 
     ? level.previewImg 
     : `images/${level.id}.png`;
   
   return `
-    <div class="level">
+    <div class="level ${!level.lenght ? 'no-length-level' : ''}">
       <div class="level-preview">
         <a href="${level.videoUrl}" target="_blank">
           <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiA5Ii8+" 
@@ -7887,11 +8325,11 @@ function generateLevelHTML(level, position, listType) {
         </a>
       </div>
       <div class="level-info">
-        <h2 class="level-title">#${position} - ${level.title}</h2>
+        <h2 class="level-title ${titleColorClass}">#${position} - ${level.title}</h2>
         <p class="level-author">Published by ${level.author}</p>
         <p class="level-verifier">Verified by ${level.verifier}</p>
       </div>
-${isFormerFirstPlace ? '<div class="level-crown-container" title="Former Hardest Level"><img src="images/Crown.png" alt="👑" style="width: 100%; height: 100%; object-fit: contain;"></div>' : ''}
+      ${isFormerFirstPlace ? '<div class="level-crown-container" title="Former Hardest Level"><img src="images/Crown.png" alt="👑" style="width: 100%; height: 100%; object-fit: contain;"></div>' : ''}
       <div class="show-in-list" onclick="scrollToLevel(this)">Show in List</div>
       <div class="level-id" onclick="copyToClipboard(this, '${level.id}')">${level.id}</div>
     </div>
@@ -7900,18 +8338,21 @@ ${isFormerFirstPlace ? '<div class="level-crown-container" title="Former Hardest
 
     // Функция для отрисовки списка уровней
 function renderLevels(listType) {
-  const container = document.getElementById(`${listType}-list`);
-  if (!container) return;
-  
-  let html = '';
-  
-  levelData[listType].forEach((level, index) => {
-    const position = index + 1;
-    html += generateLevelHTML(level, position, listType);
-  });
-  
-  container.innerHTML = html;
-  setupLazyLoading();
+    const container = document.getElementById(`${listType}-list`);
+    if (!container) return;
+    
+    let html = '';
+    
+    levelData[listType].forEach((level, index) => {
+        const position = index + 1;
+        html += generateLevelHTML(level, position, listType);
+    });
+    
+    container.innerHTML = html;
+    setupLazyLoading();
+    
+    // Проверяем дубликаты после рендеринга
+    checkForDuplicateIds();
 }
 
     // Demon Roulette State
@@ -7925,8 +8366,29 @@ function renderLevels(listType) {
         remainingSkips: 0
     };
 
+    function formatDuration(seconds) {
+    seconds = parseInt(seconds);
+    if (isNaN(seconds)) return "N/A";
+    
+    const days = Math.floor(seconds / 86400);
+    seconds %= 86400;
+    const hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
+    const minutes = Math.floor(seconds / 60);
+    seconds %= 60;
+    
+    let parts = [];
+    if (days > 0) parts.push(`${days}d`);
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}m`);
+    if (seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
+    
+    return parts.join(' ');
+}
+
     // Функция для генерации HTML уровня в рулетке
 function generateRouletteLevelHTML(level, position, listType, minPercentage = 1) {
+    const maxPlusOne = document.getElementById('max-plus-one').checked;
     const listName = listType === 'classic' ? 'Classic List' : 'Challenge List';
     const isFormerFirstPlace = wasFirstPlaceOnRelease(level, listType);
     
@@ -7958,10 +8420,10 @@ function generateRouletteLevelHTML(level, position, listType, minPercentage = 1)
                         <div class="roulette-level-stat-label">Publisher</div>
                         <div class="roulette-level-stat-value">${level.author}</div>
                     </div>
-                    <div class="roulette-level-stat">
-                        <div class="roulette-level-stat-label">Verifier</div>
-                        <div class="roulette-level-stat-value">${level.verifier}</div>
-                    </div>
+<div class="roulette-level-stat">
+    <div class="roulette-level-stat-label">Length</div>
+    <div class="roulette-level-stat-value">${level.lenght ? formatDuration(level.lenght) : 'N/A'}</div>
+</div>
                     <div class="roulette-level-stat">
                         <div class="roulette-level-stat-label">ID</div>
                         <div class="roulette-level-stat-value copyable-id" onclick="copyToClipboard(this, '${level.id}')" title="Click to copy">
@@ -7972,8 +8434,13 @@ function generateRouletteLevelHTML(level, position, listType, minPercentage = 1)
                 </div>
                 
                 <div class="roulette-input-section">
-                    <input type="number" id="percentage-input" placeholder="Enter your percentage (${minPercentage}-100)" min="${minPercentage}" max="100">
-                    <button id="submit-percentage">Submit</button>
+                    ${maxPlusOne ? `
+                        <input type="number" id="percentage-input" value="${minPercentage}" min="${minPercentage}" max="100" readonly class="no-spinners">
+                        <button id="submit-percentage">Submit</button>
+                    ` : `
+                        <input type="number" id="percentage-input" placeholder="Enter your percentage (${minPercentage}-100)" min="${minPercentage}" max="100">
+                        <button id="submit-percentage">Submit</button>
+                    `}
                     ${rouletteState.remainingSkips > 0 ? `<button id="skip-level" class="skip-btn">Skip (${rouletteState.remainingSkips} left)</button>` : ''}
                 </div>
             </div>
@@ -8183,39 +8650,7 @@ function generateNextLevel() {
     
     rouletteState.currentLevel = levelData;
     
-// Определяем минимальный процент на основе истории
-let minPercentage = 1;
-if (rouletteState.history.length > 0) {
-    // Находим последний введенный процент (не пропущенный)
-    for (let i = rouletteState.history.length - 1; i >= 0; i--) {
-        if (rouletteState.history[i].percentage !== 'Skipped') {
-            minPercentage = parseInt(rouletteState.history[i].percentage) + 1;
-            break;
-        }
-    }
-    
-    // Если включена опция "Skip adds percent", добавляем +1% за каждый пропуск после последнего введенного процента
-    const skipAddsPercent = document.getElementById('skip-adds-percent').checked;
-    if (skipAddsPercent) {
-        const lastNonSkippedIndex = rouletteState.history.findIndex(item => 
-            item.percentage !== 'Skipped' && 
-            parseInt(item.percentage) === minPercentage - 1
-        );
-        
-        if (lastNonSkippedIndex >= 0) {
-            const skipsAfter = rouletteState.history.slice(lastNonSkippedIndex + 1)
-                .filter(item => item.percentage === 'Skipped').length;
-            
-            minPercentage += skipsAfter;
-        }
-    }
-    
-    // Если было установлено значение из пропуска, используем его
-    if (rouletteState.lastPercentage) {
-        minPercentage = rouletteState.lastPercentage;
-        delete rouletteState.lastPercentage;
-    }
-}
+    let minPercentage = calculateMinPercentage(); // Используем отдельную функцию для расчета
     
     // Обновляем контейнер уровней
     const container = document.getElementById('roulette-levels-container');
@@ -8226,27 +8661,77 @@ if (rouletteState.history.length > 0) {
         minPercentage
     );
     
-    // Добавляем обработчик для кнопки отправки
+    // Добавляем обработчики
     document.getElementById('submit-percentage').addEventListener('click', submitPercentage);
     
-    // Добавляем обработчик для кнопки пропуска
     if (rouletteState.remainingSkips > 0) {
         document.getElementById('skip-level').addEventListener('click', skipLevel);
     }
     
-    // Добавляем обработчик для нажатия Enter
+    // Улучшенная обработка Enter
     const percentageInput = document.getElementById('percentage-input');
+    let enterKeyPressed = false;
+    
     percentageInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !enterKeyPressed) {
+            e.preventDefault(); // Предотвращаем стандартное поведение
+            enterKeyPressed = true;
             submitPercentage();
+            setTimeout(() => enterKeyPressed = false, 200);
         }
     });
     
-    // Автоматически фокусируемся на поле ввода
-    percentageInput.focus();
+    // Надежная фокусировка в конце текста
+    requestAnimationFrame(() => {
+        percentageInput.focus();
+        // Двойной setTimeout для гарантии работы в разных браузерах
+        setTimeout(() => {
+            const len = percentageInput.value.length;
+            percentageInput.setSelectionRange(len, len);
+            
+            // Дополнительная проверка для мобильных устройств
+            if (percentageInput.value && percentageInput.selectionStart !== len) {
+                setTimeout(() => {
+                    percentageInput.setSelectionRange(len, len);
+                }, 50);
+            }
+        }, 10);
+    });
     
-    // Инициализируем ленивую загрузку изображений
     setupLazyLoading();
+}
+
+// Новая функция для расчета минимального процента
+function calculateMinPercentage() {
+    let minPercentage = 1;
+    if (rouletteState.history.length > 0) {
+        for (let i = rouletteState.history.length - 1; i >= 0; i--) {
+            if (rouletteState.history[i].percentage !== 'Skipped') {
+                minPercentage = parseInt(rouletteState.history[i].percentage) + 1;
+                break;
+            }
+        }
+        
+        if (document.getElementById('skip-adds-percent').checked) {
+            const lastNonSkippedIndex = rouletteState.history.findIndex(item => 
+                item.percentage !== 'Skipped' && 
+                parseInt(item.percentage) === minPercentage - 1
+            );
+            
+            if (lastNonSkippedIndex >= 0) {
+                const skipsAfter = rouletteState.history.slice(lastNonSkippedIndex + 1)
+                    .filter(item => item.percentage === 'Skipped').length;
+                
+                minPercentage += skipsAfter;
+            }
+        }
+        
+        if (rouletteState.lastPercentage) {
+            minPercentage = rouletteState.lastPercentage;
+            delete rouletteState.lastPercentage;
+        }
+    }
+    return minPercentage;
 }
 
     // Функция для пропуска уровня
@@ -8292,24 +8777,38 @@ if (skipAddsPercent) {
 
     // Функция для отправки процента
 function submitPercentage() {
-    const input = document.getElementById('percentage-input');
-    const percentage = parseInt(input.value);
-    const minPercentage = parseInt(input.min) || 1;
+    const now = Date.now();
     
-    // Проверка на корректность ввода
-    if (isNaN(percentage)) {
-        showCustomAlert('Please enter a valid percentage!');
+    // Кулдаун 200ms для всех случаев
+    if (now - lastSubmitTime < 200) {
         return;
     }
+    lastSubmitTime = now;
+
+    const input = document.getElementById('percentage-input');
+    let percentage;
     
-    if (percentage < minPercentage || percentage > 100) {
-        showCustomAlert(`Percentage must be between ${minPercentage} and 100!`);
-        return;
+    if (document.getElementById('max-plus-one').checked) {
+        percentage = parseInt(input.value);
+    } else {
+        percentage = parseInt(input.value);
+        const minPercentage = parseInt(input.min) || 1;
+        
+        // Проверка на корректность ввода
+        if (isNaN(percentage)) {
+            showCustomAlert('Please enter a valid percentage!');
+            return;
+        }
+        
+        if (percentage < minPercentage || percentage > 100) {
+            showCustomAlert(`Percentage must be between ${minPercentage} and 100!`);
+            return;
+        }
     }
     
     // Проверка на 100%
     if (percentage === 100) {
-        showCustomAlert('Congratulations! You completed the challenge with 100%!', true);
+        showCustomAlert('Congratulations! You completed the roulette with 100%!', true);
         endRoulette();
         return;
     }
@@ -8346,6 +8845,7 @@ function exportRouletteData() {
         settings: {
             classicList: document.getElementById('roulette-classic').checked,
             challengesList: document.getElementById('roulette-challenges').checked,
+            maxPlusOne: document.getElementById('max-plus-one').checked,
             platformerList: document.getElementById('roulette-platformer').checked,
             classicMin: parseInt(document.getElementById('roulette-classic-min').value) || 1,
             classicMax: parseInt(document.getElementById('roulette-classic-max').value) || 1000,
@@ -8487,6 +8987,8 @@ function importRouletteData(file) {
                 data.settings.skipAddsPercent : true;
             document.getElementById('filter-unrated').checked = data.settings.filterUnrated || false;
             document.getElementById('filter-2player').checked = data.settings.filter2Player || false;
+            document.getElementById('max-plus-one').checked = data.settings.maxPlusOne !== undefined ? 
+                data.settings.maxPlusOne : false;
 
             // Загружаем историю
             rouletteState.history = data.history.map(item => {
@@ -8797,8 +9299,10 @@ function filterLevelsByDate(date) {
 
 
     // Основной скрипт
-    document.addEventListener('DOMContentLoaded', () => {
-  const searchModeBtn = document.getElementById('search-mode-btn');
+document.addEventListener('DOMContentLoaded', () => {
+    checkForDuplicateIds(); // Проверяем дубликаты ID при загрузке
+    
+    const searchModeBtn = document.getElementById('search-mode-btn');
   searchModeBtn.addEventListener('click', () => {
     searchMode = searchMode === 'contains' ? 'startsWith' : 'contains';
 searchModeBtn.innerHTML = searchMode === 'contains' 
@@ -8815,51 +9319,53 @@ searchModeBtn.title = searchMode === 'contains' ? 'Contains mode' : 'Starts with
       const dropdownLinks = document.querySelectorAll('.dropdown-content a');
       const scrollToTopBtn = document.querySelector('.scroll-to-top');
 
-      // Time Machine элементы
-    const timeMachineBtn = document.getElementById('time-machine-btn');
-    const timeMachineModal = document.getElementById('time-machine-modal');
-    const timeMachineClose = document.getElementById('time-machine-close');
-    const timeMachineApply = document.getElementById('time-machine-apply');
-    const timeMachineInput = document.getElementById('time-machine-input');
+// Оптимизированные обработчики Time Machine
+const timeMachineBtn = document.getElementById('time-machine-btn');
+const timeMachineModal = document.getElementById('time-machine-modal');
+const timeMachineClose = document.getElementById('time-machine-close');
+const timeMachineApply = document.getElementById('time-machine-apply');
+const timeMachineInput = document.getElementById('time-machine-input');
 
-    if (timeMachineBtn) {
-      timeMachineBtn.addEventListener('click', () => {
-        timeMachineModal.style.display = 'flex';
-        setTimeout(() => {
-          timeMachineModal.classList.add('active');
-          if (timeMachineInput) timeMachineInput.focus();
-        }, 10);
-      });
-    }
+timeMachineBtn.addEventListener('click', () => {
+  timeMachineModal.style.display = 'flex';
+  setTimeout(() => {
+    timeMachineModal.classList.add('active');
+    timeMachineInput.focus();
+    
+    // Добавление обработчика Esc
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') closeTimeMachineModal();
+    };
+    document.addEventListener('keydown', handleEsc);
+    timeMachineModal._escHandler = handleEsc;
+  }, 10);
+});
 
-    if (timeMachineClose) {
-      timeMachineClose.addEventListener('click', () => {
-        timeMachineModal.classList.remove('active');
-        setTimeout(() => {
-          timeMachineModal.style.display = 'none';
-        }, 300);
-      });
-    }
+timeMachineClose.addEventListener('click', closeTimeMachineModal);
+timeMachineModal.addEventListener('click', (e) => {
+  if (e.target === timeMachineModal) closeTimeMachineModal();
+});
 
+timeMachineApply.addEventListener('click', () => {
+  const dateStr = timeMachineInput.value;
+  if (!dateStr) {
+    showCustomAlert('Please enter a date!');
+    return;
+  }
+  const selectedDate = new Date(dateStr);
+  filterLevelsByDate(selectedDate);
+  closeTimeMachineModal();
+});
 
-    if (timeMachineApply) {
-      timeMachineApply.addEventListener('click', () => {
-        const dateStr = timeMachineInput.value;
-        
-        if (!dateStr) {
-          showCustomAlert('Please enter a date!');
-          return;
-        }
-        
-        const selectedDate = new Date(dateStr);
-        filterLevelsByDate(selectedDate);
-        
-        timeMachineModal.classList.remove('active');
-        setTimeout(() => {
-          timeMachineModal.style.display = 'none';
-        }, 300);
-      });
-    }
+function closeTimeMachineModal() {
+  if (timeMachineModal._escHandler) {
+    document.removeEventListener('keydown', timeMachineModal._escHandler);
+  }
+  timeMachineModal.classList.remove('active');
+  setTimeout(() => {
+    timeMachineModal.style.display = 'none';
+  }, 300);
+}
       
       // Demon Roulette элементы
       const rouletteBtn = document.getElementById('roulette-btn');
@@ -9025,70 +9531,6 @@ endRouletteBtn.addEventListener('click', () => {
         }
       });
     });
-
-    // Находим кнопку Time Machine
-const timeMachineBtn = document.getElementById('time-machine-btn');
-const timeMachineModal = document.getElementById('time-machine-modal');
-const timeMachineClose = document.getElementById('time-machine-close');
-const timeMachineApply = document.getElementById('time-machine-apply');
-const timeMachineInput = document.getElementById('time-machine-input');
-
-// Когда нажимаем на кнопку Time Machine
-timeMachineBtn.addEventListener('click', () => {
-  timeMachineModal.style.display = 'flex';
-  setTimeout(() => {
-    timeMachineModal.classList.add('active');
-    timeMachineInput.focus();
-    
-    // Добавляем обработчик Esc при открытии
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') {
-        closeTimeMachineModal();
-        document.removeEventListener('keydown', handleEsc);
-      }
-    };
-    document.addEventListener('keydown', handleEsc);
-    
-    // Сохраняем ссылку на обработчик для последующего удаления
-    timeMachineModal._escHandler = handleEsc;
-  }, 10);
-});
-
-// Функция закрытия модального окна
-function closeTimeMachineModal() {
-  // Удаляем обработчик Esc
-  if (timeMachineModal._escHandler) {
-    document.removeEventListener('keydown', timeMachineModal._escHandler);
-    delete timeMachineModal._escHandler;
-  }
-  
-  timeMachineModal.classList.remove('active');
-  setTimeout(() => {
-    timeMachineModal.style.display = 'none';
-  }, 300);
-}
-
-// Закрытие по клику на крестик
-timeMachineClose.addEventListener('click', closeTimeMachineModal);
-
-// Закрытие по клику вне окна
-timeMachineModal.addEventListener('click', (e) => {
-  if (e.target === timeMachineModal) {
-    closeTimeMachineModal();
-  }
-});
-
-// Применение даты
-timeMachineApply.addEventListener('click', () => {
-  const dateStr = timeMachineInput.value;
-  if (!dateStr) {
-    showCustomAlert('Please enter a date!');
-    return;
-  }
-  const selectedDate = new Date(dateStr);
-  filterLevelsByDate(selectedDate);
-  closeTimeMachineModal();
-});
 
   </script>
   
