@@ -5,15 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DEMONLIST</title>
   <style>
-    body {
-      background-color: #00112d;
-      color: #fff;
-      font-family: 'Montserrat', sans-serif;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-      padding-top: 70px;
-    }
+body {
+  background-color: #00112d;
+  background-image: url('images/main.png');
+  background-size: auto 100%;
+  background-position: left center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  padding-top: 70px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
     a {
       color: inherit;
@@ -25,20 +32,20 @@
       color: #aaa;
     }
 
-    .compact-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 70px;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      display: flex;
-      align-items: center;
-      padding: 0 25px;
-      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.6);
-      z-index: 1000;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
+.compact-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: #111827;
+  display: flex;
+  align-items: center;
+  padding: 0 25px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
     .header-title {
       font-size: 1.9em;
@@ -49,71 +56,76 @@
       white-space: nowrap;
     }
 
-    .dropdown {
-      position: relative;
-      display: inline-block;
-      margin-right: 20px;
-    }
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin-right: 20px;
+}
 
-    .dropbtn {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 10px 40px 10px 15px;
-      font-size: 1em;
-      border-radius: 6px;
-      cursor: pointer;
-      min-width: 160px;
-      text-align: left;
-      position: relative;
-      transition: all 0.2s ease;
-    }
+.dropbtn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  border: none;
+  padding: 10px 15px;
+  font-size: 1em;
+  cursor: pointer;
+  min-width: auto; /* Изменено с 120px на auto */
+  text-align: center; /* Изменено с left на center */
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: auto; /* Изменено с 100% на auto */
+  box-sizing: border-box;
+  white-space: nowrap; /* Добавлено для предотвращения переноса текста */
+}
 
-    .dropbtn::after {
-      content: "▼";
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.6em;
-      opacity: 0.8;
-    }
+.dropdown-arrow {
+  margin-left: 3px; 
+  font-size: 0.7em;
+  color: #fff;
+  transition: all 0.2s ease;
+  position: relative;
+  top: 2px; 
+} 
 
-    .dropbtn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.4);
-    }
+.dropbtn:hover, 
+.dropbtn:hover .dropdown-arrow,
+.dropbtn:hover .fa-layer-group {
+  color: #fff;
+}
 
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #333;
-      min-width: 160px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-      z-index: 1;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      top: 100%;
-      left: 0;
-    }
+.fa-layer-group {
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.2s ease;
+}
 
-    .dropdown-content a {
-      color: #fff;
-      padding: 10px 16px;
-      text-decoration: none;
-      display: block;
-      transition: background-color 0.2s;
-      font-size: 0.95em;
-    }
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #1f2937;
+  min-width: 160px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  border: none;
+  top: 100%;
+  left: 0;
+}
 
-    .dropdown-content a:hover {
-      background-color: #444;
-    }
+.dropdown-content a {
+  color: #fff;
+  padding: 10px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s;
+  font-size: 0.95em;
+}
 
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
+.dropdown-content a:hover {
+  background-color: #374151;
+}
 
 .search-container {
   flex-grow: 1;
@@ -1403,14 +1415,18 @@ background-clip: text;
 <div class="compact-header">
   <div class="header-title">DEMONLIST</div>
   
-  <div class="dropdown">
-    <button class="dropbtn" id="current-list-btn">Classic List</button>
-<div class="dropdown-content">
-  <a href="#" data-list="classic">Classic List</a>
-  <a href="#" data-list="challenges">Challenge List</a>
-  <a href="#" data-list="platformer">Platformer List</a>
-</div>
+<div class="dropdown">
+  <button class="dropbtn" id="current-list-btn">
+    <i class="fas fa-bars"></i>
+    Lists
+    <span class="dropdown-arrow"><i class="fas fa-angle-down"></i></span>
+  </button>
+  <div class="dropdown-content" id="dropdown-content">
+    <a href="#" data-list="classic">Classic</a>
+    <a href="#" data-list="challenges">Challenge</a>
+    <a href="#" data-list="platformer">Platformer</a>
   </div>
+</div>
   
 <div class="search-container">
   <div class="search-input-wrapper">
@@ -1460,43 +1476,31 @@ background-clip: text;
             List Selection
         </div>
         
-        <div class="list-with-inputs">
-            <div class="list-input-row">
-                <label class="roulette-checkbox-label">
-                    <input type="checkbox" id="roulette-classic" checked>
-                    <span class="roulette-checkbox-custom"></span>
-                    <span>Classic List</span>
-                </label>
-                <div class="range-inputs">
-                    <input type="number" id="roulette-classic-min" placeholder="Min" min="1" value="1" class="no-spinners">
-                    <input type="number" id="roulette-classic-max" placeholder="Max" min="1" value="1000" class="no-spinners">
-                </div>
-            </div>
-            
-            <div class="list-input-row">
-                <label class="roulette-checkbox-label">
-                    <input type="checkbox" id="roulette-challenges">
-                    <span class="roulette-checkbox-custom"></span>
-                    <span>Challenge List</span>
-                </label>
-                <div class="range-inputs">
-                    <input type="number" id="roulette-challenges-min" placeholder="Min" min="1" value="1" class="no-spinners">
-                    <input type="number" id="roulette-challenges-max" placeholder="Max" min="1" value="1000" class="no-spinners">
-                </div>
-            </div>
-
-            <div class="list-input-row">
-    <label class="roulette-checkbox-label">
-        <input type="checkbox" id="roulette-platformer">
-        <span class="roulette-checkbox-custom"></span>
-        <span>Platformer List</span>
-    </label>
-    <div class="range-inputs">
-        <input type="number" id="roulette-platformer-min" placeholder="Min" min="1" value="1" class="no-spinners">
-        <input type="number" id="roulette-platformer-max" placeholder="Max" min="1" value="1000" class="no-spinners">
+<div class="list-with-inputs">
+    <div class="list-input-row">
+        <label class="roulette-checkbox-label">
+            <input type="checkbox" id="roulette-classic" checked>
+            <span class="roulette-checkbox-custom"></span>
+            <span>Classic List</span>
+        </label>
+        <div class="range-inputs">
+            <input type="number" id="roulette-classic-min" placeholder="Min" min="1" value="1" class="no-spinners">
+            <input type="number" id="roulette-classic-max" placeholder="Max" min="1" value="1000" class="no-spinners">
+        </div>
+    </div>
+    
+    <div class="list-input-row">
+        <label class="roulette-checkbox-label">
+            <input type="checkbox" id="roulette-challenges">
+            <span class="roulette-checkbox-custom"></span>
+            <span>Challenge List</span>
+        </label>
+        <div class="range-inputs">
+            <input type="number" id="roulette-challenges-min" placeholder="Min" min="1" value="1" class="no-spinners">
+            <input type="number" id="roulette-challenges-max" placeholder="Max" min="1" value="1000" class="no-spinners">
+        </div>
     </div>
 </div>
-        </div>
     </div>
     
     <!-- Объединенная секция настроек -->
@@ -2068,19 +2072,6 @@ const levelInfo = `#${item.position}${listType} - ${item.level.title}`;
                 }
             });
         }
-
-        if (document.getElementById('roulette-platformer').checked) {
-    const minPos = parseInt(document.getElementById('roulette-platformer-min').value) || 1;
-    const maxPos = parseInt(document.getElementById('roulette-platformer-max').value) || 1000;
-    const levels = levelData['platformer'];
-    levels.forEach((level, index) => {
-        const position = index + 1;
-        if (position >= minPos && position <= maxPos) {
-            allLevels.push(level);
-            positionMap.push({ listType: 'platformer', position });
-        }
-    });
-}
         
         if (allLevels.length === 0) return null;
         
@@ -2550,9 +2541,7 @@ function importRouletteData(file) {
                     level = levelData.classic.find(l => l.id === item.id) || levelData.classic[item.position - 1];
                 } else if (item.listType === 'challenges') {
                     level = levelData.challenges.find(l => l.id === item.id) || levelData.challenges[item.position - 1];
-                } else if (item.listType === 'platformer') {
-                    level = levelData.platformer.find(l => l.id === item.id) || levelData.platformer[item.position - 1];
-                }
+                } 
                 
                 if (!level) {
                     throw new Error(`Level not found: ${item.title} (${item.listType} #${item.position})`);
@@ -2959,21 +2948,36 @@ function initializeApp() {
         });
         
 // Dropdown меню
+const dropbtn = document.getElementById('current-list-btn');
+const dropdownContent = document.getElementById('dropdown-content');
+const dropdownLinks = document.querySelectorAll('.dropdown-content a');
+
+// Обработчик клика по кнопке
+dropbtn.addEventListener('click', function(e) {
+  e.stopPropagation();
+  dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+});
+
+// Закрытие при клике вне dropdown
+document.addEventListener('click', function() {
+  dropdownContent.style.display = 'none';
+});
+
+// Обработчики для ссылок dropdown
 dropdownLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const listType = e.target.getAttribute('data-list');
-        currentListBtn.textContent = e.target.textContent;
-        
-        classicList.style.display = listType === 'classic' ? 'flex' : 'none';
-        challengesList.style.display = listType === 'challenges' ? 'flex' : 'none';
-        platformerList.style.display = listType === 'platformer' ? 'flex' : 'none';
-        
-        // Сохраняем активный список
-        localStorage.setItem('activeList', listType);
-        
-        filterLevels();
-    });
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    const listType = this.getAttribute('data-list');
+    
+    classicList.style.display = listType === 'classic' ? 'flex' : 'none';
+    challengesList.style.display = listType === 'challenges' ? 'flex' : 'none';
+    platformerList.style.display = listType === 'platformer' ? 'flex' : 'none';
+    
+    localStorage.setItem('activeList', listType);
+    filterLevels();
+    
+    dropdownContent.style.display = 'none';
+  });
 });
         
         // Demon Roulette обработчики
