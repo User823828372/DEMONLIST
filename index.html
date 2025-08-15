@@ -22,6 +22,13 @@ body {
   overflow-x: hidden;
 }
 
+@media (min-width: 1920px) {
+  body {
+    background-size: 100% auto;
+    background-position: center center;
+  }
+}
+
     a {
       color: inherit;
       text-decoration: none;
@@ -140,7 +147,7 @@ body {
 }
 
 #search-input {
-  background: rgba(0, 0, 0, 0.25);
+  background: #374151;
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 12px 45px 12px 20px;
@@ -217,7 +224,7 @@ body {
   display: flex;
   align-items: center;
   background-color: #1f2937;
-  border: 1px solid #444;
+  border: 1px solid #353f4f;
   margin-bottom: 12px;
   padding: 12px;
   border-radius: 8px;
@@ -268,12 +275,12 @@ body {
   font-weight: 600; 
 }
 
-    .level-author,
-    .level-verifier {
-      font-size: 1.05em;
-      margin: 0;
-      color: #ccc;
-    }
+.level-author,
+.level-verifier {
+  font-size: 1.05em;
+  margin: 0;
+  color: #ccc;
+}
 
 .level-id {
   position: absolute;
@@ -395,6 +402,7 @@ body {
   background-position: 0 0, 10px 10px;
   transition: opacity 0.3s ease;
   object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .level-preview img[data-src],
@@ -1430,7 +1438,7 @@ background-clip: text;
   
 <div class="search-container">
   <div class="search-input-wrapper">
-    <input type="text" id="search-input" placeholder="Search for a level...">
+    <input type="text" id="search-input" placeholder="Search...">
     <button class="search-mode-btn" id="search-mode-btn" title="Search mode">
       <i class="fas fa-font"></i>
     </button>
@@ -2119,10 +2127,12 @@ const levelInfo = `#${item.position}${listType} - ${item.level.title}`;
 
     // Функция для запуска рулетки
 function startRoulette() {
-  // Очищаем историю при старте
-rouletteState.history = [];
-document.getElementById('history-container').innerHTML = generateHistoryHTML();
-
+    console.log('Starting roulette...'); // Добавлено для отладки
+    
+    // Очищаем историю при старте
+    rouletteState.history = [];
+    document.getElementById('history-container').innerHTML = '<p>No History Yet</p>';
+    
     const allowRepeats = document.getElementById('allow-repeats').checked;
     const skipEnabled = document.getElementById('enable-skips').checked;
     const skipCount = skipEnabled ? parseInt(document.getElementById('skip-count').value) || 3 : 0;
@@ -2136,14 +2146,6 @@ document.getElementById('history-container').innerHTML = generateHistoryHTML();
     if (document.getElementById('roulette-challenges').checked) {
         listTypes.push('challenges');
     }
-    if (document.getElementById('roulette-platformer').checked) {
-        listTypes.push('platformer');
-    }
-    
-    if (listTypes.length === 0) {
-        showCustomAlert('Please select at least one list!');
-        return;
-    }
     
     // Обновляем состояние рулетки
     rouletteState = {
@@ -2154,10 +2156,12 @@ document.getElementById('history-container').innerHTML = generateHistoryHTML();
         usedLevels: new Set(),
         totalSkips: skipCount,
         remainingSkips: skipCount,
-        skipAddsPercent // Добавляем новое поле в состояние
+        skipAddsPercent
     };
     
-    // Прокручиваем страницу вверх перед показом рулетки
+    console.log('Roulette state initialized:', rouletteState); // Добавлено для отладки
+    
+    // Прокручиваем страницу вверх
     window.scrollTo({
         top: 0,
         behavior: 'smooth'
@@ -2165,29 +2169,35 @@ document.getElementById('history-container').innerHTML = generateHistoryHTML();
     
     // Показываем секцию рулетки
     document.getElementById('roulette-section').style.display = 'block';
+    console.log('Roulette section shown'); // Добавлено для отладки
     
     // Генерируем первый уровень
     generateNextLevel();
+    console.log('First level generated'); // Добавлено для отладки
 
-    // Сохраняем состояние рулетки
-saveAllSettings();
+    // Сохраняем состояние
+    saveAllSettings();
 }
 
     // Функция для генерации следующего уровня
 function generateNextLevel() {
+    console.log('Generating next level...');
+    
     const levelData = getRandomLevel();
     
     if (!levelData) {
+        console.log('No levels available');
         showCustomAlert('No more levels available in the selected range!');
         endRoulette();
         return;
     }
     
     rouletteState.currentLevel = levelData;
+    console.log('Selected level:', levelData.level.title);
     
-    let minPercentage = calculateMinPercentage(); // Используем отдельную функцию для расчета
+    let minPercentage = calculateMinPercentage();
+    console.log('Min percentage:', minPercentage);
     
-    // Обновляем контейнер уровней
     const container = document.getElementById('roulette-levels-container');
     container.innerHTML = generateRouletteLevelHTML(
         levelData.level, 
@@ -2195,45 +2205,28 @@ function generateNextLevel() {
         levelData.listType,
         minPercentage
     );
+    console.log('Level HTML generated');
     
-    // Добавляем обработчики
-    document.getElementById('submit-percentage').addEventListener('click', submitPercentage);
-    
-    if (rouletteState.remainingSkips > 0) {
-        document.getElementById('skip-level').addEventListener('click', skipLevel);
-    }
-    
-    // Улучшенная обработка Enter
-    const percentageInput = document.getElementById('percentage-input');
-    let enterKeyPressed = false;
-    
-    percentageInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !enterKeyPressed) {
-            e.preventDefault(); // Предотвращаем стандартное поведение
-            enterKeyPressed = true;
-            submitPercentage();
-            setTimeout(() => enterKeyPressed = false, 200);
+    // Фокусировка на поле ввода
+    requestAnimationFrame(() => {
+        const percentageInput = document.getElementById('percentage-input');
+        if (percentageInput) {
+            percentageInput.focus();
+            setTimeout(() => {
+                const len = percentageInput.value.length;
+                percentageInput.setSelectionRange(len, len);
+                
+                if (percentageInput.value && percentageInput.selectionStart !== len) {
+                    setTimeout(() => {
+                        percentageInput.setSelectionRange(len, len);
+                    }, 50);
+                }
+            }, 10);
         }
     });
-    
-    // Надежная фокусировка в конце текста
-    requestAnimationFrame(() => {
-        percentageInput.focus();
-        // Двойной setTimeout для гарантии работы в разных браузерах
-        setTimeout(() => {
-            const len = percentageInput.value.length;
-            percentageInput.setSelectionRange(len, len);
-            
-            // Дополнительная проверка для мобильных устройств
-            if (percentageInput.value && percentageInput.selectionStart !== len) {
-                setTimeout(() => {
-                    percentageInput.setSelectionRange(len, len);
-                }, 50);
-            }
-        }, 10);
-    });
-    
+
     setupLazyLoading();
+    console.log('Next level setup complete');
 }
 
 // Новая функция для расчета минимального процента
@@ -3004,14 +2997,32 @@ dropdownLinks.forEach(link => {
             }
         });
         
-        spinBtn.addEventListener('click', (e) => {
-            e.preventDefault();
+spinBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    // Проверяем, что хотя бы один список выбран
+    const classicChecked = document.getElementById('roulette-classic').checked;
+    const challengesChecked = document.getElementById('roulette-challenges').checked;
+    
+    if (!classicChecked && !challengesChecked) {
+        showCustomAlert('Please select at least one list!');
+        return;
+    }
+
+    // Закрываем модальное окно
+    rouletteModal.classList.remove('active');
+    setTimeout(() => {
+        rouletteModal.style.display = 'none';
+        
+        // Запускаем рулетку после закрытия окна
+        try {
             startRoulette();
-            rouletteModal.classList.remove('active');
-            setTimeout(() => {
-                rouletteModal.style.display = 'none';
-            }, 300);
-        });
+        } catch (error) {
+            console.error('Error starting roulette:', error);
+            showCustomAlert('Failed to start roulette. Please check console for details.');
+        }
+    }, 300);
+});
         
         endRouletteBtn.addEventListener('click', () => {
             showConfirmationModal(
@@ -3086,6 +3097,28 @@ dropdownLinks.forEach(link => {
             timeMachineModal.style.display = 'none';
         }, 300);
     }
+
+            // Глобальные обработчики для событий рулетки
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'submit-percentage') {
+                submitPercentage();
+            }
+            if (e.target && e.target.id === 'skip-level') {
+                skipLevel();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.target && e.target.id === 'percentage-input' && e.key === 'Enter') {
+                const now = Date.now();
+                if (now - lastSubmitTime < 200) {
+                    return;
+                }
+                lastSubmitTime = now;
+                e.preventDefault();
+                submitPercentage();
+            }
+        });
     
     // Запускаем инициализацию
     initializeApp();
