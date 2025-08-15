@@ -52,16 +52,37 @@ body {
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.6);
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  justify-content: space-between; /* Добавлено */
 }
 
-    .header-title {
-      font-size: 1.9em;
-      font-weight: 700;
-      margin-right: 30px;
-      color: #fff;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-      white-space: nowrap;
-    }
+.header-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.search-container {
+  flex-grow: 1;
+  max-width: 550px;
+  margin: 0 25px;
+  min-width: 150px;
+}
+
+.header-title {
+  font-size: 1.9em;
+  font-weight: 700;
+  margin-right: 30px;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
 
 .dropdown {
   position: relative;
@@ -1421,40 +1442,44 @@ background-clip: text;
 <body>
   <!-- Компактная шапка -->
 <div class="compact-header">
-  <div class="header-title">DEMONLIST</div>
-  
-<div class="dropdown">
-  <button class="dropbtn" id="current-list-btn">
-    <i class="fas fa-bars"></i>
-    Lists
-    <span class="dropdown-arrow"><i class="fas fa-angle-down"></i></span>
-  </button>
-  <div class="dropdown-content" id="dropdown-content">
-    <a href="#" data-list="classic">Classic</a>
-    <a href="#" data-list="challenges">Challenge</a>
-    <a href="#" data-list="platformer">Platformer</a>
+  <div class="header-left">
+    <div class="header-title">DEMONLIST</div>
+    
+    <div class="dropdown">
+      <button class="dropbtn" id="current-list-btn">
+        <i class="fas fa-bars"></i>
+        Lists
+        <span class="dropdown-arrow"><i class="fas fa-angle-down"></i></span>
+      </button>
+      <div class="dropdown-content" id="dropdown-content">
+        <a href="#" data-list="classic">Classic</a>
+        <a href="#" data-list="challenges">Challenge</a>
+        <a href="#" data-list="platformer">Platformer</a>
+      </div>
+    </div>
+    
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <input type="text" id="search-input" placeholder="Search...">
+        <button class="search-mode-btn" id="search-mode-btn" title="Search mode">
+          <i class="fas fa-font"></i>
+        </button>
+        <button class="time-machine-btn" id="time-machine-btn" title="Time Machine">
+          <i class="fas fa-clock"></i>
+        </button>
+      </div>
+    </div>
   </div>
-</div>
   
-<div class="search-container">
-  <div class="search-input-wrapper">
-    <input type="text" id="search-input" placeholder="Search...">
-    <button class="search-mode-btn" id="search-mode-btn" title="Search mode">
-      <i class="fas fa-font"></i>
+  <div class="header-right">
+    <button class="view-toggle-btn" id="view-toggle-btn">
+      <i class="fas fa-th-large"></i> Compact View
     </button>
-    <button class="time-machine-btn" id="time-machine-btn" title="Time Machine">
-      <i class="fas fa-clock"></i>
+    
+    <button class="roulette-btn" id="roulette-btn">
+      <i class="fas fa-dice"></i> Roulette
     </button>
   </div>
-</div>
-  
-  <button class="view-toggle-btn" id="view-toggle-btn">
-    <i class="fas fa-th-large"></i> Compact View
-  </button>
-  
-  <button class="roulette-btn" id="roulette-btn">
-    <i class="fas fa-dice"></i> Roulette
-  </button>
 </div>
 
   <!-- Модальное окно Demon Roulette -->
