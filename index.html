@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DEMONLIST</title>
+  <title>Ultimate Demonlist</title>
+    <link rel="icon" href="images/websiteicon.ico" type="image/x-icon">
   <style>
 body {
   background-color: #00112d;
@@ -52,7 +53,7 @@ body {
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.6);
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  justify-content: space-between; /* Добавлено */
+  justify-content: space-between;
 }
 
 .header-left {
@@ -97,15 +98,15 @@ body {
   padding: 10px 15px;
   font-size: 1em;
   cursor: pointer;
-  min-width: auto; /* Изменено с 120px на auto */
-  text-align: center; /* Изменено с left на center */
+  min-width: auto;
+  text-align: center;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 6px;
-  height: auto; /* Изменено с 100% на auto */
+  height: auto;
   box-sizing: border-box;
-  white-space: nowrap; /* Добавлено для предотвращения переноса текста */
+  white-space: nowrap;
 }
 
 .dropdown-arrow {
@@ -1406,29 +1407,6 @@ background-clip: text;
       from { opacity: 1; transform: translateX(-50%) translateY(0); }
       to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
     }
-    
-    /* Стили для цветов названий уровней */
-    .no-length-title {
-      color: #ffa500 !important; /* Оранжевый для уровней без lenght */
-    }
-    
-    .has-preview-title {
-      color: #ffff00 !important; /* Желтый для уровней с previewImg */
-    }
-    
-    .no-length-has-preview-title {
-      color: #ff0000 !important; /* Красный для уровней без lenght, но с previewImg */
-    }
-    
-    /* Стиль для всего уровня, если нет lenght */
-    .level.no-length-level {
-      background-color: rgba(255, 0, 0, 0.1) !important;
-      border: 1px solid rgba(255, 0, 0, 0.3) !important;
-    }
-    
-    .compact-view .no-length-level {
-      background-color: rgba(255, 0, 0, 0.1) !important;
-    }
 
   </style>
 
@@ -1662,9 +1640,23 @@ function saveAllSettings() {
     saveToLocalStorage('compactView', document.getElementById('classic-list').classList.contains('compact-view'));
     saveToLocalStorage('searchMode', searchMode);
     
-    if (rouletteState.active) {
-        saveToLocalStorage('rouletteState', rouletteState);
-    }
+    // Сохраняем только настройки рулетки, но не её состояние
+    const rouletteSettings = {
+        classicList: document.getElementById('roulette-classic').checked,
+        challengesList: document.getElementById('roulette-challenges').checked,
+        classicMin: parseInt(document.getElementById('roulette-classic-min').value) || 1,
+        classicMax: parseInt(document.getElementById('roulette-classic-max').value) || 1000,
+        challengesMin: parseInt(document.getElementById('roulette-challenges-min').value) || 1,
+        challengesMax: parseInt(document.getElementById('roulette-challenges-max').value) || 1000,
+        allowRepeats: document.getElementById('allow-repeats').checked,
+        skipCount: parseInt(document.getElementById('skip-count').value) || 0,
+        skipAddsPercent: document.getElementById('skip-adds-percent').checked,
+        filterUnrated: document.getElementById('filter-unrated').checked,
+        filter2Player: document.getElementById('filter-2player').checked,
+        maxPlusOne: document.getElementById('max-plus-one').checked
+    };
+    
+    saveToLocalStorage('rouletteSettings', rouletteSettings);
 }
 
 function loadAllSettings() {
@@ -1692,66 +1684,33 @@ function loadAllSettings() {
             : 'Starts with mode';
     }
     
-    // Загрузка состояния рулетки
-    const savedRouletteState = loadFromLocalStorage('rouletteState');
-    if (savedRouletteState) {
-        rouletteState = savedRouletteState;
-        if (rouletteState.active) {
-            document.getElementById('roulette-section').style.display = 'block';
-            document.getElementById('history-container').innerHTML = generateHistoryHTML();
-            
-if (rouletteState.currentLevel) {
-    const minPercentage = calculateMinPercentage();
-    const container = document.getElementById('roulette-levels-container');
-    container.innerHTML = generateRouletteLevelHTML(
-        rouletteState.currentLevel.level, 
-        rouletteState.currentLevel.position,
-        rouletteState.currentLevel.listType,
-        minPercentage
-    );
-    
-    // Восстанавливаем процент
-    const percentageInput = document.getElementById('percentage-input');
-    if (percentageInput) {
-        percentageInput.value = minPercentage;
-    }
-
-    // Добавляем обработчики событий заново
-    document.getElementById('submit-percentage').addEventListener('click', submitPercentage);
-    
-    if (rouletteState.remainingSkips > 0) {
-        document.getElementById('skip-level').addEventListener('click', skipLevel);
+    // Загрузка настроек рулетки (но не состояния)
+    const savedRouletteSettings = loadFromLocalStorage('rouletteSettings');
+    if (savedRouletteSettings) {
+        document.getElementById('roulette-classic').checked = savedRouletteSettings.classicList;
+        document.getElementById('roulette-challenges').checked = savedRouletteSettings.challengesList;
+        document.getElementById('roulette-classic-min').value = savedRouletteSettings.classicMin;
+        document.getElementById('roulette-classic-max').value = savedRouletteSettings.classicMax;
+        document.getElementById('roulette-challenges-min').value = savedRouletteSettings.challengesMin;
+        document.getElementById('roulette-challenges-max').value = savedRouletteSettings.challengesMax;
+        document.getElementById('allow-repeats').checked = savedRouletteSettings.allowRepeats;
+        document.getElementById('skip-count').value = savedRouletteSettings.skipCount;
+        document.getElementById('skip-adds-percent').checked = savedRouletteSettings.skipAddsPercent;
+        document.getElementById('filter-unrated').checked = savedRouletteSettings.filterUnrated;
+        document.getElementById('filter-2player').checked = savedRouletteSettings.filter2Player;
+        document.getElementById('max-plus-one').checked = savedRouletteSettings.maxPlusOne;
     }
     
-    // Обработка нажатия Enter
-    let enterKeyPressed = false;
-    
-    percentageInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !enterKeyPressed) {
-            e.preventDefault();
-            enterKeyPressed = true;
-            submitPercentage();
-            setTimeout(() => enterKeyPressed = false, 200);
-        }
-    });
-
-    // Фокусировка на поле ввода
-    requestAnimationFrame(() => {
-        percentageInput.focus();
-        setTimeout(() => {
-            const len = percentageInput.value.length;
-            percentageInput.setSelectionRange(len, len);
-            
-            if (percentageInput.value && percentageInput.selectionStart !== len) {
-                setTimeout(() => {
-                    percentageInput.setSelectionRange(len, len);
-                }, 50);
-            }
-        }, 10);
-    });
-}
-        }
-    }
+    // Всегда сбрасываем состояние рулетки при загрузке
+    rouletteState = {
+        active: false,
+        allowRepeats: false,
+        currentLevel: null,
+        history: [],
+        usedLevels: new Set(),
+        totalSkips: 0,
+        remainingSkips: 0
+    };
 }
 
 // Функция для проверки дубликатов ID
@@ -2027,49 +1986,61 @@ function generateRouletteLevelHTML(level, position, listType, minPercentage = 1)
     `;
 }
 
- // Функция для генерации HTML истории
+// Функция для генерации HTML истории
 function generateHistoryHTML() {
-  if (rouletteState.history.length === 0) return '<p>No History Yet</p>';
-  
-  // Проверяем, сколько списков выбрано
-  const classicChecked = document.getElementById('roulette-classic').checked;
-  const challengesChecked = document.getElementById('roulette-challenges').checked;
-  const platformerChecked = document.getElementById('roulette-platformer').checked;
-  
-  // Показывать тип только если выбрано больше одного списка
-  const showListType = [classicChecked, challengesChecked, platformerChecked].filter(Boolean).length > 1;
-  
-  let html = '';
-  // Перебираем историю в обратном порядке (новые сверху)
-  for (let i = rouletteState.history.length - 1; i >= 0; i--) {
-    const item = rouletteState.history[i];
+    if (rouletteState.history.length === 0) return '<p>No History Yet</p>';
     
-    // Определяем тип списка
-    let listType = '';
-    if (showListType) {
-      if (levelData.classic.some(l => l.id === item.level.id)) {
-        listType = ' (Classic)';
-      } else if (levelData.challenges.some(l => l.id === item.level.id)) {
-        listType = ' (Challenge)';
-      } else if (levelData.platformer.some(l => l.id === item.level.id)) {
-        listType = ' (Platformer)';
-      }
+    // Получаем текущие настройки рулетки или используем значения по умолчанию
+    let classicChecked = false;
+    let challengesChecked = false;
+    let platformerChecked = false;
+    
+    try {
+        const classicCheckbox = document.getElementById('roulette-classic');
+        const challengesCheckbox = document.getElementById('roulette-challenges');
+        const platformerCheckbox = document.getElementById('roulette-platformer');
+        
+        classicChecked = classicCheckbox ? classicCheckbox.checked : false;
+        challengesChecked = challengesCheckbox ? challengesCheckbox.checked : false;
+        platformerChecked = platformerCheckbox ? platformerCheckbox.checked : false;
+    } catch (e) {
+        console.error('Error getting checkbox states:', e);
     }
     
-const levelInfo = `#${item.position}${listType} - ${item.level.title}`;
+    // Показывать тип только если выбрано больше одного списка
+    const showListType = [classicChecked, challengesChecked, platformerChecked].filter(Boolean).length > 1;
     
-    html += `
-      <div class="roulette-history-item">
-        <div class="roulette-history-level">
-          ${levelInfo}
-        </div>
-        <div class="roulette-history-percentage">
-          ${item.percentage === 'Skipped' ? '<span style="color:#aaa">Skipped</span>' : item.percentage + '%'}
-        </div>
-      </div>
-    `;
-  }
-  return html;
+    let html = '';
+    // Перебираем историю в обратном порядке (новые сверху)
+    for (let i = rouletteState.history.length - 1; i >= 0; i--) {
+        const item = rouletteState.history[i];
+        
+        // Определяем тип списка
+        let listType = '';
+        if (showListType) {
+            if (levelData.classic.some(l => l.id === item.level.id)) {
+                listType = ' (Classic)';
+            } else if (levelData.challenges.some(l => l.id === item.level.id)) {
+                listType = ' (Challenge)';
+            } else if (levelData.platformer.some(l => l.id === item.level.id)) {
+                listType = ' (Platformer)';
+            }
+        }
+        
+        const levelInfo = `#${item.position}${listType} - ${item.level.title}`;
+        
+        html += `
+            <div class="roulette-history-item">
+                <div class="roulette-history-level">
+                    ${levelInfo}
+                </div>
+                <div class="roulette-history-percentage">
+                    ${item.percentage === 'Skipped' ? '<span style="color:#aaa">Skipped</span>' : item.percentage + '%'}
+                </div>
+            </div>
+        `;
+    }
+    return html;
 }
 
     // Функция для получения случайного уровня
@@ -2232,23 +2203,23 @@ function generateNextLevel() {
     );
     console.log('Level HTML generated');
     
-    // Фокусировка на поле ввода
-    requestAnimationFrame(() => {
-        const percentageInput = document.getElementById('percentage-input');
-        if (percentageInput) {
+// Добавляем небольшую задержку перед фокусировкой, чтобы DOM успел обновиться
+const focusInput = () => {
+    const percentageInput = document.getElementById('percentage-input');
+    if (percentageInput && document.body.contains(percentageInput)) {
+        try {
             percentageInput.focus();
-            setTimeout(() => {
-                const len = percentageInput.value.length;
-                percentageInput.setSelectionRange(len, len);
-                
-                if (percentageInput.value && percentageInput.selectionStart !== len) {
-                    setTimeout(() => {
-                        percentageInput.setSelectionRange(len, len);
-                    }, 50);
-                }
-            }, 10);
+            const len = percentageInput.value.length;
+            percentageInput.setSelectionRange(len, len);
+        } catch (e) {
+            console.error('Error focusing input:', e);
         }
-    });
+    } else {
+        requestAnimationFrame(focusInput);
+    }
+};
+
+requestAnimationFrame(focusInput);
 
     setupLazyLoading();
     console.log('Next level setup complete');
@@ -2390,7 +2361,6 @@ saveAllSettings();
 function endRoulette() {
     rouletteState.active = false;
     document.getElementById('roulette-section').style.display = 'none';
-    localStorage.removeItem('rouletteState');
     showCustomAlert('Roulette ended', true);
 }
 
@@ -2607,15 +2577,6 @@ container.innerHTML = generateRouletteLevelHTML(
     if (data.currentLevel.percentage) {
         document.getElementById('percentage-input').value = data.currentLevel.percentage;
     }
-    
-    // Добавляем обработчики
-    document.getElementById('submit-percentage').addEventListener('click', submitPercentage);
-    document.getElementById('skip-level')?.addEventListener('click', skipLevel);
-    document.getElementById('percentage-input').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            submitPercentage();
-        }
-    });
     
     // Инициализируем ленивую загрузку изображений
     setupLazyLoading();
@@ -3124,26 +3085,22 @@ spinBtn.addEventListener('click', (e) => {
     }
 
             // Глобальные обработчики для событий рулетки
-        document.addEventListener('click', function(e) {
-            if (e.target && e.target.id === 'submit-percentage') {
-                submitPercentage();
-            }
-            if (e.target && e.target.id === 'skip-level') {
-                skipLevel();
-            }
-        });
+document.addEventListener('click', function(e) {
+    // Используем closest для динамических элементов
+    if (e.target.closest('#submit-percentage')) {
+        submitPercentage();
+    }
+    if (e.target.closest('#skip-level')) {
+        skipLevel();
+    }
+});
 
-        document.addEventListener('keydown', function(e) {
-            if (e.target && e.target.id === 'percentage-input' && e.key === 'Enter') {
-                const now = Date.now();
-                if (now - lastSubmitTime < 200) {
-                    return;
-                }
-                lastSubmitTime = now;
-                e.preventDefault();
-                submitPercentage();
-            }
-        });
+document.addEventListener('keydown', function(e) {
+    if (e.target.closest('#percentage-input') && e.key === 'Enter') {
+        e.preventDefault();
+        submitPercentage();
+    }
+});
     
     // Запускаем инициализацию
     initializeApp();
