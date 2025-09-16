@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultimate Demonlist</title>
+  <link rel="icon" href="images/websiteicon.ico" type="image/x-icon">
+  <style>
+    body {
+      background-color: #00112d;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      padding-top: 20px;
+    }
+
+    .container {
+      width: 85%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .title {
+      font-size: 2em;
+      margin: 0;
+      background: linear-gradient(to right, #8a2387, #e94057, #f27121);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      padding: 10px 15px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .players-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+.player-card {
+  background: #1f2937;
+  border-radius: 8px;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer; /* Добавлено: курсор-указатель */
+}
+
+.player-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer; /* Добавлено: курсор-указатель при наведении */
+}
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .player-flag {
+      width: 30px;
+      height: 20px;
+      border-radius: 0;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .player-name {
+      font-weight: 600;
+      font-size: 1.1em;
+    }
+
+    .player-score {
+      font-weight: 700;
+      color: #e94057;
+      font-size: 1.2em;
+    }
+
+    .player-position {
+      font-weight: 700;
+      color: #1e88e5;
+      font-size: 1.3em;
+      min-width: 30px;
+      text-align: center;
+    }
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #1f2937;
+  border-radius: 12px;
+  padding: 25px;
+  width: 80%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 28px;
+  cursor: pointer;
+  color: #e94057;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #f27121;
+}
+
+.modal-levels-list {
+  margin-top: 20px;
+}
+
+.level-item {
+  padding: 12px;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border-left: 4px solid #e94057;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.level-name {
+  font-weight: 500;
+}
+
+.level-position {
+  color: #1e88e5;
+  font-weight: 600;
+  background: rgba(30, 136, 229, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">Top Players</h1>
+      <button class="back-btn" onclick="window.location.href='index.html'">
+        <i class="fas fa-arrow-left"></i> Back to List
+      </button>
+    </div>
+
+<!-- Модальное окно -->
+<div id="player-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <h2 id="modal-player-name"></h2>
+    <div id="modal-levels-list" class="modal-levels-list">
+      <!-- Уровни будут вставлены здесь -->
+    </div>
+  </div>
+</div>
+
+    <div class="players-list" id="players-list">
+      <!-- Players will be inserted here by JavaScript -->
+    </div>
+  </div>
+  
+<script src="levelData.js"></script>
+  <script>
+    // Player data with their top 6 hardest levels by ID
+    const playerData = [
+      {
+        name: "zZoink",
+        country: "us",
+        levels: ["119544028", "119550490", "86407629", "109780665", "117692518", "114283297"]
+      },
+      {
+        name: "TrickGMD",
+        country: "us",
+        levels: ["86407629", "4125776", "112313819", "89496627", "110815379", "73667628"]
+      },
+      {
+        name: "wPopoff",
+        country: "us",
+        levels: ["119550490", "116732736", "114283297", "70436808", "4125776", "112313819"]
+      },
+      {
+        name: "Andreya6",
+        country: "ru",
+        levels: ["86407629", "114283297", "112313819", "89496627", "73667628", "91351939"]
+      },
+      {
+        name: "qSerVax",
+        country: "ua",
+        levels: ["86407629", "112313819", "89496627", "110815379", "73667628", "49896559"]
+      },
+      {
+        name: "Netermind",
+        country: "us",
+        levels: ["112313819", "89496627", "110815379", "73667628", "107805281", "49896559"]
+      },
+      {
+        name: "Thnnder",
+        country: "us",
+        levels: ["110815379", "73667628", "107805281", "49896559", "27690100", "75206202"]
+      },
+      {
+        name: "Taiago",
+        country: "pt",
+        levels: ["86407629", "114283297", "89496627", "73667628", "91351939", "86018142"]
+      },
+      {
+        name: "Nickname09",
+        country: "ru",
+        levels: ["114283297", "73667628", "91351939", "86018142", "93091893", "87665224"]
+      },
+      {
+        name: "Vorten",
+        country: "ru",
+        levels: ["110815379", "73667628", "49896559", "91351939", "86018142", "113599729"]
+      },
+      {
+        name: "loliklee",
+        country: "md",
+        levels: ["89496627", "73667628", "49896559", "91351939", "27690100", "87665224"]
+      },
+      {
+        name: "roze [GD]",
+        country: "ru",
+        levels: ["4125776", "112313819", "77331805", "89496627", "73667628", "49896559"]
+      },
+      {
+        name: "eastshark",
+        country: "es",
+        levels: ["110816181", "27690100", "93091893", "75206202", "85133223", "95851008"]
+      },
+      {
+        name: "zLevii",
+        country: "au",
+        levels: ["110815379", "86018142", "93091893", "75206202", "109439644", "90477539"]
+      },
+      {
+        name: "Superjavicon",
+        country: "es",
+        levels: ["27690100", "93091893", "85133223", "90477539", "81139702", "94359172"]
+      },
+      {
+        name: "Stefan Boss",
+        country: "ro",
+        levels: ["116174063", "73667628", "49896559", "93091893", "90477539", "96314787"]
+      },
+      {
+        name: "kloone",
+        country: "fi",
+        levels: ["73667628", "86018142", "27690100", "93091893", "76962930", "85133223"]
+      },
+      {
+        name: "w3rty",
+        country: "ru",
+        levels: ["114283297", "112313819", "89496627", "110815379", "73667628", "86018142"]
+      },
+      {
+        name: "Whizkid05",
+        country: "gb",
+        levels: ["112313819", "107805281", "13586257", "113322063", "93917076", "75206202"]
+      },
+      {
+        name: "ViperVenom95",
+        country: "au",
+        levels: ["49896559", "86018142", "93091893", "75206202", "90477539", "89414220"]
+      },
+      {
+        name: "Laniakea",
+        country: "kr",
+        levels: ["49896559", "86018142", "27690100", "76962930", "93917076", "75206202"]
+      },
+      {
+        name: "Doggie",
+        country: "us",
+        levels: ["4125776", "73667628", "49896559", "27690100", "60805571", "93091893"]
+      },
+      {
+        name: "teraaa",
+        country: "ru",
+        levels: ["112313819", "73667628", "27690100", "60805571", "76962930", "75206202"]
+      },
+      {
+        name: "iIiLaSeRiIi",
+        country: "gb",
+        levels: ["110815379", "91351939", "86018142", "93091893", "75206202", "90477539"]
+      },
+      {
+        name: "Cursed",
+        country: "gb",
+        levels: ["73667628", "49896559", "91351939", "27690100", "60805571", "98446627"]
+      },
+      {
+        name: "Serpentical",
+        country: "hu",
+        levels: ["112313819", "89496627", "73667628", "91351939", "27690100", "87665224"]
+      },
+      {
+        name: "Mizukii",
+        country: "de",
+        levels: ["89496627", "73667628", "49896559", "86018142", "27690100", "85133223"]
+      },
+      {
+        name: "Arshadow",
+        country: "ru",
+        levels: ["112313819", "89496627", "73667628", "49896559", "27690100", "87665224"]
+      },
+      {
+        name: "Kaza",
+        country: "ro",
+        levels: ["73667628", "86018142", "27690100", "75206202", "90477539", "94359172"]
+      },
+      {
+        name: "SnowBallerr",
+        country: "au",
+        levels: ["73667628", "27690100", "75206202", "85133223", "95851008", "89414220"]
+      },
+      {
+        name: "Hqmy",
+        country: "us",
+        levels: ["116174063", "73667628", "86018142", "93091893", "109439644", "90477539"]
+      },
+      {
+        name: "skzyl",
+        country: "us",
+        levels: ["27690100", "93917076", "85133223", "94969889", "81139702", "81011195"]
+      },
+      {
+        name: "WaterBottle317",
+        country: "us",
+        levels: ["27690100", "87665224", "76962930", "75206202", "85133223", "90477539"]
+      },
+      {
+        name: "Cookie",
+        country: "us",
+        levels: ["86018142", "27690100", "76962930", "75206202", "95851008", "89414220"]
+      },
+      {
+        name: "DibiiziCookie",
+        country: "br",
+        levels: ["73667628", "49896559", "86018142", "93091893", "75206202", "109439644"]
+      },
+      {
+        name: "Hover",
+        country: "at",
+        levels: ["73667628", "27690100", "76962930", "75206202", "85133223", "90477539"]
+      },
+      {
+        name: "JesseGamingGD",
+        country: "nl",
+        levels: ["110815379", "73667628", "27690100", "93091893", "75206202", "81139702"]
+      },
+      {
+        name: "Abdieldevil",
+        country: "pe",
+        levels: ["89496627", "73667628", "91351939", "27690100", "87665224", "76962930"]
+      },
+      {
+        name: "Albert",
+        country: "us",
+        levels: ["4125776", "110815379", "73667628", "27690100", "93091893", "89187968"]
+      },
+      {
+        name: "Kopre",
+        country: "us",
+        levels: ["73667628", "75206202", "85133223", "90477539", "81139702", "94359172"]
+      },
+      {
+        name: "Seturan",
+        country: "kr",
+        levels: ["4125776", "49896559", "76962930", "95851008", "90477539", "96314787"]
+      },
+      {
+        name: "BoN4iK1772",
+        country: "ru",
+        levels: ["93091893", "90477539", "96314787", "113045735", "81011195", "113256247"]
+      },
+      {
+        name: "Jerpaa",
+        country: "fi",
+        levels: ["91351939", "27690100", "76962930", "109439644", "90477539", "81139702"]
+      },
+      {
+        name: "Finley",
+        country: "ca",
+        levels: ["73667628", "75206202", "90477539", "89414220", "96314787", "94969889"]
+      },
+      {
+        name: "PoCle",
+        country: "kr",
+        levels: ["112313819", "49896559", "113599729", "87665224", "76962930", "89187968"]
+      },
+      {
+        name: "cobrablitz",
+        country: "us",
+        levels: ["86018142", "27690100", "90477539", "81139702", "90390075", "86084399"]
+      },
+      {
+        name: "ColossalOrange",
+        country: "us",
+        levels: ["73667628", "27690100", "76962930", "85133223", "89414220", "94359172"]
+      },
+      {
+        name: "rnexel",
+        country: "ca",
+        levels: ["89414220", "81139702", "94359172", "114990369", "81011195", "113256247"]
+      },
+      {
+        name: "fallen",
+        country: "ru",
+        levels: ["89496627", "73667628", "27690100", "76962930", "75206202", "120255728"]
+      },
+      {
+        name: "Nordstrom",
+        country: "us",
+        levels: ["73667628", "49896559", "113599729", "93917076", "120255728", "89414220"]
+      },
+      {
+        name: "l1nxxd",
+        country: "ua",
+        levels: ["86018142", "93091893", "75206202", "90477539", "89414220", "95998005"]
+      },
+      {
+        name: "Tulachi65",
+        country: "cl",
+        levels: ["86018142", "27690100", "85133223", "90477539", "90390075", "113256247"]
+      },
+      {
+        name: "manu",
+        country: "cl",
+        levels: ["86018142", "27690100", "90477539", "94969889", "86084399", "110891882"]
+      },
+      {
+        name: "PlKil",
+        country: "kr",
+        levels: ["73667628", "91351939", "113599729", "90477539", "96314787", "94359172"]
+      },
+      {
+        name: "Hipo",
+        country: "ar",
+        levels: ["27690100", "75206202", "49072489", "90477539", "110500920", "95719795"]
+      },
+      {
+        name: "Axinity",
+        country: "dk",
+        levels: ["73667628", "27690100", "76962930", "75206202", "81139702", "90390075"]
+      },
+      {
+        name: "Sharkfield",
+        country: "us",
+        levels: ["73667628", "75206202", "85133223", "90477539", "81139702", "94359172"]
+      },
+      {
+        name: "Breakcore",
+        country: "ee",
+        levels: ["73667628", "49896559", "75206202", "85133223", "89414220", "89187968"]
+      },
+      {
+        name: "fusion425",
+        country: "us",
+        levels: ["27690100", "75206202", "90477539", "81139702", "94359172", "82544060"]
+      },
+      {
+        name: "Kole",
+        country: "rs",
+        levels: ["73667628", "49896559", "90477539", "81139702", "81011195", "82544060"]
+      },
+      {
+        name: "takmaster",
+        country: "ru",
+        levels: ["73667628", "113599729", "93091893", "90477539", "89414220", "90390075"]
+      },
+      {
+        name: "PersonHuman42",
+        country: "au",
+        levels: ["110815379", "75206202", "89414220", "81139702", "90390075", "89187968"]
+      },
+      {
+        name: "KlimK",
+        country: "ru",
+        levels: ["125795798", "73667628", "76962930", "90390075", "92196326", "72315402"]
+      },
+      {
+        name: "turtle",
+        country: "us",
+        levels: ["73667628", "86018142", "27690100", "75206202", "90477539", "110500920"]
+      },
+      {
+        name: "microforest",
+        country: "ru",
+        levels: ["73667628", "27690100", "87665224", "76962930", "85133223", "90477539"]
+      },
+      {
+        name: "Paliermu",
+        country: "it",
+        levels: ["87665224", "85133223", "90477539", "81139702", "94359172", "90390075"]
+      },
+      {
+        name: "GuillExprex52",
+        country: "es",
+        levels: ["114283297", "91351939", "87665224", "76962930", "109439644", "90477539"]
+      },
+      {
+        name: "MeQ8cNv43s6A",
+        country: "jp",
+        levels: ["4125776", "73667628", "27690100", "109439644", "85133223", "108708033"]
+      },
+      {
+        name: "Johnlikediamond",
+        country: "us",
+        levels: ["86018142", "85133223", "90477539", "114990369", "113256247", "113220284"]
+      },
+      {
+        name: "CuatrocientosYT",
+        country: "es",
+        levels: ["94969889", "81139702", "90390075", "81011195", "86084399", "82544060"]
+      },
+      {
+        name: "zoe",
+        country: "us",
+        levels: ["4125776", "73667628", "87665224", "60805571", "76767195", "27690100"]
+      },
+      {
+        name: "GGonop",
+        country: "fi",
+        levels: ["113599729", "85133223", "89414220", "96314787", "94969889", "81011195"]
+      },
+      {
+        name: "theworldofme",
+        country: "us",
+        levels: ["93091893", "89414220", "90390075", "81011195", "113256247", "110991117"]
+      },
+      {
+        name: "weyolll3",
+        country: "es",
+        levels: ["86018142", "75206202", "90477539", "81139702", "90390075", "89187968"]
+      },
+      {
+        name: "noname228gg",
+        country: "ru",
+        levels: ["4125776", "73667628", "76962930", "85133223", "113443235", "69685815"]
+      },
+      {
+        name: "Light",
+        country: "ru",
+        levels: ["73667628", "49896559", "86018142", "75206202", "89187968", "69685815"]
+      },
+      {
+        name: "Kopyedz",
+        country: "ru",
+        levels: ["73667628", "75206202", "90477539", "89414220", "81139702", "94359172"]
+      },
+      {
+        name: "whfyre",
+        country: "ua",
+        levels: ["113599729", "76962930", "89414220", "96083028", "82249742", "95049815"]
+      },
+      {
+        name: "zThund3r",
+        country: "fr",
+        levels: ["73667628", "49896559", "86018142", "27690100", "72315402", "69685815"]
+      },
+      {
+        name: "cudby",
+        country: "ca",
+        levels: ["27690100", "90477539", "89414220", "90390075", "110500920", "72315402"]
+      },
+      {
+        name: "DiamondSplash",
+        country: "us",
+        levels: ["86018142", "110534288", "75206202", "86084399", "89187968", "95998005"]
+      },
+      {
+        name: "Franzy",
+        country: "ar",
+        levels: ["85133223", "82544060", "110500920", "96083028", "72315402", "69685815"]
+      },
+      {
+        name: "notd4n1",
+        country: "it",
+        levels: ["86018142", "75206202", "94969889", "81139702", "88203501", "59075347"]
+      },
+      {
+        name: "Bigthunder556",
+        country: "us",
+        levels: ["90477539", "81139702", "93339534", "95049815", "72315402", "69685815"]
+      },
+      {
+        name: "seels55",
+        country: "us",
+        levels: ["77331805", "76962930", "60805571", "92910288", "95357570", "85042202"]
+      },
+      {
+        name: "TheDiamondPizza",
+        country: "al",
+        levels: ["4125776", "89496627", "27690100", "76962930", "38230726", "60805571"]
+      },
+      {
+        name: "tensaid",
+        country: "ru",
+        levels: ["27122654", "61531210", "93505324", "93505324", "93505324", "93505324"]
+      },
+    ];
+
+    // Function to calculate player score
+    function calculatePlayerScore(player) {
+      let totalScore = 0;
+      const weights = [10/42, 9/42, 8/42, 7/42, 5/42, 3/42];
+      
+      player.levels.forEach((levelId, index) => {
+        // Find level position in classic list
+        const classicIndex = levelData.classic.findIndex(l => l.id === levelId);
+        if (classicIndex !== -1) {
+          totalScore += (classicIndex + 1) * weights[index];
+        }
+      });
+      
+      return Math.round(totalScore * 100);
+    }
+
+function renderPlayers() {
+  const container = document.getElementById('players-list');
+  
+  // Calculate scores for all players
+  const playersWithScores = playerData.map(player => ({
+    ...player,
+    score: calculatePlayerScore(player)
+  }));
+  
+  // Sort by score (ascending)
+  playersWithScores.sort((a, b) => a.score - b.score);
+  
+  // Generate HTML
+  let html = '';
+  playersWithScores.forEach((player, index) => {
+    const countryCode = player.country.toLowerCase();
+    let flagImage = `flags/${countryCode}.svg`;
+
+    html += `
+      <div class="player-card" data-player-name="${player.name}" data-levels='${JSON.stringify(player.levels)}'>
+        <div class="player-info">
+          <span class="player-position">${index + 1}</span>
+          <img src="${flagImage}" class="player-flag" alt="${countryCode}">
+          <span class="player-name">${player.name}</span>
+        </div>
+        <span class="player-score">${player.score}</span>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+  
+  // Добавляем обработчики кликов после рендеринга
+  addPlayerClickHandlers();
+}
+
+// Функция для добавления обработчиков кликов
+function addPlayerClickHandlers() {
+  const playerCards = document.querySelectorAll('.player-card');
+  
+  playerCards.forEach(card => {
+    card.addEventListener('click', function() {
+      const playerName = this.getAttribute('data-player-name');
+      const levelsData = JSON.parse(this.getAttribute('data-levels'));
+      openPlayerModal(playerName, levelsData);
+    });
+  });
+}
+
+// Функция для открытия модального окна
+function openPlayerModal(playerName, levelIds) {
+  const modal = document.getElementById('player-modal');
+  const playerNameElement = document.getElementById('modal-player-name');
+  const levelsListElement = document.getElementById('modal-levels-list');
+  
+  // Устанавливаем имя игрока
+  playerNameElement.textContent = `${playerName}'s Hardests`;
+  
+  // Очищаем список уровней
+  levelsListElement.innerHTML = '';
+  
+  // Создаем массив объектов уровней с их позициями
+  const levelsWithPositions = levelIds.map(levelId => {
+    const levelInfo = findLevelInfo(levelId);
+    return {
+      id: levelId,
+      name: levelInfo.name,
+      position: levelInfo.position
+    };
+  });
+  
+  // Сортируем уровни по позиции (от самой сложной к менее сложной)
+  levelsWithPositions.sort((a, b) => a.position - b.position);
+  
+  // Добавляем уровни в модальное окно
+  levelsWithPositions.forEach((level, index) => {
+    const levelElement = document.createElement('div');
+    levelElement.className = 'level-item';
+    levelElement.innerHTML = `
+      <span class="level-name">${level.name}</span>
+      <span class="level-position">#${level.position}</span>
+    `;
+    levelsListElement.appendChild(levelElement);
+  });
+  
+  // Показываем модальное окно
+  modal.style.display = 'flex';
+}
+
+// Функция для поиска информации об уровне
+function findLevelInfo(levelId) {
+  // Преобразуем levelId в строку для сравнения
+  const searchId = levelId.toString();
+  
+  // Ищем в classic списке
+  for (let i = 0; i < levelData.classic.length; i++) {
+    if (levelData.classic[i].id.toString() === searchId) {
+      return {
+        name: levelData.classic[i].title,
+        position: i + 1
+      };
+    }
+  }
+  
+  // Ищем в extended списке
+  for (let i = 0; i < levelData.extended.length; i++) {
+    if (levelData.extended[i].id.toString() === searchId) {
+      return {
+        name: levelData.extended[i].title,
+        position: i + 1 + levelData.classic.length
+      };
+    }
+  }
+  
+  // Если уровень не найден
+  return {
+    name: `Unknown Level (ID: ${levelId})`,
+    position: 'N/A'
+  };
+}
+
+// Функция для закрытия модального окна
+function closeModal() {
+  document.getElementById('player-modal').style.display = 'none';
+}
+
+// Обработчики событий для закрытия модального окна
+document.addEventListener('DOMContentLoaded', () => {
+  // Клик по крестику
+  document.querySelector('.close-btn').addEventListener('click', closeModal);
+  
+  // Клик вне модального окна
+  document.getElementById('player-modal').addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeModal();
+    }
+  });
+  
+  // Клавиша ESC
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeModal();
+    }
+  });
+  
+  renderPlayers();
+});
+
+// Функция для открытия модального окна
+function openPlayerModal(playerName, levelIds) {
+  const modal = document.getElementById('player-modal');
+  const playerNameElement = document.getElementById('modal-player-name');
+  const levelsListElement = document.getElementById('modal-levels-list');
+  
+  // Устанавливаем имя игрока
+  playerNameElement.textContent = `${playerName}'s Hardests`;
+  
+  // Очищаем список уровней
+  levelsListElement.innerHTML = '';
+  
+  // Создаем массив объектов уровней с их позициями и названиями
+  const levelsWithInfo = levelIds.map(levelId => {
+    const levelInfo = findLevelInfo(levelId);
+    return {
+      id: levelId,
+      name: levelInfo.name,
+      position: levelInfo.position
+    };
+  });
+  
+  // Сортируем уровни по позиции (от самой сложной к менее сложной)
+  levelsWithInfo.sort((a, b) => a.position - b.position);
+  
+  // Добавляем уровни в модальное окно
+  levelsWithInfo.forEach((level, index) => {
+    const levelElement = document.createElement('div');
+    levelElement.className = 'level-item';
+    levelElement.innerHTML = `
+      <span class="level-name">${level.name}</span>
+      <span class="level-position">#${level.position}</span>
+    `;
+    levelsListElement.appendChild(levelElement);
+  });
+  
+  // Показываем модальное окно
+  modal.style.display = 'flex';
+}
+
+// Функция для поиска информации об уровне
+function findLevelInfo(levelId) {
+  // Преобразуем levelId в строку для сравнения
+  const searchId = levelId.toString();
+  
+  // Ищем в classic списке
+  for (let i = 0; i < levelData.classic.length; i++) {
+    if (levelData.classic[i].id.toString() === searchId) {
+      return {
+        name: levelData.classic[i].title, // Исправлено: title вместо name
+        position: i + 1
+      };
+    }
+  }
+  
+  // Ищем в extended списке
+  for (let i = 0; i < levelData.extended.length; i++) {
+    if (levelData.extended[i].id.toString() === searchId) {
+      return {
+        name: levelData.extended[i].title, // Исправлено: title вместо name
+        position: i + 1 + levelData.classic.length
+      };
+    }
+  }
+  
+  // Если уровень не найден
+  return {
+    name: `Unknown Level (ID: ${levelId})`,
+    position: 'N/A'
+  };
+}
+
+// Функция для закрытия модального окна
+function closeModal() {
+  document.getElementById('player-modal').style.display = 'none';
+}
+
+// Обработчики событий для закрытия модального окна
+document.addEventListener('DOMContentLoaded', () => {
+  // Клик по крестику
+  document.querySelector('.close-btn').addEventListener('click', closeModal);
+  
+  // Клик вне модального окна
+  document.getElementById('player-modal').addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeModal();
+    }
+  });
+  
+  // Клавиша ESC
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeModal();
+    }
+  });
+  
+  renderPlayers();
+});
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      renderPlayers();
+    });
+  </script>
+</body>
+</html>

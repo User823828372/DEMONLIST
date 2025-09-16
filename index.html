@@ -415,6 +415,74 @@ body {
   transform: translateY(-4px);
 }
 
+.filters-btn {
+  position: fixed;
+  top: 100px;
+  right: 40px;
+  left: auto;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #8a2387, #e94057);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 30px rgba(233, 64, 87, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  visibility: visible;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 999;
+  transform: scale(1);
+  overflow: hidden;
+  outline: none;
+}
+
+.filters-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+  transform: translateX(-100%) skewX(-20deg);
+  transition: transform 0.6s ease;
+}
+
+.filters-btn:hover::before {
+  transform: translateX(100%) skewX(-20deg);
+}
+
+.filters-btn:hover {
+  box-shadow: 0 6px 30px rgba(233, 64, 87, 0.7);
+}
+
+.filters-btn.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+.filters-btn:hover.visible {
+  transform: scale(1.05);
+}
+
+.filters-btn:active {
+  transform: scale(0.95) !important;
+}
+
+.filter-group {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .level-preview img,
 .roulette-level-preview img {
   background-color: #444;
@@ -454,6 +522,33 @@ body {
 
 .level-crown-container:hover {
   transform: scale(1.1);
+}
+
+.level-new-container {
+  position: absolute;
+  top: 15px;
+  right: 50px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.level-new-container.compact {
+  position: static;
+  margin-left: auto;
+  margin-right: 8px;
+  width: 20px;
+  height: 20px;
+}
+
+.level-new-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .roulette-level .level-crown-container {
@@ -1335,6 +1430,14 @@ background-clip: text;
   font-size: 0.8em;
 }
 
+.compact-view .level-new-container {
+  position: static;
+  margin-left: 70px;
+  margin-right: 0px;
+  width: 40px;
+  height: 40px;
+}
+
 .search-mode-btn {
   position: absolute;
   right: 8px;
@@ -1398,6 +1501,28 @@ background-clip: text;
     outline: none;
 }
 
+.players-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.players-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
       to { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -1449,15 +1574,19 @@ background-clip: text;
     </div>
   </div>
   
-  <div class="header-right">
-    <button class="view-toggle-btn" id="view-toggle-btn">
-      <i class="fas fa-th-large"></i> Compact View
-    </button>
-    
-    <button class="roulette-btn" id="roulette-btn">
-      <i class="fas fa-dice"></i> Roulette
-    </button>
-  </div>
+<div class="header-right">
+  <button class="players-btn" id="players-btn" title="Top Players">
+    <i class="fas fa-trophy"></i>
+  </button>
+  
+  <button class="view-toggle-btn" id="view-toggle-btn">
+    <i class="fas fa-th-large"></i> Compact View
+  </button>
+  
+  <button class="roulette-btn" id="roulette-btn">
+    <i class="fas fa-dice"></i> Roulette
+  </button>
+</div>
 </div>
 
   <!-- Модальное окно Demon Roulette -->
@@ -1610,6 +1739,11 @@ background-clip: text;
   <i class="fas fa-arrow-up"></i>
 </button>
 
+<!-- Кнопка Filters -->
+<button class="filters-btn" aria-label="Filters" id="filters-btn">
+  <i class="fas fa-filter"></i>
+</button>
+
   <!-- Скрытый input для импорта -->
 <input type="file" id="import-file" accept=".txt,.json" style="display: none;">
 
@@ -1639,6 +1773,10 @@ function loadFromLocalStorage(key) {
 function saveAllSettings() {
     saveToLocalStorage('compactView', document.getElementById('classic-list').classList.contains('compact-view'));
     saveToLocalStorage('searchMode', searchMode);
+    saveToLocalStorage('filterUnratedLevels', document.getElementById('filter-unrated-levels').checked);
+    saveToLocalStorage('filter2PlayerLevels', document.getElementById('filter-2player-levels').checked);
+    saveToLocalStorage('filterInvisibleLevels', document.getElementById('filter-invisible-levels').checked);
+    saveToLocalStorage('filterChallengesLevels', document.getElementById('filter-challenges-levels').checked);
     
     // Сохраняем только настройки рулетки, но не её состояние
     const rouletteSettings = {
@@ -1682,6 +1820,25 @@ function loadAllSettings() {
         document.getElementById('search-mode-btn').title = searchMode === 'contains' 
             ? 'Contains mode' 
             : 'Starts with mode';
+    }
+
+    // Загрузка фильтров
+    const filterUnratedLevels = loadFromLocalStorage('filterUnratedLevels');
+    const filter2PlayerLevels = loadFromLocalStorage('filter2PlayerLevels');
+    const filterInvisibleLevels = loadFromLocalStorage('filterInvisibleLevels');
+    const filterChallengesLevels = loadFromLocalStorage('filterChallengesLevels');
+    
+    if (filterUnratedLevels !== null) {
+        document.getElementById('filter-unrated-levels').checked = filterUnratedLevels;
+    }
+    if (filter2PlayerLevels !== null) {
+        document.getElementById('filter-2player-levels').checked = filter2PlayerLevels;
+    }
+    if (filterInvisibleLevels !== null) {
+        document.getElementById('filter-invisible-levels').checked = filterInvisibleLevels;
+    }
+    if (filterChallengesLevels !== null) {
+        document.getElementById('filter-challenges-levels').checked = filterChallengesLevels;
     }
     
     // Загрузка настроек рулетки (но не состояния)
@@ -1797,7 +1954,7 @@ function wasFirstPlaceOnRelease(level, listType) {
         }
         
         // Игнорируем Silent clubstep для Acheron, Acheron buffed и Avernus
-        const isAcheronGroup = ["Acheron", "Acheron buffed", "Avernus"].includes(level.title);
+        const isAcheronGroup = ["Acheron", "Acheron buffed"].includes(level.title);
         if (isAcheronGroup && l.title === "Silent clubstep") {
             return false;
         }
@@ -1823,9 +1980,26 @@ function wasFirstPlaceOnRelease(level, listType) {
     return hardestLevel.id === level.id;
 }
 
+// Функция для проверки, является ли уровень новым (вышел в последние 30 дней)
+function isLevelNew(releaseDate) {
+    if (!releaseDate) return false;
+    
+    const release = new Date(releaseDate);
+    if (isNaN(release.getTime())) return false;
+    
+    const currentDate = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(currentDate.getDate() - 30);
+    
+    return release >= thirtyDaysAgo && release <= currentDate;
+}
+
     // Функция для генерации HTML уровня
 function generateLevelHTML(level, position, listType) {
   let isFormerFirstPlace = wasFirstPlaceOnRelease(level, listType);
+  
+  // Проверяем, является ли уровень новым (вышел в последние 30 дней)
+  const isNewLevel = isLevelNew(level.releaseDate);
   
   // Определяем цвет названия в зависимости от условий
   let titleColorClass = '';
@@ -1866,6 +2040,7 @@ function generateLevelHTML(level, position, listType) {
         <p class="level-author">Published by ${level.author}</p>
         <p class="level-verifier">Verified by ${level.verifier}</p>
       </div>
+      ${isNewLevel ? '<div class="level-new-container" title="New Level (Verified in last 30 days)"><img src="images/new_label.png" alt="NEW"></div>' : ''}
       ${isFormerFirstPlace ? '<div class="level-crown-container" title="Former Hardest Level"><img src="images/Crown.png" alt="👑" style="width: 100%; height: 100%; object-fit: contain;"></div>' : ''}
       <div class="show-in-list" onclick="scrollToLevel(this)">Show in List</div>
       <div class="level-id" onclick="copyToClipboard(this, '${level.id}')">${level.id}</div>
@@ -1873,16 +2048,23 @@ function generateLevelHTML(level, position, listType) {
   `;
 }
 
-    // Функция для отрисовки списка уровней
+// Функция для отрисовки списка уровней с учетом фильтров
 function renderLevels(listType) {
     const container = document.getElementById(`${listType}-list`);
     if (!container) return;
     
     let html = '';
+    const filterUnrated = document.getElementById('filter-unrated-levels').checked;
+    let position = 1;
     
-    levelData[listType].forEach((level, index) => {
-        const position = index + 1;
+    levelData[listType].forEach((level) => {
+        // Применяем фильтр Unrated
+        if (filterUnrated && level.tags && level.tags.includes("Unrated")) {
+            return; // Пропускаем уровень
+        }
+        
         html += generateLevelHTML(level, position, listType);
+        position++;
     });
     
     container.innerHTML = html;
@@ -2717,40 +2899,96 @@ const closeBtn = document.getElementById('confirm-modal-close');
 
     // Функция для фильтрации уровней
 function filterLevels() {
-  const searchTerm = document.getElementById('search-input').value.toLowerCase();
-  const classicList = document.getElementById('classic-list');
-  const challengesList = document.getElementById('challenges-list');
-  const platformerList = document.getElementById('platformer-list');
-  
-  let levels, container;
-  if (classicList.style.display !== 'none') {
-    levels = classicList.querySelectorAll('.level');
-    container = classicList;
-  } else if (challengesList.style.display !== 'none') {
-    levels = challengesList.querySelectorAll('.level');
-    container = challengesList;
-  } else {
-    levels = platformerList.querySelectorAll('.level');
-    container = platformerList;
-  }
-  
-  const hasSearchTerm = searchTerm.length > 0;
-  container.classList.toggle('search-active', hasSearchTerm);
-  
-  levels.forEach(level => {
-    const title = level.querySelector('.level-title').textContent.toLowerCase();
-    let matches = false;
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const classicList = document.getElementById('classic-list');
+    const challengesList = document.getElementById('challenges-list');
+    const platformerList = document.getElementById('platformer-list');
     
-    if (searchMode === 'contains') {
-      matches = title.includes(searchTerm);
+    let levels, container;
+    if (classicList.style.display !== 'none') {
+        levels = classicList.querySelectorAll('.level');
+        container = classicList;
+    } else if (challengesList.style.display !== 'none') {
+        levels = challengesList.querySelectorAll('.level');
+        container = challengesList;
     } else {
-      // Убираем номер позиции (#1 - LevelName -> levelname)
-      const cleanTitle = title.replace(/^#\d+\s-\s/, '');
-      matches = cleanTitle.startsWith(searchTerm);
+        levels = platformerList.querySelectorAll('.level');
+        container = platformerList;
     }
     
-    level.style.display = matches ? 'flex' : 'none';
-  });
+    const hasSearchTerm = searchTerm.length > 0;
+    container.classList.toggle('search-active', hasSearchTerm);
+    
+    // Получаем текущие настройки фильтров
+    const filterUnrated = document.getElementById('filter-unrated-levels').checked;
+    const filter2Player = document.getElementById('filter-2player-levels').checked;
+    const filterInvisible = document.getElementById('filter-invisible-levels').checked;
+    const filterChallenges = document.getElementById('filter-challenges-levels').checked;
+    
+    levels.forEach(level => {
+        const title = level.querySelector('.level-title').textContent.toLowerCase();
+        const levelId = level.querySelector('.level-id').textContent;
+        
+        // Определяем тип текущего списка
+        let listType;
+        if (classicList.style.display !== 'none') {
+            listType = 'classic';
+        } else if (challengesList.style.display !== 'none') {
+            listType = 'challenges';
+        } else {
+            listType = 'platformer';
+        }
+        
+        // Находим данные уровня
+        const levelDataItem = levelData[listType].find(l => l.id === levelId);
+        
+        // Проверяем, не отфильтрован ли уровень
+        let isFiltered = false;
+        
+        if (levelDataItem) {
+            // Применяем фильтр Unrated
+            if (filterUnrated && levelDataItem.tags && levelDataItem.tags.includes("Unrated")) {
+                isFiltered = true;
+            }
+            
+            // Применяем фильтр 2-Player
+            if (filter2Player && levelDataItem.tags && levelDataItem.tags.includes("2Player")) {
+                isFiltered = true;
+            }
+            
+            // Применяем фильтр Invisible
+            if (filterInvisible && levelDataItem.tags && levelDataItem.tags.includes("Invisible")) {
+                isFiltered = true;
+            }
+            
+            // Применяем фильтр Challenges (длительность ≤ 29 секунд)
+            if (filterChallenges && levelDataItem.lenght) {
+                const durationSeconds = parseDurationToSeconds(levelDataItem.lenght);
+                if (durationSeconds <= 29) {
+                    isFiltered = true;
+                }
+            }
+        }
+        
+        // Если уровень отфильтрован, скрываем его независимо от поискового запроса
+        if (isFiltered) {
+            level.style.display = 'none';
+            return;
+        }
+        
+        // Проверяем соответствие поисковому запросу
+        let matches = false;
+        
+        if (searchMode === 'contains') {
+            matches = title.includes(searchTerm);
+        } else {
+            // Убираем номер позиции (#1 - LevelName -> levelname)
+            const cleanTitle = title.replace(/^#\d+\s-\s/, '');
+            matches = cleanTitle.startsWith(searchTerm);
+        }
+        
+        level.style.display = matches ? 'flex' : 'none';
+    });
 }
 
     // Функция для прокрутки к уровню
@@ -2790,15 +3028,47 @@ function filterLevelsByDate(date) {
     
     const allLevels = levelData[currentList];
     
-    // Фильтруем уровни, выпущенные до или в выбранную дату
+    // Получаем текущие настройки фильтров
+    const filterUnrated = document.getElementById('filter-unrated-levels').checked;
+    const filter2Player = document.getElementById('filter-2player-levels').checked;
+    const filterInvisible = document.getElementById('filter-invisible-levels').checked;
+    const filterChallenges = document.getElementById('filter-challenges-levels').checked;
+    
+    // Фильтруем уровни, выпущенные до или в выбранную дату + применяем фильтры
     const filteredLevels = allLevels.filter(level => {
         if (!level.releaseDate) return false;
-        return new Date(level.releaseDate) <= date;
+        
+        // Проверяем дату
+        if (new Date(level.releaseDate) > date) return false;
+        
+        // Применяем фильтр Unrated
+        if (filterUnrated && level.tags && level.tags.includes("Unrated")) {
+            return false;
+        }
+        
+        // Применяем фильтр 2-Player
+        if (filter2Player && level.tags && level.tags.includes("2Player")) {
+            return false;
+        }
+        
+        // Применяем фильтр Invisible
+        if (filterInvisible && level.tags && level.tags.includes("Invisible")) {
+            return false;
+        }
+        
+        // Применяем фильтр Challenges (длительность ≤ 29 секунд)
+        if (filterChallenges && level.lenght) {
+            const durationSeconds = parseDurationToSeconds(level.lenght);
+            if (durationSeconds <= 29) {
+                return false;
+            }
+        }
+        
+        return true;
     });
     
-    // Сортируем по дате релиза (новые сначала) и сложности (как в оригинальном списке)
+    // Сортируем по позиции в оригинальном списке
     filteredLevels.sort((a, b) => {
-        // Сначала сортируем по позиции в оригинальном списке (чем выше позиция - тем сложнее уровень)
         const posA = allLevels.findIndex(l => l.id === a.id) + 1;
         const posB = allLevels.findIndex(l => l.id === b.id) + 1;
         return posA - posB;
@@ -2807,16 +3077,62 @@ function filterLevelsByDate(date) {
     const container = document.getElementById(`${currentList}-list`);
     container.innerHTML = '';
     
-    // Генерируем HTML с новыми позициями
+    // Генерируем HTML с новыми позициями и учетом Former #1 с фильтрами
     filteredLevels.forEach((level, index) => {
         const newPosition = index + 1;
-        container.innerHTML += generateLevelHTML(level, newPosition, currentList);
+        
+        // Проверяем был ли уровень на первом месте с учетом фильтров
+        const isFormerFirstPlace = wasFirstPlaceOnRelease(level, currentList, filterUnrated, filter2Player, filterInvisible, filterChallenges);
+        
+        let titleColorClass = '';
+        if (!level.lenght && !level.previewImg) {
+            // Нет ни lenght, ни previewImg - оставляем стандартный цвет
+        } else if (!level.lenght) {
+            // Нет lenght - оранжевый
+            titleColorClass = 'no-length-title';
+        } else if (level.previewImg) {
+            // Есть previewImg - желтый
+            titleColorClass = 'has-preview-title';
+        }
+        
+        if (!level.lenght && level.previewImg) {
+            titleColorClass = 'no-length-has-preview-title';
+        }
+        
+        const previewUrl = level.previewImg 
+            ? level.previewImg 
+            : `images/${level.id}.png`;
+        
+        const isNewLevel = isLevelNew(level.releaseDate);
+        
+        container.innerHTML += `
+            <div class="level ${!level.lenght ? 'no-length-level' : ''}">
+                <div class="level-preview">
+                    <a href="${level.videoUrl}" target="_blank">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiA5Ii8+" 
+                             data-src="${previewUrl}" 
+                             alt="Level Preview" 
+                             loading="lazy" 
+                             width="400" 
+                             height="225">
+                    </a>
+                </div>
+                <div class="level-info">
+                    <h2 class="level-title ${titleColorClass}">#${newPosition} - ${level.title}</h2>
+                    <p class="level-author">Published by ${level.author}</p>
+                    <p class="level-verifier">Verified by ${level.verifier}</p>
+                </div>
+                ${isNewLevel ? '<div class="level-new-container" title="New Level (Verified in last 30 days)"><img src="images/new_label.png" alt="NEW"></div>' : ''}
+                ${isFormerFirstPlace ? '<div class="level-crown-container" title="Former Hardest Level"><img src="images/Crown.png" alt="👑" style="width: 100%; height: 100%; object-fit: contain;"></div>' : ''}
+                <div class="show-in-list" onclick="scrollToLevel(this)">Show in List</div>
+                <div class="level-id" onclick="copyToClipboard(this, '${level.id}')">${level.id}</div>
+            </div>
+        `;
     });
     
     setupLazyLoading();
     showCustomAlert(`Showing top ${filteredLevels.length} ${currentList} levels as of ${date.toLocaleDateString()}`, true);
 }
-
 
 // Основной скрипт
 document.addEventListener('DOMContentLoaded', function() {
@@ -2853,6 +3169,189 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Critical elements not found!');
         return;
     }
+
+// Функция для применения фильтров
+function applyFilters(showAlert = true) {
+    const filterUnrated = document.getElementById('filter-unrated-levels').checked;
+    const filter2Player = document.getElementById('filter-2player-levels').checked;
+    const filterInvisible = document.getElementById('filter-invisible-levels').checked;
+    const filterChallenges = document.getElementById('filter-challenges-levels').checked;
+    
+    // Сохраняем настройки фильтров
+    saveToLocalStorage('filterUnratedLevels', filterUnrated);
+    saveToLocalStorage('filter2PlayerLevels', filter2Player);
+    saveToLocalStorage('filterInvisibleLevels', filterInvisible);
+    saveToLocalStorage('filterChallengesLevels', filterChallenges);
+    
+    // Применяем фильтры ко всем спискам
+    ['classic', 'challenges', 'platformer'].forEach(listType => {
+        const container = document.getElementById(`${listType}-list`);
+        const levels = container.querySelectorAll('.level');
+        
+        let visibleCount = 0;
+        
+        levels.forEach(level => {
+            const levelId = level.querySelector('.level-id').textContent;
+            const levelDataItem = levelData[listType].find(l => l.id === levelId);
+            
+            let shouldShow = true;
+            
+            // Фильтр Unrated уровней
+            if (filterUnrated && levelDataItem && levelDataItem.tags && levelDataItem.tags.includes("Unrated")) {
+                shouldShow = false;
+            }
+            
+            // Фильтр 2-Player уровней
+            if (filter2Player && levelDataItem && levelDataItem.tags && levelDataItem.tags.includes("2Player")) {
+                shouldShow = false;
+            }
+            
+            // Фильтр Invisible уровней
+            if (filterInvisible && levelDataItem && levelDataItem.tags && levelDataItem.tags.includes("Invisible")) {
+                shouldShow = false;
+            }
+            
+            // Фильтр Challenges (длительность ≤ 29 секунд)
+            if (filterChallenges && levelDataItem && levelDataItem.lenght) {
+                const durationSeconds = parseDurationToSeconds(levelDataItem.lenght);
+                if (durationSeconds <= 29) {
+                    shouldShow = false;
+                }
+            }
+            
+            // ВАЖНО: Всегда показываем превью, даже если уровень скрыт
+            const previewImg = level.querySelector('.level-preview img');
+            if (previewImg && previewImg.dataset.src) {
+                previewImg.src = previewImg.dataset.src;
+                previewImg.classList.add('loaded');
+            }
+            
+            level.style.display = shouldShow ? 'flex' : 'none';
+            
+            if (shouldShow) {
+                visibleCount++;
+                
+                // Обновляем позицию
+                const titleElement = level.querySelector('.level-title');
+                titleElement.textContent = titleElement.textContent.replace(/^#\d+/, `#${visibleCount}`);
+                
+                // Пересчитываем иконку Former #1 с учетом фильтров
+                const hasCrown = wasFirstPlaceOnRelease(levelDataItem, listType, filterUnrated, filter2Player, filterInvisible, filterChallenges);
+                const crownContainer = level.querySelector('.level-crown-container');
+                
+                if (hasCrown && !crownContainer) {
+                    level.innerHTML += '<div class="level-crown-container" title="Former Hardest Level"><img src="images/Crown.png" alt="👑" style="width: 100%; height: 100%; object-fit: contain;"></div>';
+                } else if (!hasCrown && crownContainer) {
+                    crownContainer.remove();
+                }
+            }
+        });
+    });
+    
+    // Перезагружаем изображения после применения фильтров
+    setTimeout(() => {
+        setupLazyLoading();
+    }, 100);
+    
+    // Показываем сообщение только если явно указано
+    if (showAlert) {
+        showCustomAlert('Filters applied successfully!', true);
+    }
+}
+
+// Функция для сброса фильтров
+function resetFilters() {
+    // Сбрасываем состояние фильтров
+    document.getElementById('filter-unrated-levels').checked = false;
+    document.getElementById('filter-2player-levels').checked = false;
+    document.getElementById('filter-invisible-levels').checked = false;
+    document.getElementById('filter-challenges-levels').checked = false;
+    
+    // Сохраняем настройки
+    saveToLocalStorage('filterUnratedLevels', false);
+    saveToLocalStorage('filter2PlayerLevels', false);
+    saveToLocalStorage('filterInvisibleLevels', false);
+    saveToLocalStorage('filterChallengesLevels', false);
+    
+    // Перерисовываем уровни без фильтров
+    renderLevels('classic');
+    renderLevels('challenges');
+    renderLevels('platformer');
+    
+    // Восстанавливаем активный список
+    const activeList = localStorage.getItem('activeList') || 'classic';
+    document.querySelector(`.dropdown-content a[data-list="${activeList}"]`).click();
+    
+    showCustomAlert('Filters reset successfully!', true);
+}
+
+// Функция для проверки, был ли уровень на первом месте при выходе с учетом фильтров
+function wasFirstPlaceOnRelease(level, listType, filterUnrated = false, filter2Player = false, filterInvisible = false, filterChallenges = false) {
+    const releaseDate = new Date(level.releaseDate);
+    if (isNaN(releaseDate.getTime())) return false;
+    
+    // Находим индекс текущего уровня в списке
+    const levelIndex = levelData[listType].findIndex(l => l.id === level.id);
+    if (levelIndex === -1) return false;
+    
+    // Находим все уровни, выпущенные до или в тот же день, кроме исключений
+    const levelsBefore = levelData[listType].filter(l => {
+        if (!l.releaseDate) return false;
+        
+        // Применяем фильтр Unrated
+        if (filterUnrated && l.tags && l.tags.includes("Unrated")) {
+            return false;
+        }
+        
+        // Применяем фильтр 2-Player
+        if (filter2Player && l.tags && l.tags.includes("2Player")) {
+            return false;
+        }
+        
+        // Применяем фильтр Invisible
+        if (filterInvisible && l.tags && l.tags.includes("Invisible")) {
+            return false;
+        }
+        
+        // Применяем фильтр Challenges (длительность ≤ 29 секунд)
+        if (filterChallenges && l.lenght) {
+            const durationSeconds = parseDurationToSeconds(l.lenght);
+            if (durationSeconds <= 29) {
+                return false;
+            }
+        }
+        
+        // Игнорируем Amethyst только для Thinking Space II
+        if (level.title === "Thinking Space II" && l.title === "Amethyst") {
+            return false;
+        }
+        
+        // Игнорируем Silent clubstep для Acheron и Acheron buffed
+        const isAcheronGroup = ["Acheron", "Acheron buffed"].includes(level.title);
+        if (isAcheronGroup && l.title === "Silent clubstep") {
+            return false;
+        }
+        
+        const lDate = new Date(l.releaseDate);
+        return lDate <= releaseDate;
+    });
+    
+    // Если нет других уровней или наш уровень самый старый
+    if (levelsBefore.length === 0) return false;
+    
+    // Сортируем по позиции в списке (чем выше позиция - тем сложнее уровень)
+    const sortedByPosition = [...levelsBefore].sort((a, b) => {
+        const posA = levelData[listType].indexOf(a) + 1;
+        const posB = levelData[listType].indexOf(b) + 1;
+        return posA - posB;
+    });
+    
+    // Самый сложный уровень среди выпущенных до или в тот же день
+    const hardestLevel = sortedByPosition[0];
+    
+    // Проверяем, является ли наш уровень самым сложным среди выпущенных в этот день
+    return hardestLevel.id === level.id;
+}
     
     // Функция для инициализации приложения
 function initializeApp() {
@@ -2873,6 +3372,19 @@ function initializeApp() {
     // Восстанавливаем активный список
     const activeList = localStorage.getItem('activeList') || 'classic';
     document.querySelector(`.dropdown-content a[data-list="${activeList}"]`).click();
+    
+// Применяем фильтры после полной загрузки и рендеринга
+const filterUnratedLevels = loadFromLocalStorage('filterUnratedLevels');
+const filter2PlayerLevels = loadFromLocalStorage('filter2PlayerLevels');
+const filterInvisibleLevels = loadFromLocalStorage('filterInvisibleLevels');
+const filterChallengesLevels = loadFromLocalStorage('filterChallengesLevels');
+
+if (filterUnratedLevels || filter2PlayerLevels || filterInvisibleLevels || filterChallengesLevels) {
+    // Небольшая задержка для гарантии полного рендеринга
+    setTimeout(() => {
+        applyFilters(false); // false - не показывать сообщение
+    }, 100);
+}
     
     // Инициализируем ленивую загрузку
     setupLazyLoading();
@@ -2958,6 +3470,11 @@ dropdownLinks.forEach(link => {
     dropdownContent.style.display = 'none';
   });
 });
+
+// Players button handler
+document.getElementById('players-btn').addEventListener('click', () => {
+  window.location.href = 'players.html';
+});
         
         // Demon Roulette обработчики
         rouletteBtn.addEventListener('click', () => {
@@ -3040,6 +3557,47 @@ spinBtn.addEventListener('click', (e) => {
                 e.target.value = '';
             }
         });
+
+        // Filters button handlers
+const filtersBtn = document.getElementById('filters-btn');
+const filtersModal = document.getElementById('filters-modal');
+const filtersClose = document.getElementById('filters-modal-close');
+const filtersApply = document.getElementById('filters-apply-btn');
+
+filtersBtn.addEventListener('click', () => {
+    // Синхронизируем состояние чекбокса с текущими настройками
+    const filterUnratedLevels = loadFromLocalStorage('filterUnratedLevels');
+    document.getElementById('filter-unrated-levels').checked = filterUnratedLevels !== null ? filterUnratedLevels : false;
+    
+    filtersModal.style.display = 'flex';
+    setTimeout(() => {
+        filtersModal.classList.add('active');
+    }, 10);
+});
+
+filtersClose.addEventListener('click', () => {
+    filtersModal.classList.remove('active');
+    setTimeout(() => {
+        filtersModal.style.display = 'none';
+    }, 300);
+});
+
+filtersApply.addEventListener('click', () => {
+    // Получаем новое состояние чекбокса
+    const newFilterState = document.getElementById('filter-unrated-levels').checked;
+    
+    // Сохраняем настройки
+    saveToLocalStorage('filterUnratedLevels', newFilterState);
+    
+    // Применяем фильтры
+    applyFilters();
+    
+    // Закрываем модальное окно
+    filtersModal.classList.remove('active');
+    setTimeout(() => {
+        filtersModal.style.display = 'none';
+    }, 300);
+});
         
         // Time Machine обработчики
         timeMachineBtn.addEventListener('click', () => {
@@ -3106,6 +3664,15 @@ document.addEventListener('keydown', function(e) {
     initializeApp();
 });
 
+// Обработчик для кнопки сброса фильтров
+document.getElementById('filters-reset-btn').addEventListener('click', () => {
+    resetFilters();
+    filtersModal.classList.remove('active');
+    setTimeout(() => {
+        filtersModal.style.display = 'none';
+    }, 300);
+});
+
   </script>
   
 <!-- Модальное окно подтверждения -->
@@ -3149,6 +3716,51 @@ document.addEventListener('keydown', function(e) {
     </div>
     <div class="time-machine-footer">
       <button class="modal-btn" id="time-machine-apply">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно Filters -->
+<div class="modal" id="filters-modal">
+  <div class="modal-content" style="max-width: 450px;">
+    <button class="modal-close" id="filters-modal-close">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="modal-header">
+      <h2 class="modal-title">Filters</h2>
+    </div>
+    <div class="modal-body">
+      <div class="filter-group">
+        <label class="roulette-checkbox-label">
+          <input type="checkbox" id="filter-unrated-levels">
+          <span class="roulette-checkbox-custom"></span>
+          <span>Filter Unrated Levels</span>
+        </label>
+      </div>
+      <div class="filter-group">
+        <label class="roulette-checkbox-label">
+          <input type="checkbox" id="filter-2player-levels">
+          <span class="roulette-checkbox-custom"></span>
+          <span>Filter 2-Player Levels</span>
+        </label>
+      </div>
+      <div class="filter-group">
+        <label class="roulette-checkbox-label">
+          <input type="checkbox" id="filter-invisible-levels">
+          <span class="roulette-checkbox-custom"></span>
+          <span>Filter Invisible Levels</span>
+        </label>
+      </div>
+      <div class="filter-group">
+        <label class="roulette-checkbox-label">
+          <input type="checkbox" id="filter-challenges-levels">
+          <span class="roulette-checkbox-custom"></span>
+          <span>Filter Challenges (≤29s)</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer" style="display: flex; gap: 10px;">
+      <button class="modal-btn" id="filters-apply-btn" style="flex: 1;">Apply Filters</button>
     </div>
   </div>
 </div>
