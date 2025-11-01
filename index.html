@@ -1953,7 +1953,7 @@ function wasFirstPlaceOnRelease(level, listType) {
             return false;
         }
         
-        // Игнорируем Silent clubstep для Acheron, Acheron buffed и Avernus
+        // Игнорируем Silent clubstep для Acheron, Acheron buffed
         const isAcheronGroup = ["Acheron", "Acheron buffed"].includes(level.title);
         if (isAcheronGroup && l.title === "Silent clubstep") {
             return false;
@@ -1989,7 +1989,7 @@ function isLevelNew(releaseDate) {
     
     const currentDate = new Date();
     const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(currentDate.getDate() - 30);
+    thirtyDaysAgo.setDate(currentDate.getDate() - 90);
     
     return release >= thirtyDaysAgo && release <= currentDate;
 }
@@ -2040,7 +2040,7 @@ function generateLevelHTML(level, position, listType) {
         <p class="level-author">Published by ${level.author}</p>
         <p class="level-verifier">Verified by ${level.verifier}</p>
       </div>
-      ${isNewLevel ? '<div class="level-new-container" title="New Level (Verified in last 30 days)"><img src="images/new_label.png" alt="NEW"></div>' : ''}
+      ${isNewLevel ? '<div class="level-new-container" title="New Level (Verified in last 90 days)"><img src="images/new_label.png" alt="NEW"></div>' : ''}
       ${isFormerFirstPlace ? '<div class="level-crown-container" title="Former Hardest Level"><img src="images/Crown.png" alt="👑" style="width: 100%; height: 100%; object-fit: contain;"></div>' : ''}
       <div class="show-in-list" onclick="scrollToLevel(this)">Show in List</div>
       <div class="level-id" onclick="copyToClipboard(this, '${level.id}')">${level.id}</div>
@@ -3122,7 +3122,7 @@ function filterLevelsByDate(date) {
                     <p class="level-author">Published by ${level.author}</p>
                     <p class="level-verifier">Verified by ${level.verifier}</p>
                 </div>
-                ${isNewLevel ? '<div class="level-new-container" title="New Level (Verified in last 30 days)"><img src="images/new_label.png" alt="NEW"></div>' : ''}
+                ${isNewLevel ? '<div class="level-new-container" title="New Level (Verified in last 90 days)"><img src="images/new_label.png" alt="NEW"></div>' : ''}
                 ${isFormerFirstPlace ? '<div class="level-crown-container" title="Former Hardest Level"><img src="images/Crown.png" alt="👑" style="width: 100%; height: 100%; object-fit: contain;"></div>' : ''}
                 <div class="show-in-list" onclick="scrollToLevel(this)">Show in List</div>
                 <div class="level-id" onclick="copyToClipboard(this, '${level.id}')">${level.id}</div>
